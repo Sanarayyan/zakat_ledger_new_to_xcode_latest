@@ -21,8 +21,8 @@
     width: 100%;
     height: 100%;
     max-width: 680px;
-    background: var(--bg-card, #ffffff);
-    color: var(--text-main, #2d3748);
+    background: var(--bg-card);
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -31,10 +31,7 @@
     overflow: hidden;
 }
 
-body.dark-mode .rsm-container {
-    background: #181818;
-    color: #e2e8f0;
-}
+
 
 /* Header */
 .rsm-header {
@@ -45,9 +42,7 @@ body.dark-mode .rsm-container {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-body.dark-mode .rsm-header {
-    border-color: var(--text-muted);
-}
+
 
 .rsm-header-left {
     display: flex;
@@ -90,10 +85,7 @@ body.dark-mode .rsm-header {
     gap: 8px;
 }
 
-body.dark-mode .rsm-tabs {
-    background: rgba(255, 255, 255, 0.01);
-    border-color: var(--text-muted);
-}
+
 
 .rsm-tab-btn {
     flex: 1;
@@ -114,16 +106,16 @@ body.dark-mode .rsm-tabs {
 
 .rsm-tab-btn:hover {
     background: rgba(0, 0, 0, 0.04);
-    color: var(--text-main, #2d3748);
+    color: var(--text-main);
 }
 
 body.dark-mode .rsm-tab-btn:hover {
     background: var(--border);
-    color: #e2e8f0;
+    color: var(--text-main);
 }
 
 .rsm-tab-btn.active {
-    background: var(--primary, #064e3b) !important;
+    background: var(--primary) !important;
     color: white !important;
     box-shadow: 0 4px 14px rgba(6, 78, 59, 0.3);
 }
@@ -145,7 +137,7 @@ body.dark-mode .rsm-tab-btn:hover {
     font-size: 1.1rem;
     font-weight: 800;
     margin: 0 0 4px 0;
-    color: var(--primary, #064e3b);
+    color: var(--primary);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -166,13 +158,10 @@ body.dark-mode .rsm-tab-btn:hover {
     cursor: pointer;
     position: relative;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    background: var(--bg-card-inside, #fafafa);
+    background: var(--bg-surface);
 }
 
-body.dark-mode .rsm-theme-card {
-    border-color: var(--text-muted);
-    background: #202020;
-}
+
 
 .rsm-theme-card:hover {
     transform: translateY(-4px);
@@ -180,7 +169,7 @@ body.dark-mode .rsm-theme-card {
 }
 
 .rsm-theme-card.active {
-    border-color: var(--primary, #064e3b) !important;
+    border-color: var(--primary) !important;
     background: rgba(6, 78, 59, 0.03) !important;
     box-shadow: 0 8px 25px rgba(6, 78, 59, 0.1) !important;
 }
@@ -199,7 +188,7 @@ body.dark-mode .rsm-theme-card {
 }
 
 .theme-preview-modern {
-    background: #ffffff;
+    background: var(--bg-card);
     color: var(--text-main);
 }
 
@@ -209,7 +198,7 @@ body.dark-mode .rsm-theme-card {
 }
 
 .theme-preview-dark {
-    background: #121212;
+    background: var(--bg-body);
     color: #e0e0e0;
 }
 
@@ -239,7 +228,7 @@ body.dark-mode .rsm-theme-card {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: var(--primary, #064e3b);
+    background: var(--primary);
     color: white;
     width: 22px;
     height: 22px;
@@ -262,9 +251,7 @@ body.dark-mode .rsm-theme-card {
     position: relative;
 }
 
-body.dark-mode .rsm-size-control {
-    background: var(--border);
-}
+
 
 .size-label {
     font-weight: bold;
@@ -284,9 +271,7 @@ body.dark-mode .rsm-size-control {
     outline: none;
 }
 
-body.dark-mode .rsm-slider {
-    background: rgba(255,255,255,0.15);
-}
+
 
 .rsm-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -294,7 +279,7 @@ body.dark-mode .rsm-slider {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: var(--primary, #064e3b);
+    background: var(--primary);
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     transition: transform 0.15s ease;
@@ -308,7 +293,7 @@ body.dark-mode .rsm-slider {
     position: absolute;
     right: 24px;
     top: -12px;
-    background: var(--secondary, #d4af37);
+    background: var(--secondary);
     color: white;
     padding: 4px 10px;
     border-radius: 8px;
@@ -327,9 +312,7 @@ body.dark-mode .rsm-slider {
     gap: 20px;
 }
 
-body.dark-mode .rsm-setting-row {
-    border-color: var(--text-muted);
-}
+
 
 .row-info h4 {
     margin: 0 0 4px 0;
@@ -352,9 +335,7 @@ body.dark-mode .rsm-setting-row {
     border-radius: 12px;
 }
 
-body.dark-mode .rsm-toggle-group {
-    background: rgba(255,255,255,0.08);
-}
+
 
 .toggle-btn {
     border: none;
@@ -369,15 +350,12 @@ body.dark-mode .rsm-toggle-group {
 }
 
 .toggle-btn.active {
-    background: #ffffff;
-    color: var(--primary, #064e3b) !important;
+    background: var(--bg-card);
+    color: var(--primary) !important;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-body.dark-mode .toggle-btn.active {
-    background: #282828;
-    color: var(--text-main) !important;
-}
+
 
 /* Switch Styles */
 .rsm-switch {
@@ -423,7 +401,7 @@ body.dark-mode .rsm-switch .slider {
 }
 
 .rsm-switch input:checked + .slider {
-    background-color: var(--primary, #064e3b);
+    background-color: var(--primary);
 }
 
 .rsm-switch input:checked + .slider:before {
@@ -445,15 +423,12 @@ body.dark-mode .rsm-switch .slider {
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 14px;
     cursor: pointer;
-    background: var(--bg-card-inside, #fafafa);
+    background: var(--bg-surface);
     position: relative;
     transition: all 0.2s ease;
 }
 
-body.dark-mode .rsm-reciter-card {
-    border-color: var(--text-muted);
-    background: #202020;
-}
+
 
 .rsm-reciter-card:hover {
     transform: translateY(-2px);
@@ -461,7 +436,7 @@ body.dark-mode .rsm-reciter-card {
 }
 
 .rsm-reciter-card.active {
-    border-color: var(--primary, #064e3b);
+    border-color: var(--primary);
     background: rgba(6, 78, 59, 0.03) !important;
 }
 
@@ -479,7 +454,7 @@ body.dark-mode .rsm-reciter-card {
     right: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--primary, #064e3b);
+    color: var(--primary);
     font-weight: bold;
     font-size: 1rem;
 }
@@ -497,8 +472,8 @@ body.dark-mode .rsm-reciter-card {
     padding: 12px 10px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
-    background: var(--bg-card-inside, #fafafa);
-    color: var(--text-main, #2d3748);
+    background: var(--bg-surface);
+    color: var(--text-main);
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
@@ -506,146 +481,20 @@ body.dark-mode .rsm-reciter-card {
     text-align: center;
 }
 
-body.dark-mode .rsm-speed-pill-btn {
-    border-color: var(--text-muted);
-    background: #202020;
-    color: #e2e8f0;
-}
+
 
 .rsm-speed-pill-btn:hover {
     background: rgba(0, 0, 0, 0.02);
 }
 
 .rsm-speed-pill-btn.active {
-    background: var(--primary, #064e3b) !important;
+    background: var(--primary) !important;
     color: white !important;
-    border-color: var(--primary, #064e3b) !important;
+    border-color: var(--primary) !important;
     box-shadow: 0 4px 12px rgba(6, 78, 59, 0.2);
 }
 
 /* ========================================= */
-/* ACTIVE THEME STYLES ON DETAIL PAGES */
-/* ========================================= */
-
-/* Paper Theme Styles */
-body.theme-paper,
-.app-container.theme-paper {
-    background: #fcf8f2 !important;
-    color: var(--text-main) !important;
-}
-
-.app-container.theme-paper .top-navbar-refined,
-.app-container.theme-paper .detail-header-refined {
-    background: #f5eeda !important;
-    border-color: #e3d7bf !important;
-}
-
-.app-container.theme-paper .detail-header-refined h1,
-.app-container.theme-paper .detail-header-refined p,
-.app-container.theme-paper .detail-header-refined span {
-    color: var(--text-main) !important;
-}
-
-.app-container.theme-paper .page-ayah-item {
-    color: var(--text-main) !important;
-    border-bottom-color: #e8dec7 !important;
-}
-
-.app-container.theme-paper .page-ayah-item.playing,
-.app-container.theme-paper .page-ayah-item.scroll-focused {
-    background: #f2e3c3 !important;
-    border-radius: 8px;
-}
-
-/* Dark Theme Styles */
-body.theme-dark,
-.app-container.theme-dark {
-    background: #121212 !important;
-    color: #e2e8f0 !important;
-}
-
-.app-container.theme-dark .top-navbar-refined,
-.app-container.theme-dark .detail-header-refined {
-    background: #1e1e1e !important;
-    border-color: #2c2c2c !important;
-}
-
-.app-container.theme-dark .detail-header-refined h1,
-.app-container.theme-dark .detail-header-refined p,
-.app-container.theme-dark .detail-header-refined span {
-    color: #e2e8f0 !important;
-}
-
-.app-container.theme-dark .page-ayah-item {
-    color: #cbd5e1 !important;
-    border-bottom-color: #2d2d2d !important;
-}
-
-.app-container.theme-dark .page-ayah-item.playing,
-.app-container.theme-dark .page-ayah-item.scroll-focused {
-    background: #2d3748 !important;
-    border-radius: 8px;
-}
-
-/* Islamic Emerald Theme Styles */
-body.theme-emerald,
-.app-container.theme-emerald {
-    background: #fdfdfc !important;
-    color: var(--text-main) !important;
-}
-
-.app-container.theme-emerald .top-navbar-refined {
-    background: #064e3b !important;
-    border-color: #c5a059 !important;
-    color: #ffffff !important;
-}
-
-.app-container.theme-emerald .top-navbar-refined .header-title {
-    color: #ffffff !important;
-}
-
-.app-container.theme-emerald .top-navbar-refined .btn-three-dots,
-.app-container.theme-emerald .top-navbar-refined .btn-settings svg {
-    color: #ffffff !important;
-}
-
-.app-container.theme-emerald .detail-header-refined {
-    background: #f2f6f3 !important;
-    border-color: rgba(6, 78, 59, 0.15) !important;
-    border-left: 6px solid #064e3b !important;
-    border-right: 6px solid #c5a059 !important;
-}
-
-.app-container.theme-emerald .detail-header-refined h1 {
-    color: var(--text-main) !important;
-}
-
-.app-container.theme-emerald .detail-header-refined .arabic-title {
-    color: #c5a059 !important;
-    font-weight: bold;
-}
-
-.app-container.theme-emerald .page-ayah-item {
-    color: var(--text-main) !important;
-    border-bottom: 1px dashed rgba(6, 78, 59, 0.1) !important;
-}
-
-.app-container.theme-emerald .page-ayah-item.playing,
-.app-container.theme-emerald .page-ayah-item.scroll-focused {
-    background: rgba(6, 78, 59, 0.08) !important;
-    border-radius: 8px;
-    border-right: 4px solid #c5a059;
-}
-
-.app-container.theme-emerald .btn-play-surah {
-    background: #064e3b !important;
-    color: white !important;
-}
-
-.app-container.theme-emerald .btn-play-surah:hover {
-    background: #043e2f !important;
-}
-
 @media (max-width: 480px) {
     .rsm-tabs {
         padding: 6px;

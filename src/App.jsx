@@ -1120,10 +1120,9 @@ function UserDashboard() {
     return (
         <div className="zakat-page-wrapper">
             <div className="app-layout-top">
-            <nav className="top-navbar-refined">
+            <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
-                    className="btn-settings" 
-                    style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0 }}
+                    className="back-btn" 
                     onClick={() => {
                         if (currentView === 'home') {
                             navigate('/home');
@@ -1159,7 +1158,7 @@ function UserDashboard() {
                         </>
                     )}
                 </div>
-            </nav>
+            </header>
 
 
             <main className="main-content-top fade-in">
@@ -2905,7 +2904,6 @@ function QuranPage() {
     const [loading, setLoading] = useState(true);
     const { lang, setLang, t } = useLanguage();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isLightMode, setIsLightMode] = useState(localStorage.getItem('zakat_theme') !== 'dark');
     const [streakUpdate, setStreakUpdate] = useState(0);
 
     useEffect(() => {
@@ -3056,13 +3054,6 @@ function QuranPage() {
         return t('days_ago').replace('{{days}}', days);
     };
 
-    useEffect(() => {
-        const theme = isLightMode ? 'light-mode' : 'dark-mode';
-        document.body.classList.remove('light-mode', 'dark-mode');
-        document.body.classList.add(theme);
-        localStorage.setItem('theme', theme);
-    }, [isLightMode]);
-
     const handleRecentClick = (item) => {
         if (item.type === 'juz') {
             navigate(`/quran/juz/${item.id}`, { state: { ayah: item.ayahNumber } });
@@ -3090,35 +3081,22 @@ function QuranPage() {
         });
     }, []);
 
-    useEffect(() => {
-        if (isLightMode) {
-            document.body.classList.remove('dark-mode');
-            document.body.classList.add('light-mode');
-            localStorage.setItem('zakat_theme', 'light');
-        } else {
-            document.body.classList.add('dark-mode');
-            document.body.classList.remove('light-mode');
-            localStorage.setItem('zakat_theme', 'dark');
-        }
-    }, [isLightMode]);
-
     const switchLang = (l) => setLang(l);
 
     return (
         <div className="app-layout-top">
             {/* ── Top Navbar ── */}
-            <nav className="top-navbar-refined qh-navbar">
+            <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button
-                    className="btn-settings"
-                    style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0 }}
+                    className="back-btn"
                     onClick={() => navigate('/')}
                 >
                     {BACK_ICON}
                 </button>
 
-                <div className="header-title">Quran</div>
+                <h1 className="header-title">Quran</h1>
 
-                <div className="qh-nav-actions">
+                <div className="settings-btn" style={{ background: 'transparent', width: 'auto', padding: 0, gap: '8px', display: 'flex' }}>
                     <button
                         className="qh-icon-btn"
                         title="Continue Reading"
@@ -3138,7 +3116,7 @@ function QuranPage() {
                         </svg>
                     </button>
                 </div>
-            </nav>
+            </header>
 
             {toastMessage && (
                 <div className="notification-toast">
@@ -3475,7 +3453,6 @@ function QuranPage() {
 function QuranBookmarksPage() {
     const navigate = useNavigate();
     const { t } = useLanguage();
-    const [isLightMode] = useState(localStorage.getItem('zakat_theme') !== 'dark');
 
     const [bookmarks, setBookmarks] = useState(() => {
         try { return JSON.parse(localStorage.getItem('quran_bookmarks') || '[]'); } catch { return []; }
@@ -3513,7 +3490,7 @@ function QuranBookmarksPage() {
     };
 
     return (
-        <div className={`app-layout-top ${isLightMode ? 'light-mode' : 'dark-mode'}`}>
+        <div className="app-layout-top">
             {/* ── Header ── */}
             <nav className="bkp-navbar">
                 <button
@@ -3720,7 +3697,6 @@ function SurahDetailPage() {
     const [surah, setSurah] = useState(null);
     const [loading, setLoading] = useState(true);
     const { lang, setLang, t } = useLanguage();
-    const [isLightMode, setIsLightMode] = useState(localStorage.getItem('zakat_theme') !== 'dark');
     const [reciter, setReciter] = useState('ar.alafasy');
     const [viewMode, setViewMode] = useState('ayah'); // 'ayah' or 'page'
     const [playingAyah, setPlayingAyah] = useState(null);
@@ -4023,18 +3999,6 @@ function SurahDetailPage() {
     const switchLang = (l) => setLang(l);
 
     useEffect(() => {
-        if (isLightMode) {
-            document.body.classList.remove('dark-mode');
-            document.body.classList.add('light-mode');
-            localStorage.setItem('zakat_theme', 'light');
-        } else {
-            document.body.classList.add('dark-mode');
-            document.body.classList.remove('light-mode');
-            localStorage.setItem('zakat_theme', 'dark');
-        }
-    }, [isLightMode]);
-
-    useEffect(() => {
         playbackRateRef.current = playbackRate;
         if (audioRef.current) {
             audioRef.current.playbackRate = playbackRate;
@@ -4178,23 +4142,21 @@ function SurahDetailPage() {
 
 
     return (
-        <div className={`app-container theme-${quranTheme} ${isLightMode ? 'light-mode' : 'dark-mode'}`}>
-            <nav className="top-navbar-refined">
+        <div className="app-container">
+            <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
-                    className="btn-settings" 
-                    style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0 }}
+                    className="back-btn" 
                     onClick={() => navigate(mode === 'khatam' ? '/quran?khatam=true' : '/quran')}
+                    aria-label="Go Back"
                 >
                     {BACK_ICON}
                 </button>
 
-                <div className="header-title">
+                <h1 className="header-title">
                     {loading ? '...' : surah?.englishName}
-                </div>
+                </h1>
 
-
-
-                <div className="top-menu-container" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div className="settings-btn" style={{ background: 'transparent', padding: 0 }}>
                     <button className="btn-three-dots" onClick={() => setIsTopMenuOpen(!isTopMenuOpen)}>⋮</button>
                     
                     {isTopMenuOpen && (
@@ -4233,7 +4195,7 @@ function SurahDetailPage() {
                         </>
                     )}
                 </div>
-            </nav>
+            </header>
 
             <main className={`surah-detail-content fade-in quran-container ${viewMode === 'page' ? 'page-mode' : ''}`}>
                 <div className="view-mode-toggle-wrapper">
@@ -4601,7 +4563,7 @@ function AdminPanel() {
             <div className="auth-container fade-in">
                 <form className="auth-card" onSubmit={handleLogin}>
                     <div className="logo-section">
-                        <div className="logo-icon">🛠️</div>
+                        <div className="logo-icon"><img src="/muslim-plus-logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div>
                         <h1>Admin<span>Portal</span></h1>
                         <p>Developer Access Only</p>
                     </div>
@@ -4619,7 +4581,7 @@ function AdminPanel() {
     return (
         <div className="app-layout">
             <nav className="sidebar">
-                <div className="sidebar-brand"><div className="logo-icon">🌙</div><h2>Admin View</h2></div>
+                <div className="sidebar-brand"><div className="logo-icon"><img src="/muslim-plus-logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div><h2>Admin View</h2></div>
                 <div className="nav-links">
                     <div className="nav-item active">Global Audit</div>
                     <div className="nav-item" onClick={() => window.location.href = '/'}>Exit Admin</div>
@@ -4832,7 +4794,6 @@ const JuzDetailPage = () => {
     };
 
     const { lang, setLang, t } = useLanguage();
-    const [isLightMode, setIsLightMode] = useState(localStorage.getItem('zakat_theme') !== 'dark');
     
     const audioRef = useRef(null);
 
@@ -5068,28 +5029,26 @@ const JuzDetailPage = () => {
         }
     };
 
-    if (loading) return <div className="loading-container dark-mode-ready"><div className="loader"></div><p style={{marginTop: '15px', color: '#c5a059'}}>{t('loading') || 'Loading Juz...'}</p></div>;
-    if (error) return <div className="loading-container dark-mode-ready"><p style={{color: 'red'}}>{error}</p><button onClick={() => window.location.reload()} className="btn-retry">{t('retry') || 'Retry'}</button></div>;
+    if (loading) return <div className="loading-container dark-mode-ready"><div className="loader"></div><p style={{marginTop: '15px', color: 'var(--primary)'}}>{t('loading') || 'Loading Juz...'}</p></div>;
+    if (error) return <div className="loading-container dark-mode-ready"><p style={{color: 'var(--danger, red)'}}>{error}</p><button onClick={() => window.location.reload()} className="btn-retry">{t('retry') || 'Retry'}</button></div>;
     if (!juzData) return null;
 
     return (
-        <div className={`app-container theme-${quranTheme} ${isLightMode ? 'light-mode' : 'dark-mode'}`}>
-            <nav className="top-navbar-refined">
+        <div className={`app-container theme-${quranTheme}`}>
+            <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
-                    className="btn-settings" 
-                    style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0 }}
+                    className="back-btn" 
                     onClick={() => navigate(mode === 'khatam' ? '/quran?khatam=true' : '/quran')}
+                    aria-label="Go Back"
                 >
                     {BACK_ICON}
                 </button>
 
-                <div className="header-title">
+                <h1 className="header-title">
                     {t('juz_label')} {id}
-                </div>
+                </h1>
 
-
-
-                <div className="top-menu-container" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div className="settings-btn" style={{ background: 'transparent', padding: 0 }}>
                     <button className="btn-three-dots" onClick={() => setIsTopMenuOpen(!isTopMenuOpen)}>⋮</button>
                     
                     {isTopMenuOpen && (
@@ -5128,7 +5087,7 @@ const JuzDetailPage = () => {
                         </>
                     )}
                 </div>
-            </nav>
+            </header>
 
             <main className={`surah-detail-content fade-in quran-container ${viewMode === 'page' ? 'page-mode' : ''}`}>
                 <div className="view-mode-toggle-wrapper">
@@ -5413,17 +5372,6 @@ const JuzDetailPage = () => {
 
 function HomePage() {
     const navigate = useNavigate();
-    const [isLightMode] = useState(localStorage.getItem('theme') !== 'dark-mode');
-    
-    useEffect(() => {
-        if (isLightMode) {
-            document.body.classList.remove('dark-mode');
-            document.body.classList.add('light-mode');
-        } else {
-            document.body.classList.add('dark-mode');
-            document.body.classList.remove('light-mode');
-        }
-    }, [isLightMode]);
 
     const features = [
         {
@@ -5445,7 +5393,7 @@ function HomePage() {
     ];
 
     return (
-        <div className={`home-selection-container ${isLightMode ? 'light-mode' : 'dark-mode'}`}>
+        <div className="home-selection-container">
             <header className="home-header">
                 <img src="/muslim-plus-logo.png" alt="Logo" className="home-logo" />
                 <h1>Islamic Ledger</h1>
@@ -5482,9 +5430,15 @@ function AsmaPageWrapper() {
 }
 
 function App() {
+    const [showSplash, setShowSplash] = useState(true);
     const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
         return localStorage.getItem('app_onboarding_completed') === 'true';
     });
+
+    useEffect(() => {
+        const timer = setTimeout(() => setShowSplash(false), 2500);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         if (!hasCompletedOnboarding) return;
@@ -5503,6 +5457,16 @@ function App() {
             if (window.checkAppRating) window.checkAppRating('launch');
         }, 3000);
     }, [hasCompletedOnboarding]);
+
+    if (showSplash) {
+        return (
+            <div className="premium-splash-screen fade-in">
+                <div className="splash-logo-container">
+                    <img src="/muslim-plus-logo.png" alt="Muslim Plus Logo" className="splash-logo" />
+                </div>
+            </div>
+        );
+    }
 
     if (!hasCompletedOnboarding) {
         return <AppOnboarding onComplete={() => setHasCompletedOnboarding(true)} />;

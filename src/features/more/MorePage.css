@@ -14,10 +14,11 @@
     justify-content: center;
     padding-top: env(safe-area-inset-top, 0);
     min-height: calc(56px + env(safe-area-inset-top, 0));
-    background: var(--header-bg, #fff);
+    background: var(--bg-glass);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
-    z-index: 100;
+    z-index: 1000;
 }
 
 .back-btn {
