@@ -1,0 +1,663 @@
+/* Fullscreen Quran Reading Settings Styles & Aesthetics */
+
+.rsm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+.rsm-container {
+    width: 100%;
+    height: 100%;
+    max-width: 680px;
+    background: var(--bg-card, #ffffff);
+    color: var(--text-main, #2d3748);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    font-family: 'Outfit', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-mode .rsm-container {
+    background: #181818;
+    color: #e2e8f0;
+}
+
+/* Header */
+.rsm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .rsm-header {
+    border-color: var(--text-muted);
+}
+
+.rsm-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rsm-header-icon {
+    font-size: 1.5rem;
+}
+
+.rsm-header h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.rsm-close-btn {
+    font-size: 2.2rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.rsm-close-btn:hover {
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+/* Tabs */
+.rsm-tabs {
+    display: flex;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    gap: 8px;
+}
+
+body.dark-mode .rsm-tabs {
+    background: rgba(255, 255, 255, 0.01);
+    border-color: var(--text-muted);
+}
+
+.rsm-tab-btn {
+    flex: 1;
+    padding: 14px 10px;
+    border: none;
+    background: none;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rsm-tab-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-main, #2d3748);
+}
+
+body.dark-mode .rsm-tab-btn:hover {
+    background: var(--border);
+    color: #e2e8f0;
+}
+
+.rsm-tab-btn.active {
+    background: var(--primary, #064e3b) !important;
+    color: white !important;
+    box-shadow: 0 4px 14px rgba(6, 78, 59, 0.3);
+}
+
+/* Content */
+.rsm-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px;
+}
+
+.rsm-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.rsm-section h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    color: var(--primary, #064e3b);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.01em;
+}
+
+/* Theme Previews & Cards */
+.rsm-themes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.rsm-theme-card {
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--bg-card-inside, #fafafa);
+}
+
+body.dark-mode .rsm-theme-card {
+    border-color: var(--text-muted);
+    background: #202020;
+}
+
+.rsm-theme-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.rsm-theme-card.active {
+    border-color: var(--primary, #064e3b) !important;
+    background: rgba(6, 78, 59, 0.03) !important;
+    box-shadow: 0 8px 25px rgba(6, 78, 59, 0.1) !important;
+}
+
+.rsm-theme-preview {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.preview-text {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.theme-preview-modern {
+    background: #ffffff;
+    color: var(--text-main);
+}
+
+.theme-preview-paper {
+    background: #fcf8f2;
+    color: var(--text-main);
+}
+
+.theme-preview-dark {
+    background: #121212;
+    color: #e0e0e0;
+}
+
+.theme-preview-emerald {
+    background: #f2f6f3;
+    color: var(--text-main);
+    border-left: 4px solid #c5a059;
+}
+
+.rsm-theme-info {
+    padding: 14px;
+}
+
+.rsm-theme-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.rsm-theme-info p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.rsm-theme-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--primary, #064e3b);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Size Slider */
+.rsm-size-control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 20px 24px;
+    border-radius: 16px;
+    position: relative;
+}
+
+body.dark-mode .rsm-size-control {
+    background: var(--border);
+}
+
+.size-label {
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.size-label.small { font-size: 0.85rem; }
+.size-label.large { font-size: 1.3rem; }
+
+.rsm-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 100px;
+    background: rgba(0,0,0,0.1);
+    outline: none;
+}
+
+body.dark-mode .rsm-slider {
+    background: rgba(255,255,255,0.15);
+}
+
+.rsm-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--primary, #064e3b);
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.15s ease;
+}
+
+.rsm-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.size-value-badge {
+    position: absolute;
+    right: 24px;
+    top: -12px;
+    background: var(--secondary, #d4af37);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Rows & Toggles */
+.rsm-setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    gap: 20px;
+}
+
+body.dark-mode .rsm-setting-row {
+    border-color: var(--text-muted);
+}
+
+.row-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.row-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Toggles & Selection Buttons */
+.rsm-toggle-group {
+    display: flex;
+    gap: 8px;
+    background: rgba(0,0,0,0.05);
+    padding: 4px;
+    border-radius: 12px;
+}
+
+body.dark-mode .rsm-toggle-group {
+    background: rgba(255,255,255,0.08);
+}
+
+.toggle-btn {
+    border: none;
+    background: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+    background: #ffffff;
+    color: var(--primary, #064e3b) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+body.dark-mode .toggle-btn.active {
+    background: #282828;
+    color: var(--text-main) !important;
+}
+
+/* Switch Styles */
+.rsm-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.rsm-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.rsm-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.1);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+body.dark-mode .rsm-switch .slider {
+    background-color: var(--text-muted);
+}
+
+.rsm-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.rsm-switch input:checked + .slider {
+    background-color: var(--primary, #064e3b);
+}
+
+.rsm-switch input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* Reciter Custom Grid */
+.rsm-reciter-select-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.rsm-reciter-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    cursor: pointer;
+    background: var(--bg-card-inside, #fafafa);
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+body.dark-mode .rsm-reciter-card {
+    border-color: var(--text-muted);
+    background: #202020;
+}
+
+.rsm-reciter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.rsm-reciter-card.active {
+    border-color: var(--primary, #064e3b);
+    background: rgba(6, 78, 59, 0.03) !important;
+}
+
+.reciter-avatar {
+    font-size: 1.25rem;
+}
+
+.reciter-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.rsm-reciter-check {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary, #064e3b);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Speed Pills */
+.rsm-speed-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rsm-speed-pill-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 12px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: var(--bg-card-inside, #fafafa);
+    color: var(--text-main, #2d3748);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+}
+
+body.dark-mode .rsm-speed-pill-btn {
+    border-color: var(--text-muted);
+    background: #202020;
+    color: #e2e8f0;
+}
+
+.rsm-speed-pill-btn:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.rsm-speed-pill-btn.active {
+    background: var(--primary, #064e3b) !important;
+    color: white !important;
+    border-color: var(--primary, #064e3b) !important;
+    box-shadow: 0 4px 12px rgba(6, 78, 59, 0.2);
+}
+
+/* ========================================= */
+/* ACTIVE THEME STYLES ON DETAIL PAGES */
+/* ========================================= */
+
+/* Paper Theme Styles */
+body.theme-paper,
+.app-container.theme-paper {
+    background: #fcf8f2 !important;
+    color: var(--text-main) !important;
+}
+
+.app-container.theme-paper .top-navbar-refined,
+.app-container.theme-paper .detail-header-refined {
+    background: #f5eeda !important;
+    border-color: #e3d7bf !important;
+}
+
+.app-container.theme-paper .detail-header-refined h1,
+.app-container.theme-paper .detail-header-refined p,
+.app-container.theme-paper .detail-header-refined span {
+    color: var(--text-main) !important;
+}
+
+.app-container.theme-paper .page-ayah-item {
+    color: var(--text-main) !important;
+    border-bottom-color: #e8dec7 !important;
+}
+
+.app-container.theme-paper .page-ayah-item.playing,
+.app-container.theme-paper .page-ayah-item.scroll-focused {
+    background: #f2e3c3 !important;
+    border-radius: 8px;
+}
+
+/* Dark Theme Styles */
+body.theme-dark,
+.app-container.theme-dark {
+    background: #121212 !important;
+    color: #e2e8f0 !important;
+}
+
+.app-container.theme-dark .top-navbar-refined,
+.app-container.theme-dark .detail-header-refined {
+    background: #1e1e1e !important;
+    border-color: #2c2c2c !important;
+}
+
+.app-container.theme-dark .detail-header-refined h1,
+.app-container.theme-dark .detail-header-refined p,
+.app-container.theme-dark .detail-header-refined span {
+    color: #e2e8f0 !important;
+}
+
+.app-container.theme-dark .page-ayah-item {
+    color: #cbd5e1 !important;
+    border-bottom-color: #2d2d2d !important;
+}
+
+.app-container.theme-dark .page-ayah-item.playing,
+.app-container.theme-dark .page-ayah-item.scroll-focused {
+    background: #2d3748 !important;
+    border-radius: 8px;
+}
+
+/* Islamic Emerald Theme Styles */
+body.theme-emerald,
+.app-container.theme-emerald {
+    background: #fdfdfc !important;
+    color: var(--text-main) !important;
+}
+
+.app-container.theme-emerald .top-navbar-refined {
+    background: #064e3b !important;
+    border-color: #c5a059 !important;
+    color: #ffffff !important;
+}
+
+.app-container.theme-emerald .top-navbar-refined .header-title {
+    color: #ffffff !important;
+}
+
+.app-container.theme-emerald .top-navbar-refined .btn-three-dots,
+.app-container.theme-emerald .top-navbar-refined .btn-settings svg {
+    color: #ffffff !important;
+}
+
+.app-container.theme-emerald .detail-header-refined {
+    background: #f2f6f3 !important;
+    border-color: rgba(6, 78, 59, 0.15) !important;
+    border-left: 6px solid #064e3b !important;
+    border-right: 6px solid #c5a059 !important;
+}
+
+.app-container.theme-emerald .detail-header-refined h1 {
+    color: var(--text-main) !important;
+}
+
+.app-container.theme-emerald .detail-header-refined .arabic-title {
+    color: #c5a059 !important;
+    font-weight: bold;
+}
+
+.app-container.theme-emerald .page-ayah-item {
+    color: var(--text-main) !important;
+    border-bottom: 1px dashed rgba(6, 78, 59, 0.1) !important;
+}
+
+.app-container.theme-emerald .page-ayah-item.playing,
+.app-container.theme-emerald .page-ayah-item.scroll-focused {
+    background: rgba(6, 78, 59, 0.08) !important;
+    border-radius: 8px;
+    border-right: 4px solid #c5a059;
+}
+
+.app-container.theme-emerald .btn-play-surah {
+    background: #064e3b !important;
+    color: white !important;
+}
+
+.app-container.theme-emerald .btn-play-surah:hover {
+    background: #043e2f !important;
+}
+
+@media (max-width: 480px) {
+    .rsm-tabs {
+        padding: 6px;
+    }
+    
+    .rsm-tab-btn {
+        padding: 10px 4px;
+        font-size: 0.8rem;
+        gap: 4px;
+    }
+    
+    .rsm-themes-grid, .rsm-reciter-select-grid {
+        grid-template-columns: 1fr;
+    }
+}

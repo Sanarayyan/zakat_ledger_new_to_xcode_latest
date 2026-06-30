@@ -1,0 +1,1269 @@
+.tasbih-wrapper {
+    position: relative;
+    height: 100dvh;
+    min-height: 100dvh;
+    width: 100vw;
+    background: #020617; /* Fallback background */
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden; /* Fixes vertical overflow / bounce */
+    overscroll-behavior-y: none;
+}
+
+
+
+/* Header — three-column premium layout */
+.tasbih-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 12px 18px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    z-index: 100;
+    gap: 8px;
+}
+
+/* Title perfectly centered in the grid */
+.tasbih-header-title {
+    grid-column: 2;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    opacity: 0.95;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 2px 12px rgba(52, 211, 153, 0.18);
+}
+
+/* Left controls group: back + reset + goal */
+.tap-left-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+/* Right controls group: audio + environment + settings */
+.tap-right-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.tasbih-btn-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+    flex-shrink: 0;
+}
+.tasbih-btn-icon:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: var(--text-muted);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.tasbih-btn-icon:active { transform: scale(0.91); background: rgba(255,255,255,0.12); border-color: var(--text-muted); box-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+
+/* Goal button - soft emerald tint to indicate active state */
+.goal-btn {
+    border-color: rgba(52, 211, 153, 0.18) !important;
+}
+
+/* Header Audio Toggle Button */
+.audio-toggle-btn {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.audio-toggle-btn.active {
+    color: #34d399 !important;
+    background: rgba(52, 211, 153, 0.1) !important;
+    border-color: rgba(52, 211, 153, 0.25) !important;
+    box-shadow: 0 0 15px rgba(52, 211, 153, 0.15);
+}
+
+.audio-toggle-btn.muted {
+    color: var(--text-muted) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-color: var(--text-muted) !important;
+}
+
+.audio-toggle-btn svg {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.audio-toggle-btn:active svg {
+    transform: scale(0.85);
+}
+
+/* Split Screen Interaction Zones */
+.tap-left, .tap-right {
+    position: fixed;
+    top: 70px;
+    bottom: 100px; /* Leave space for bottom selector */
+    width: 50%;
+    z-index: 50;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.tap-left { left: 0; }
+.tap-right { right: 0; }
+
+/* Main Focus */
+.main-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center to fix the downward push bug */
+    position: relative;
+    z-index: 10;
+    touch-action: pan-y; /* Allow vertical scroll just in case, but block pinch zoom */
+    min-height: 0; /* Extremely important: allows flexbox to compress this container on small screens */
+    width: 100%;
+}
+
+/* Dhikr Display Container */
+.active-dhikr-container {
+    position: relative;
+    margin: max(2vh, 16px) auto max(1.5vh, 12px) auto; /* Better breathing room */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px; /* Reduced gap */
+    z-index: 60;
+    width: 90%;
+    max-width: 380px;
+    flex-shrink: 0;
+}
+
+.active-dhikr-display {
+    background: linear-gradient(135deg, rgba(20, 35, 30, 0.6), rgba(8, 16, 13, 0.75));
+    padding: 12px 18px; /* Reduced padding */
+    border-radius: 20px; /* Refined radius */
+    border: 1px solid rgba(52, 211, 153, 0.18);
+    backdrop-filter: blur(16px);
+    width: 100%;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Tighter gap */
+    transition: all 0.3s ease;
+}
+.dhikr-arabic-row {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 12px; /* Prevent text from touching edges */
+}
+.dhikr-arabic { 
+    font-size: 1.4rem; /* Slightly reduced */
+    font-weight: 700; 
+    color: #34d399; 
+    opacity: 0.98; 
+    text-shadow: 0 3px 12px rgba(52, 211, 153, 0.25);
+    line-height: 1.35;
+}
+.dhikr-english-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.dhikr-name { 
+    font-size: 1rem; /* Slightly reduced */
+    font-weight: 700; 
+    color: #fff;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+.dhikr-meaning { 
+    font-size: 0.8rem; /* Slightly reduced */
+    color: var(--text-muted); 
+    font-style: normal;
+    line-height: 1.45;
+    font-weight: 400;
+    max-width: 95%; /* Allowed slightly more width */
+    margin-top: 2px;
+}
+
+.view-all-dhikr-btn {
+    background: rgba(52, 211, 153, 0.06);
+    border: 1px solid rgba(52, 211, 153, 0.16);
+    color: rgba(52, 211, 153, 0.85);
+    font-size: 0.7rem; /* Reduced */
+    font-weight: 600;
+    padding: 6px 14px; /* Reduced */
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(4px);
+    margin-top: 2px;
+}
+.floating-controls-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px; /* Increased gap between buttons */
+    margin: max(1vh, 8px) auto max(3vh, 18px) auto; /* Good distance from circle */
+    padding: 10px 28px; /* Slightly larger pill */
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    backdrop-filter: blur(8px);
+    width: fit-content;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 80;
+    flex-shrink: 0;
+}
+.view-all-dhikr-btn:active { 
+    transform: scale(0.95); 
+    background: rgba(52, 211, 153, 0.12); 
+    border-color: rgba(52, 211, 153, 0.3);
+    color: rgba(52, 211, 153, 1); 
+}
+
+/* Count Display - Transparent, Clean, Immersive Center */
+.tasbih-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 20;
+    pointer-events: none;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    
+    /* Removed all blur, fog, and glassmorphism. Let the natural background shine through perfectly */
+}
+.tasbih-main-number {
+    font-size: 96px;
+    font-weight: 500;
+    line-height: 1;
+    color: #ffffff;
+    /* Elegant, soft text shadow avoiding harsh clipping */
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    letter-spacing: -2px;
+}
+.goal-fraction {
+    font-size: 0.4em;
+    opacity: 0.55;
+    font-weight: 600;
+    vertical-align: middle;
+}
+.tasbih-success-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.tasbih-loop-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.5;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.target-slash { opacity: 0.3; margin: 0 4px; }
+.target-num { opacity: 0.5; }
+
+/* Bead Container & Beads */
+.bead-container {
+    position: relative;
+    pointer-events: none;
+    margin: 0 auto 71px auto; /* Margin bottom 71px keeps circle completely locked in place while wrapper shrinks */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 200; /* Ensure it stays above background visually */
+    /* width and height are dynamically set by JS to guarantee a perfect circle */
+}
+
+/* Beautiful thread connecting the beads */
+.bead-thread {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100% !important;
+    height: 100% !important;
+    border: 2px solid rgba(6, 78, 59, 0.72); /* Woven solid dark emerald cord */
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: drop-shadow(0 2.5px 3.5px rgba(0, 0, 0, 0.55)); /* Soft depth shadow */
+}
+
+.bead {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+    transform-origin: center;
+    will-change: transform;
+    transform: translateZ(0); /* Prevent Android WebView jump */
+    backface-visibility: hidden;
+}
+
+/* Realistic Bead Themes */
+
+/* 1. Turquoise Marble - Cyan Gem with Natural Stone Veins */
+.bead.turquoise-marble {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 25%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0,35 Q25,45 50,15 T100,45 M20,100 Q45,55 75,75 T100,15' fill='none' stroke='rgba(15, 118, 110, 0.4)' stroke-width='1.5'/%3E%3Cpath d='M30,0 Q15,35 60,55 T85,100' fill='none' stroke='rgba(255, 255, 255, 0.45)' stroke-width='1'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 35% 35%, #22d3ee 0%, #0891b2 45%, #0369a1 75%, #042f2e 100%);
+    box-shadow: 
+        inset -4px -4px 10px rgba(0, 0, 0, 0.65), 
+        inset 3px 3px 6px rgba(255, 255, 255, 0.9), 
+        0 8px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* 2. Walnut Wood - Dark Wood Ring Texture */
+.bead.walnut-wood {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 35%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='35' r='12' fill='none' stroke='rgba(69, 26, 3, 0.35)' stroke-width='2'/%3E%3Ccircle cx='35' cy='35' r='24' fill='none' stroke='rgba(69, 26, 3, 0.3)' stroke-width='1.8'/%3E%3Ccircle cx='35' cy='35' r='38' fill='none' stroke='rgba(69, 26, 3, 0.25)' stroke-width='1.5'/%3E%3Ccircle cx='35' cy='35' r='52' fill='none' stroke='rgba(69, 26, 3, 0.15)' stroke-width='1.2'/%3E%3Cpath d='M0,80 Q50,95 100,70' fill='none' stroke='rgba(69, 26, 3, 0.25)' stroke-width='1.5'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 35% 35%, #a16207 0%, #713f12 50%, #451a03 85%, #1c0a02 100%);
+    box-shadow: 
+        inset -4px -4px 10px rgba(0, 0, 0, 0.7), 
+        inset 2px 2px 5px rgba(255, 255, 255, 0.4), 
+        0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* 3. Amber Crystal - Golden Translucent Honey Glow */
+.bead.amber-crystal {
+    background: 
+        radial-gradient(circle at 28% 28%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 25%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpolygon points='18,32 23,29 21,34' fill='rgba(251, 146, 60, 0.45)'/%3E%3Cpolygon points='58,68 63,63 60,70' fill='rgba(255, 255, 255, 0.55)'/%3E%3Cpolygon points='38,22 42,20 40,24' fill='rgba(251, 146, 60, 0.35)'/%3E%3Cpolygon points='78,38 83,35 80,41' fill='rgba(255, 255, 255, 0.45)'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 35% 35%, #fbbf24 0%, #ea580c 45%, #9a3412 80%, #431407 100%);
+    box-shadow: 
+        inset -4px -4px 10px rgba(0, 0, 0, 0.55), 
+        inset 3px 3px 6px rgba(255, 255, 255, 0.9), 
+        0 0 15px rgba(234, 88, 12, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* 4. Black Obsidian - Sleek Gloss Dark Stone */
+.bead.black-obsidian {
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.1) 15%, rgba(255, 255, 255, 0) 35%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 25%),
+        radial-gradient(circle at 35% 35%, #475569 0%, #1e293b 35%, #0f172a 70%, #020617 100%);
+    box-shadow: 
+        inset -5px -5px 12px rgba(0, 0, 0, 0.95), 
+        inset 2px 2px 5px rgba(255, 255, 255, 0.5), 
+        0 8px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* 5. Rose Pearl - Elegant Feminine Satin Luster */
+.bead.rose-pearl {
+    background: 
+        radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.35) 20%, rgba(255, 255, 255, 0) 45%),
+        radial-gradient(circle at 30% 30%, #fdf2f8 0%, #fbcfe8 30%, #f472b6 65%, #db2777 85%, #881337 100%);
+    box-shadow: 
+        inset -3px -3px 8px rgba(136, 19, 55, 0.45), 
+        inset 3px 3px 6px rgba(255, 255, 255, 0.95), 
+        0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* 6. Emerald Stone - Deep Green Crystalline facets */
+.bead.emerald-stone {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 25%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cline x1='15' y1='25' x2='45' y2='65' stroke='rgba(5, 46, 22, 0.4)' stroke-width='1.5'/%3E%3Cline x1='55' y1='15' x2='85' y2='45' stroke='rgba(255, 255, 255, 0.3)' stroke-width='1'/%3E%3Cline x1='5' y1='85' x2='95' y2='95' stroke='rgba(5, 46, 22, 0.3)' stroke-width='1.2'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 35% 35%, #34d399 0%, #059669 40%, #047857 70%, #064e3b 100%);
+    box-shadow: 
+        inset -4px -4px 10px rgba(0, 0, 0, 0.65), 
+        inset 3px 3px 6px rgba(255, 255, 255, 0.85), 
+        0 0 12px rgba(52, 211, 153, 0.25),
+        0 8px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* 7. Ivory Marble - Polished Cream Stone with Taupe Veins */
+.bead.ivory-marble {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 25%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M15,0 Q35,45 25,75 T85,100 M5,85 Q55,55 100,95' fill='none' stroke='rgba(139, 92, 26, 0.16)' stroke-width='1.5'/%3E%3Cpath d='M45,0 Q65,35 55,100' fill='none' stroke='rgba(255, 255, 255, 0.55)' stroke-width='1'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 35% 35%, #fafaf9 0%, #f5f5f4 35%, #e7e5e4 70%, #d6d3d1 100%);
+    box-shadow: 
+        inset -3px -3px 8px rgba(0, 0, 0, 0.25), 
+        inset 3px 3px 5px rgba(255, 255, 255, 0.95), 
+        0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* Classic Bead Themes Refined */
+.bead.marble-white {
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 30%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M10,25 Q30,40 55,15 T95,40 M15,85 Q40,50 70,70 T100,15' fill='none' stroke='rgba(55, 65, 81, 0.18)' stroke-width='1.2'/%3E%3Cpath d='M35,0 Q20,30 65,50 T90,90' fill='none' stroke='rgba(255, 255, 255, 0.45)' stroke-width='1'/%3E%3Cpath d='M5,55 Q45,30 80,75' fill='none' stroke='rgba(17, 24, 39, 0.12)' stroke-width='0.9' stroke-linecap='round'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 35% 35%, #ffffff 0%, #f4f4f5 35%, #e4e4e7 68%, #b5b5ba 90%, #8c8c93 100%);
+    box-shadow: 
+        inset -5px -5px 11px rgba(0, 0, 0, 0.32), 
+        inset 4px 4px 7px rgba(255, 255, 255, 0.95), 
+        0 8px 16px rgba(0, 0, 0, 0.42);
+}
+.bead.black-stone {
+    background: radial-gradient(circle at 30% 30%, #666 0%, #262626 50%, #0d0d0d 85%, #000 100%);
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.85), inset 2px 2px 4px rgba(255,255,255,0.25), 0 6px 12px rgba(0,0,0,0.5);
+}
+.bead.emerald {
+    background: radial-gradient(circle at 30% 30%, #52e58c 0%, #166534 50%, #052e16 90%, #011408 100%);
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.65), inset 2px 2px 6px rgba(255,255,255,0.45), 0 6px 12px rgba(0,0,0,0.4);
+}
+.bead.wood-brown {
+    background: radial-gradient(circle at 30% 30%, #eab308 0%, #854d0e 55%, #451a03 85%, #1e0901 100%);
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.65), inset 2px 2px 4px rgba(255,255,255,0.25), 0 6px 12px rgba(0,0,0,0.45);
+}
+.bead.pearl {
+    background: radial-gradient(circle at 35% 35%, #fff 0%, #f8fafc 40%, #e2e8f0 75%, #94a3b8 100%);
+    box-shadow: inset -2px -2px 6px rgba(0,0,0,0.2), inset 2px 2px 6px rgba(255,255,255,0.95), 0 6px 12px rgba(0,0,0,0.3);
+}
+.bead.rose-crystal {
+    background: radial-gradient(circle at 30% 30%, #fbcfe8 0%, #ec4899 50%, #9d174d 85%, #500724 100%);
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.45), inset 2px 2px 5px rgba(255,255,255,0.65), 0 6px 12px rgba(0,0,0,0.35);
+}
+.bead.amber {
+    background: radial-gradient(circle at 30% 30%, #fde047 0%, #d97706 50%, #78350f 85%, #3c1402 100%);
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.55), inset 2px 2px 5px rgba(255,255,255,0.55), 0 6px 12px rgba(0,0,0,0.45);
+}
+.bead.silver-metal {
+    background: radial-gradient(circle at 30% 30%, #fdfdfd 0%, #cbd5e1 45%, #64748b 75%, #1e293b 100%);
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.55), inset 2px 2px 6px rgba(255,255,255,0.85), 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.bead.ocean-pearl { background: url('/beads/ocean-pearl.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.3), inset 2px 2px 6px rgba(255,255,255,0.7), 0 4px 8px rgba(0,0,0,0.3); }
+.bead.cloud-opal { background: url('/beads/cloud-opal.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.3), inset 2px 2px 6px rgba(255,255,255,0.7), 0 4px 8px rgba(0,0,0,0.3); }
+.bead.sakura-pearl { background: url('/beads/sakura-pearl.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.3), inset 2px 2px 6px rgba(255,255,255,0.7), 0 4px 8px rgba(0,0,0,0.3); }
+.bead.honey-amber { background: url('/beads/honey-amber.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.3), inset 2px 2px 6px rgba(255,255,255,0.7), 0 4px 8px rgba(0,0,0,0.3); }
+.bead.blueberry-night { background: url('/beads/blueberry-night.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), inset 2px 2px 6px rgba(255,255,255,0.5), 0 4px 8px rgba(0,0,0,0.4); }
+.bead.watermelon { background: url('/beads/watermelon.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), inset 2px 2px 6px rgba(255,255,255,0.5), 0 4px 8px rgba(0,0,0,0.3); }
+.bead.strawberry-quartz { background: url('/beads/strawberry-quartz.png') center/cover; box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), inset 2px 2px 6px rgba(255,255,255,0.5), 0 4px 8px rgba(0,0,0,0.3); }
+
+/* Active Highlight Ring State */
+.bead.active {
+    box-shadow: 
+        0 0 8px rgba(16, 185, 129, 0.2), 
+        inset -4px -4px 8px rgba(0,0,0,0.45), 
+        inset 2px 2px 5px rgba(255,255,255,0.95), 
+        0 0 0 1px rgba(16, 185, 129, 0.3),
+        0 5px 10px rgba(0,0,0,0.3) !important;
+    animation: bead-glow-pulse 3s infinite ease-in-out;
+}
+
+@keyframes bead-glow-pulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 8px rgba(16, 185, 129, 0.2), 
+            inset -4px -4px 8px rgba(0,0,0,0.45), 
+            inset 2px 2px 5px rgba(255,255,255,0.95), 
+            0 0 0 1px rgba(16, 185, 129, 0.3),
+            0 5px 10px rgba(0,0,0,0.3) !important;
+    }
+    50% {
+        box-shadow: 
+            0 0 15px rgba(16, 185, 129, 0.4), 
+            inset -4px -4px 8px rgba(0,0,0,0.45), 
+            inset 2px 2px 5px rgba(255,255,255,0.95), 
+            0 0 0 1.5px rgba(16, 185, 129, 0.5),
+            0 5px 10px rgba(0,0,0,0.3) !important;
+    }
+}
+
+/* Imam Bead Refined */
+.imam-bead {
+    position: absolute;
+    width: 14px;
+    height: 40px;
+    border-radius: 7px;
+    top: 50%;
+    left: 50%;
+    margin-left: -7px;
+    background: radial-gradient(ellipse at 30% 20%, #ffffff 0%, #cbd5e1 50%, #475569 85%, #1e293b 100%);
+    box-shadow: inset -3px -3px 6px rgba(0,0,0,0.55), inset 2px 2px 5px rgba(255,255,255,0.8), 0 5px 12px rgba(0,0,0,0.45);
+    z-index: 0;
+}
+
+.bottom-section-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-shrink: 0;
+    z-index: 150;
+    padding-bottom: env(safe-area-inset-bottom); /* Removed 16px to push selector to the absolute bottom */
+}
+
+.bottom-bead-selector-container {
+    position: relative;
+    width: 100%;
+    background: transparent;
+    padding: 0; /* Removed 10px top padding to allow exact gap control via hint margin */
+    display: block;
+    overflow: hidden;
+    /* Very soft fade masks on left and right for elegant scrolling */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    margin-bottom: 0px;
+}
+
+.bottom-bead-selector {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    /* Removed gap: 20px to support older Android WebViews; using margin-right instead */
+    overflow-x: auto;
+    width: 100%;
+    padding: 8px 36px 2px 36px; /* Reduced top padding by 8px to lower the hint */
+    scrollbar-width: none; 
+    -ms-overflow-style: none;  
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+}
+.bottom-bead-selector::before,
+.bottom-bead-selector::after {
+    display: none;
+}
+
+.bottom-bead-selector::-webkit-scrollbar {
+    display: none; 
+}
+
+.selector-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px; /* Restored comfortable gap */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 72px; /* Proper width to prevent text clipping */
+    min-width: 72px; /* Force width for older webviews that ignore flex-shrink */
+    max-width: 72px;
+    margin-right: 36px; /* Increased to ensure circles never touch (28px - 40px requested) */
+    flex-shrink: 0;
+    opacity: 0.6;
+    transform: scale(0.95);
+    scroll-snap-align: center; 
+}
+.selector-item:last-child {
+    margin-right: 0; /* No margin on the last item */
+}
+
+.selector-item:hover {
+    opacity: 0.8;
+}
+
+.selector-item.selected {
+    opacity: 1;
+    transform: scale(1.08); /* More distinct highlight */
+}
+
+.selector-bead-preview {
+    width: 36px !important; /* Optimal circle size */
+    height: 36px !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+    border-radius: 50%;
+    box-shadow: 
+        0 4px 10px rgba(0,0,0,0.35),
+        inset -2px -2px 5px rgba(0,0,0,0.4),
+        inset 2px 2px 4px rgba(255,255,255,0.8) !important;
+    transition: all 0.3s ease;
+    border: 1.5px solid transparent;
+}
+
+.selector-item.selected .selector-bead-preview {
+    border-color: var(--text-muted);
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.4),
+        inset -2px -2px 5px rgba(0,0,0,0.4),
+        inset 2px 2px 4px rgba(255,255,255,0.8) !important;
+}
+
+.selector-bead-name {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+    white-space: normal; /* Allow text wrapping */
+    line-height: 1.2;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines instead of clipping horizontally */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.3s ease;
+}
+
+.selector-item.selected .selector-bead-name {
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+/* Modals */
+.premium-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(10px);
+    z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn 0.3s ease forwards;
+}
+.premium-modal-content {
+    background: linear-gradient(180deg, #061814 0%, #020b09 100%); 
+    width: 100%; max-height: 85vh;
+    border-top-left-radius: 32px; border-top-right-radius: 32px;
+    border-top: 1px solid rgba(52, 211, 153, 0.2);
+    padding: 28px 24px; display: flex; flex-direction: column;
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.modal-header h3 { font-size: 1.25rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: 0.3px; }
+.close-btn { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.5; transition: all 0.2s ease; }
+.close-btn:hover { opacity: 0.8; }
+
+/* Dhikr List */
+.modal-list { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+.modal-item {
+    display: flex; align-items: center; gap: 16px; padding: 18px;
+    background: rgba(255,255,255,0.02); border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.04); cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-item:hover {
+    background: rgba(52, 211, 153, 0.04);
+    border-color: rgba(52, 211, 153, 0.15);
+}
+.modal-item.selected { 
+    background: rgba(52, 211, 153, 0.12); 
+    border-color: rgba(52, 211, 153, 0.35); 
+    box-shadow: 0 4px 15px rgba(52, 211, 153, 0.1);
+}
+.item-arabic { font-size: 1.5rem; font-weight: 700; min-width: 85px; text-align: right; color: #34d399; }
+.item-title { font-size: 1.05rem; font-weight: 700; color: #fff; }
+.item-sub { font-size: 0.82rem; opacity: 0.55; margin-top: 4px; line-height: 1.35; }
+
+/* Settings Modal Specifics */
+.settings-content { padding-bottom: 40px; }
+.settings-body { display: flex; flex-direction: column; gap: 26px; overflow-y: auto; }
+.setting-group { display: flex; flex-direction: column; gap: 12px; }
+.setting-group label { font-size: 0.95rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.2px; }
+.setting-options { display: flex; gap: 10px; flex-wrap: wrap; }
+.opt-btn {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-muted); padding: 10px 18px; border-radius: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+}
+.opt-btn.active { 
+    background: rgba(52, 211, 153, 0.15); 
+    border-color: #10b981; 
+    color: #34d399; 
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
+}
+.opt-input {
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
+    color: #fff; padding: 10px 14px; border-radius: 14px; width: 110px; text-align: center; font-weight: 600; transition: all 0.2s ease;
+}
+.opt-input:focus { 
+    outline: none; 
+    border-color: #10b981; 
+    background: rgba(255,255,255,0.05); 
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
+}
+.opt-input::placeholder { color: var(--text-muted); }
+
+.toggle-group { flex-direction: row; justify-content: space-between; align-items: center; }
+.toggle-switch {
+    width: 52px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.12);
+    position: relative; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toggle-switch.on { background: #10b981; box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
+.toggle-thumb {
+    width: 24px; height: 24px; border-radius: 50%; background: #fff;
+    position: absolute; top: 3px; left: 3px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.toggle-switch.on .toggle-thumb { left: 25px; }
+
+.simple-reset-btn {
+    background: rgba(239, 68, 68, 0.08);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+}
+.simple-reset-btn:active {
+    transform: scale(0.98);
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.tasbih-wrapper.flex-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* Back Button Top Left absolute layout on Continuation Screen */
+.back-btn-top-left {
+    position: absolute;
+    top: calc(20px + env(safe-area-inset-top));
+    left: 20px;
+    z-index: 200;
+}
+
+.resume-prompt-card {
+    background: linear-gradient(135deg, rgba(16, 30, 25, 0.96), rgba(8, 15, 12, 0.98));
+    border: 1px solid rgba(52, 211, 153, 0.22);
+    border-radius: 28px;
+    padding: 36px 28px;
+    text-align: center;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(52, 211, 153, 0.05);
+    max-width: 100%;
+    width: 340px;
+    box-sizing: border-box;
+    margin: auto;
+}
+.resume-prompt-card h2 { 
+    font-size: 1.35rem; 
+    font-weight: 800;
+    margin-bottom: 22px; 
+    color: #fff; 
+    letter-spacing: 0.2px;
+    line-height: 1.45; /* extra support for upright Malayalan script */
+}
+.resume-details { margin-bottom: 30px; }
+.res-dhikr { 
+    font-size: 1.6rem; 
+    font-weight: 700; 
+    color: #34d399; 
+    margin-bottom: 12px; 
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+}
+.res-simple-stats { font-size: 1.2rem; font-weight: 700; opacity: 0.95; }
+.res-time-ago { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
+
+.resume-actions { display: flex; flex-direction: column; gap: 12px; }
+.btn-resume-primary {
+    background: linear-gradient(135deg, #10b981, #059669); 
+    color: #ffffff; 
+    font-size: 1rem; 
+    font-weight: 700;
+    padding: 14px; 
+    border-radius: 16px; 
+    border: none; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+.btn-resume-primary:active { 
+    transform: scale(0.97); 
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+.btn-resume-secondary {
+    background: rgba(255, 255, 255, 0.04); 
+    color: var(--text-muted); 
+    font-size: 0.95rem; 
+    font-weight: 600;
+    padding: 14px; 
+    border-radius: 16px; 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+}
+.btn-resume-secondary:active {
+    transform: scale(0.97);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.completion-card {
+    background: linear-gradient(135deg, rgba(16, 30, 25, 0.96), rgba(8, 15, 12, 0.98));
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    border-radius: 30px;
+    padding: 44px 32px;
+    text-align: center;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 0 60px rgba(52, 211, 153, 0.25), 0 25px 50px rgba(0, 0, 0, 0.55);
+    max-width: 90%;
+    width: 360px;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) ease;
+}
+.completion-icon {
+    font-size: 3.2rem;
+    margin-bottom: 16px;
+    text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+}
+.completion-card h2 {
+    font-size: 1.65rem;
+    color: #fff;
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: 0.2px;
+}
+.completion-stats {
+    font-size: 1.35rem;
+    color: #34d399;
+    font-weight: 800;
+    margin-bottom: 32px;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+}
+.completion-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.goal-options {
+    justify-content: center;
+}
+.custom-goal-input {
+    width: auto;
+    min-width: 80px;
+}
+
+/* Premium Confirm Modal */
+.confirm-overlay {
+    backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.65); /* Softer overlay */
+}
+.premium-confirm-card {
+    background: linear-gradient(135deg, rgba(22, 32, 28, 0.95), rgba(12, 18, 15, 0.98)); /* Softer, slightly lighter dark */
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Cleaner border */
+    border-radius: 32px; /* Smoother corners */
+    padding: 32px 24px; /* Balanced padding */
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45); /* Softer shadow */
+    max-width: 310px;
+    width: 90%;
+    animation: smoothPopIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes smoothPopIn {
+    0% { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.confirm-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-muted); /* Elegant soft color */
+    margin-bottom: 20px; /* Better vertical spacing */
+}
+.confirm-icon svg {
+    filter: drop-shadow(0 2px 8px rgba(255,255,255,0.05));
+}
+
+.premium-confirm-card h3 {
+    font-size: 1.25rem; /* Slightly smaller but cleaner */
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.premium-confirm-card p {
+    color: var(--text-muted); /* Softer subtitle */
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+.confirm-sub {
+    font-size: 0.75rem !important; /* Smaller helper text */
+    color: var(--text-muted) !important;
+    margin-bottom: 28px !important;
+}
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+}
+.btn-confirm-cancel {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03); /* Subtle dark glass */
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    padding: 14px 0;
+    border-radius: 16px; /* Smoother */
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-confirm-cancel:hover { background: rgba(255, 255, 255, 0.06); }
+.btn-confirm-cancel:active { transform: scale(0.97); }
+
+.btn-confirm-reset {
+    flex: 1;
+    background: rgba(220, 38, 38, 0.08); /* Muted danger color */
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    color: rgba(239, 68, 68, 0.9);
+    padding: 14px 0;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-confirm-reset:hover { background: rgba(220, 38, 38, 0.12); }
+.btn-confirm-reset:active { transform: scale(0.97); background: rgba(220, 38, 38, 0.18); }
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.tap-instructions {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.01);
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.03);
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+    z-index: 20;
+    animation: fadeIn 1s ease forwards, softFade 3s ease 5s forwards;
+}
+@keyframes softFade {
+    to { opacity: 0.25; }
+}
+
+/* Gesture Hint Style */
+.gesture-hint {
+    margin-top: 0;
+    margin-bottom: 2px; /* Set bottom gap to perfectly distribute the limited physical screen space */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    z-index: 20;
+    animation: fadeIn 1s ease forwards;
+    background: transparent;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.gesture-text {
+    font-weight: 500;
+}
+
+.gesture-arrow {
+    display: inline-block;
+    color: var(--emerald-accent, #10b981);
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.pulse-left {
+    animation: pulseLeft 1.8s infinite ease-in-out;
+}
+
+.pulse-right {
+    animation: pulseRight 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseLeft {
+    0%, 100% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(-3px); opacity: 1; }
+}
+
+@keyframes pulseRight {
+    0%, 100% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(3px); opacity: 1; }
+}
+.inst-side {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+.inst-side span {
+    font-weight: 700;
+    color: rgba(52, 211, 153, 0.85);
+    background: rgba(52, 211, 153, 0.05);
+    padding: 2px 6px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+}
+.inst-dot { opacity: 0.3; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+@keyframes subtleBounce {
+    0%, 100% { transform: translateY(0); } /* Reverted 15px downward shift to move hint UP and create gap above Theme Selector */
+    50% { transform: translateY(-3px); }
+}
+
+@media (max-width: 480px) {
+    .tasbih-wrapper {
+        /* Removed flex-start override to allow native column scaling */
+    }
+
+    .active-dhikr-container {
+        margin: 20px auto 0 auto !important; 
+        gap: 22px !important; 
+        transform: translateY(-12px); /* Moved Dhikr card UP */
+    }
+
+    .floating-controls-row {
+        margin: 0px auto 20px auto !important; 
+        padding: 0px 20px !important; 
+        background: transparent !important; /* Removed heavy glass container */
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: translateY(-18px); /* Moved buttons UP to create breathing room above circle */
+    }
+
+    .view-all-dhikr-btn {
+        transform: translateY(-12px) !important; /* Moved ONLY the button UP */
+    }
+
+    .floating-controls-row .tasbih-btn-icon {
+        width: 40px !important; 
+        height: 40px !important;
+    }
+
+    .main-screen {
+        /* Removed flex-start and flex: 0 0 auto overrides to allow centering */
+        min-height: 0; 
+    }
+
+    .bead-container { 
+        /* Removed override */
+        transform: none !important;
+    }
+
+    .bottom-section-wrapper {
+        /* Removed flex: 1 and space-between overrides */
+        padding-top: 0 !important; 
+    }
+
+    .gesture-hint {
+        margin-top: 0 !important; 
+        font-size: 0.65rem !important; 
+        padding: 4px !important;
+        animation: fadeIn 1s ease forwards, subtleBounce 3s ease-in-out infinite !important;
+    }
+
+    /* Removed destructive overrides that squished beads and disabled scrolling */
+}
+
+@media (max-width: 380px) {
+    .bead-container { transform: scale(0.9) !important; }
+}
+
+/* Playback Speed Control Styles */
+.speed-control-container {
+  position: relative;
+  display: inline-block;
+}
+
+.speed-badge-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border-radius: 20px;
+  padding: 0 14px;
+  height: 40px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.speed-badge-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(245, 197, 66, 0.5);
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
+}
+
+.tasbih-actions .speed-popover-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #061814;
+  border: 1px solid rgba(52, 211, 153, 0.15);
+  border-radius: 16px;
+  padding: 12px;
+  width: 220px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(52, 211, 153, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+  backdrop-filter: blur(25px);
+  animation: popDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.speed-popover-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #34d399;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.15);
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.speed-option-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.speed-option-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #34d399;
+}
+
+.speed-option-btn.active {
+  background: #10b981;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Premium Settings Refactor */
+.premium-setting {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+}
+.premium-setting:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(52, 211, 153, 0.15);
+}
+.premium-label {
+    font-size: 1.1rem !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+.premium-speed-container {
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 8px;
+}
+.premium-pill-btn {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    padding: 12px 0;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.premium-pill-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+}
+.premium-pill-btn.active-glow {
+    background: rgba(52, 211, 153, 0.15);
+    border-color: #34d399;
+    color: #34d399;
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.2);
+    transform: translateY(-2px);
+}
+.premium-toggle-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.premium-sublabel {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+.premium-switch {
+    transform: scale(1.1);
+}

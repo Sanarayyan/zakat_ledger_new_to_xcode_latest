@@ -1,0 +1,179 @@
+.autoscroll-v3-root {
+    position: fixed !important;
+    bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+    right: 16px !important;
+    z-index: 999999 !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    pointer-events: auto;
+    font-family: 'Outfit', sans-serif;
+}
+
+.glass-morphism {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-mode .glass-morphism {
+    background: rgba(20, 20, 20, 0.9) !important;
+    border-color: var(--text-muted) !important;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Trigger Button */
+.as-v3-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    background: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.as-v3-trigger:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+.as-v3-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+.as-v3-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.as-v3-label {
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: white;
+}
+
+/* Active Control Pill */
+.as-v3-pill {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 8px 20px;
+    border-radius: 100px;
+    height: 68px;
+}
+
+.as-v3-speeds {
+    display: flex;
+    gap: 10px;
+}
+
+.as-v3-speed-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+body.dark-mode .as-v3-speed-dot {
+    background: var(--border);
+    color: var(--text-muted);
+}
+
+.as-v3-speed-dot.active {
+    background: linear-gradient(135deg, #d4af37, #b5952f) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5), inset 0 2px 4px rgba(255,255,255,0.2) !important;
+    border: 1px solid rgba(212, 175, 55, 0.8);
+    font-weight: 800;
+    transform: scale(1.05);
+}
+
+.as-v3-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .as-v3-divider {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.as-v3-main-action {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary) !important;
+    color: white !important;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.as-v3-main-action.playing {
+    background: #ef4444 !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    animation: as-v3-pulse 2s infinite ease-in-out;
+}
+
+.as-v3-close {
+    font-size: 2rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0 10px;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.as-v3-close:hover {
+    color: #ef4444;
+}
+
+@keyframes as-v3-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+    .as-v3-trigger {
+        padding: 6px 12px;
+        gap: 8px;
+    }
+    
+    .as-v3-label {
+        font-size: 0.75rem;
+    }
+    
+    .as-v3-icon {
+        width: 28px;
+        height: 28px;
+    }
+}

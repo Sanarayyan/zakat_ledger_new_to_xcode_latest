@@ -1,0 +1,132 @@
+.versionhub-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 24px;
+}
+
+.versionhub-card {
+    background: var(--bg-card);
+    width: 100%;
+    max-width: 380px;
+    border-radius: 28px;
+    padding: 40px 32px;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.versionhub-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: rgba(255, 215, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    margin-bottom: 8px;
+}
+
+.versionhub-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.versionhub-badges {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.versionhub-badge {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.versionhub-arrow {
+    color: var(--text-muted);
+    font-weight: bold;
+}
+
+.versionhub-description {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.versionhub-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.versionhub-btn-primary {
+    background: var(--gold);
+    color: var(--text-main);
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.versionhub-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.versionhub-btn-secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.versionhub-btn-secondary:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.light-mode .versionhub-card {
+    background: #ffffff;
+}
+
+.light-mode .versionhub-badge {
+    background: #f1f5f9;
+}
+
+.light-mode .versionhub-btn-secondary:hover {
+    background: #f1f5f9;
+}

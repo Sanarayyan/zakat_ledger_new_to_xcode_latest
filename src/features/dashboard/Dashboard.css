@@ -1,0 +1,1135 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Color Palette - Soft, minimal, elegant */
+:root {
+  --dash-card-bg: #ffffff;
+  --dash-text-main: #2b3a32;
+  --dash-text-muted: #6b7a70;
+  --dash-primary: #a3b19b; /* Muted olive / soft green */
+  --dash-accent: #f4f1ea; /* Light cream */
+  --dash-border: rgba(0, 0, 0, 0.03);
+  --dash-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  --dash-shadow-sm: 0 2px 8px rgba(0,0,0,0.02);
+  --dash-header-bg: rgba(255, 255, 255, 0.95);
+}
+
+.dash-wrapper.dark {
+  --dash-card-bg: var(--bg-card);
+  --dash-text-main: var(--text-main);
+  --dash-text-muted: var(--text-muted);
+  --dash-accent: var(--bg-card);
+  --dash-border: var(--border);
+  --dash-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  --dash-shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --dash-header-bg: rgba(30, 36, 32, 0.95);
+}
+
+.dash-wrapper {
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    background: transparent;
+    color: var(--dash-text-main);
+}
+
+.dash-container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 16px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+/* Header */
+.dash-header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: calc(12px + var(--safe-area-top, env(safe-area-inset-top))) 0 12px 0;
+    margin-bottom: 32px;
+    box-sizing: border-box;
+}
+
+
+
+.dash-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.dash-lang-toggle {
+    display: flex;
+    align-items: center;
+    background: var(--dash-accent);
+    padding: 4px;
+    border-radius: 24px;
+    border: 1px solid var(--dash-border);
+    white-space: nowrap;
+}
+
+.dash-lang-btn {
+    border: none;
+    background: transparent;
+    color: var(--dash-text-muted);
+    cursor: pointer;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 20px;
+    font-family: inherit;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dash-lang-btn.active {
+    background: var(--dash-card-bg);
+    color: var(--dash-text-main);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.dash-wrapper.dark .dash-lang-btn.active {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.dash-icon-btn {
+    background: none;
+    border: none;
+    color: var(--dash-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.dash-icon-btn:hover {
+    color: var(--dash-text-main);
+}
+
+/* Main Date Card */
+.dash-date-card {
+    background: rgba(244, 241, 234, 0.95); /* Ultra-readable premium solid glassmorphism */
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-radius: 24px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 12px 30px rgba(43, 58, 50, 0.08);
+}
+
+.dash-wrapper.dark .dash-date-card {
+    background: var(--bg-card); /* Dark theme rich charcoal backdrop */
+    border-color: var(--text-muted);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+.dash-date-bg-icon {
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 150px;
+    height: 150px;
+    pointer-events: none;
+    color: var(--dash-card-bg);
+    opacity: 0.5;
+}
+
+.dash-date-info {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 24px;
+}
+
+.dash-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted); /* Richer olive-forest green for high-contrast visibility */
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 700; /* Bolder */
+}
+
+.dash-wrapper.dark .dash-label {
+    color: var(--text-muted); /* Crisp light olive */
+}
+
+.dash-date-info h2 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-main);
+    letter-spacing: -0.4px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.dash-wrapper.dark .dash-date-info h2 {
+    color: var(--text-main); /* Crisp white */
+}
+
+.dash-date-info p {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.dash-wrapper.dark .dash-date-info p {
+    color: var(--text-muted); /* Highly readable secondary */
+}
+
+.dash-prayer-info {
+    position: relative;
+    z-index: 1;
+    background: #ffffff; /* Pure crisp white for extreme legibility */
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.dash-wrapper.dark .dash-prayer-info {
+    background: var(--bg-card); /* Solid dark contrast */
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dash-prayer-next {
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-prayer-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dash-text-main);
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.dash-prayer-timer {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.dash-timer {
+    font-size: 1.25rem; /* Larger numbers */
+    font-weight: 700; /* Strong bold */
+    color: var(--text-muted); /* Rich, dark emerald green */
+    text-shadow: 0 0 10px rgba(21, 128, 61, 0.1);
+    letter-spacing: 0.5px;
+}
+
+.dash-wrapper.dark .dash-timer {
+    color: var(--text-main); /* Glowing golden/gold */
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+}
+
+
+/* Features Grid */
+.dash-features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 360px) {
+    .dash-features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dash-feature-quran {
+    grid-row: span 2;
+    background: var(--dash-card-bg);
+    border-radius: 24px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: var(--dash-shadow-sm);
+    border: 1px solid var(--dash-border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dash-feature-quran:active { 
+    transform: scale(0.98); 
+}
+
+.dash-icon-box {
+    width: 48px;
+    height: 48px;
+    background: var(--dash-accent);
+    color: var(--dash-primary);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.dash-icon-box.small {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0;
+    border-radius: 12px;
+}
+
+.dash-feature-text-bottom h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--dash-text-main);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.dash-feature-text-bottom p {
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.dash-feature-prayer, .dash-feature-qibla {
+    background: var(--dash-card-bg);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--dash-shadow-sm);
+    border: 1px solid var(--dash-border);
+    min-width: 0;
+}
+
+.dash-feature-prayer h3, .dash-feature-qibla h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--dash-text-main);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.home-shortcuts {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 0;
+    margin-top: 0;
+}
+
+.shortcut-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 4px;
+    min-height: 120px;
+    border-radius: 20px;
+    background: var(--dash-card-bg);
+    box-shadow: var(--dash-shadow-sm);
+    border: 1px solid var(--dash-border);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-width: 0;
+}
+
+.shortcut-card:hover {
+    box-shadow: var(--dash-shadow);
+}
+
+.shortcut-card:active { 
+    transform: scale(0.96); 
+}
+
+.shortcut-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 12px;
+    background: var(--dash-accent);
+    border-radius: 14px;
+    color: var(--dash-primary);
+}
+
+.shortcut-icon img,
+.shortcut-icon svg {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.shortcut-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--dash-text-main);
+    margin: 0;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.dash-icon-box.circle svg, 
+.dash-icon-box.circle img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Daily Ayah */
+.dash-ayah-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.dash-ayah-inner-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #d4af37; /* Soft elegant gold */
+    margin-bottom: 8px;
+}
+
+.dash-wrapper.dark .dash-ayah-inner-title {
+    color: var(--text-muted);
+}
+
+.dash-ayah-divider {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    border-radius: 2px;
+    opacity: 0.6;
+}
+
+.dash-wrapper.dark .dash-ayah-divider {
+    background: linear-gradient(90deg, transparent, var(--text-muted), transparent);
+}
+
+.dash-daily-ayah {
+    background: var(--dash-accent);
+    border-radius: 24px;
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+    box-shadow: var(--dash-shadow-sm);
+    border: 1px solid var(--dash-border);
+}
+
+.dash-ayah-arabic {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.6;
+    font-family: 'Amiri', serif;
+    color: var(--dash-text-main);
+}
+
+.dash-ayah-translation {
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--dash-text-muted);
+    margin-bottom: 16px;
+}
+
+.dash-ayah-ref {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--dash-text-muted);
+    font-weight: 600;
+}
+
+/* Streak */
+.dash-streak {
+    background: var(--dash-card-bg);
+    border-radius: 20px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--dash-shadow-sm);
+    border: 1px solid var(--dash-border);
+}
+
+.dash-streak-icon-box {
+    width: 48px;
+    height: 48px;
+    background: var(--dash-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dash-streak-info { 
+    flex: 1; 
+}
+
+.dash-streak-info h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--dash-text-main);
+    margin-bottom: 4px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.dash-streak-info p {
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.dash-streak-arrow { 
+    color: var(--dash-primary); 
+}
+
+/* Bottom Nav */
+.dash-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--dash-header-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.04);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    z-index: 100;
+    border-top: 1px solid var(--dash-border);
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+@media (min-width: 481px) {
+    .dash-bottom-nav {
+        max-width: 480px;
+        margin: 0 auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+.dash-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--dash-text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    min-width: 0;
+    flex: 1 1 0;
+}
+
+.dash-nav-item.active { 
+    color: var(--dash-text-main); 
+}
+
+.dash-nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dash-nav-item span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    line-height: 1.15;
+}
+
+/* === Daily Ayah — skeleton loading & dynamic states === */
+.da-loading {
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.da-skeleton {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0;
+}
+
+.da-skel-line {
+    border-radius: 8px;
+    background: linear-gradient(
+        90deg,
+        var(--dash-card-bg) 25%,
+        rgba(163, 177, 155, 0.15) 50%,
+        var(--dash-card-bg) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+.da-skel-arabic  { width: 75%; height: 32px; border-radius: 10px; }
+.da-skel-trans   { width: 88%; height: 18px; }
+.da-skel-ref     { width: 48%; height: 14px; }
+
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Smooth fade-in for loaded content */
+.dash-daily-ayah:not(.da-loading) {
+    animation: ayahFadeIn 0.5s ease-out;
+}
+
+@keyframes ayahFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Ref line enhanced */
+.dash-ayah-ref {
+    letter-spacing: 0.04em;
+}
+
+/* ====================================================
+   🔥 PREMIUM MINI STREAK CAPSULE WIDGET
+   ==================================================== */
+.dash-streak-capsule {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff; /* Bright high-contrast white capsule */
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin-top: 18px;
+    box-shadow: 0 6px 20px rgba(26, 92, 58, 0.04);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.dash-wrapper.dark .dash-streak-capsule {
+    background: var(--bg-card); /* Contrast dark charcoal card */
+    border-color: var(--border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dash-streak-capsule:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(26, 92, 58, 0.08);
+}
+
+.dash-wrapper.dark .dash-streak-capsule:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Capsule layout rows */
+.dsc-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dsc-streak {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.dsc-flame {
+    font-size: 1.25rem;
+    animation: dscFlamePulse 2s infinite ease-in-out;
+}
+
+@keyframes dscFlamePulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(230, 126, 34, 0.3)); }
+    50% { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(230, 126, 34, 0.7)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(230, 126, 34, 0.3)); }
+}
+
+.dsc-streak-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary); /* Deep forest green for high visibility */
+}
+
+.dash-wrapper.dark .dsc-streak-text {
+    color: var(--text-main); /* Light contrast */
+}
+
+.dsc-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.dsc-ratio {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted); /* Solid secondary color */
+}
+
+.dash-wrapper.dark .dsc-ratio {
+    color: var(--text-muted);
+}
+
+/* Interactive status indicator dot */
+.dsc-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d4af37; /* Gold */
+    box-shadow: 0 0 6px #d4af37;
+}
+
+.dsc-status-dot.complete {
+    background-color: #22c55e; /* Emerald */
+    box-shadow: 0 0 8px #22c55e;
+}
+
+/* Micro progress bar track */
+.dsc-progress-track {
+    width: 100%;
+    height: 6px;
+    background: #eef2f0; /* Soft track background */
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dash-wrapper.dark .dsc-progress-track {
+    background: var(--bg-card);
+}
+
+.dsc-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1a5c3a, #d4af37); /* Dynamic emerald-to-gold luxury gradient fill */
+    border-radius: 4px;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dash-wrapper.dark .dsc-progress-fill {
+    background: linear-gradient(90deg, #34d399, var(--text-main));
+}
+
+/* Descriptive caption footer */
+.dsc-footer {
+    display: flex;
+}
+
+.dsc-encourage {
+    font-size: 0.78rem;
+    font-weight: 600; /* Clear semi-bold emphasis */
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.dash-wrapper.dark .dsc-encourage {
+    color: var(--text-muted);
+}
+
+/* Crescent pulse replacing flame */
+.dsc-crescent-icon {
+    font-size: 1.2rem;
+    animation: dscCrescentPulse 3s infinite ease-in-out;
+}
+
+@keyframes dscCrescentPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.2)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.2)); }
+}
+
+/* Interactive segmented chips */
+.dsc-indicators {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 4px 0 2px 0;
+}
+
+.dsc-indicator-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 6px 4px;
+    min-height: unset;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 4px;
+}
+
+.dash-wrapper.dark .dsc-indicator-btn {
+    border-color: var(--border);
+}
+
+.dsc-indicator-symbol {
+    font-size: 0.85rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.dsc-indicator-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+/* 1. State: Completed */
+.dsc-indicator-btn.completed {
+    background: linear-gradient(135deg, #1a5c3a, #2e7d54);
+    border-color: #1a5c3a;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(26, 92, 58, 0.15);
+}
+
+.dash-wrapper.dark .dsc-indicator-btn.completed {
+    background: linear-gradient(135deg, #34d399, var(--bg-card));
+    border-color: #34d399;
+    color: var(--bg-card)827;
+    box-shadow: 0 2px 8px rgba(52, 211, 153, 0.25);
+}
+
+/* 2. State: Active (Current active prayer) */
+.dsc-indicator-btn.active {
+    background: rgba(26, 92, 58, 0.05);
+    border: 1.5px solid #1a5c3a;
+    color: var(--primary);
+    box-shadow: 0 0 10px rgba(26, 92, 58, 0.15);
+    animation: activePrayerGlow 2s infinite ease-in-out;
+}
+
+.dash-wrapper.dark .dsc-indicator-btn.active {
+    background: rgba(52, 211, 153, 0.05);
+    border: 1.5px solid #34d399;
+    color: #34d399;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+    animation: activePrayerGlowDark 2s infinite ease-in-out;
+}
+
+@keyframes activePrayerGlow {
+    0% { box-shadow: 0 0 4px rgba(26, 92, 58, 0.1); }
+    50% { box-shadow: 0 0 12px rgba(26, 92, 58, 0.3); }
+    100% { box-shadow: 0 0 4px rgba(26, 92, 58, 0.1); }
+}
+
+@keyframes activePrayerGlowDark {
+    0% { box-shadow: 0 0 4px rgba(52, 211, 153, 0.15); }
+    50% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.4); }
+    100% { box-shadow: 0 0 4px rgba(52, 211, 153, 0.15); }
+}
+
+/* 3. State: Missed (Past unchecked prayers) */
+.dsc-indicator-btn.missed {
+    background: rgba(239, 68, 68, 0.03);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #ef4444; /* Non-aggressive soft red nudge */
+}
+
+.dash-wrapper.dark .dsc-indicator-btn.missed {
+    background: rgba(248, 113, 113, 0.03);
+    border-color: rgba(248, 113, 113, 0.25);
+    color: var(--text-main);
+}
+
+/* 4. State: Locked (Future prayers) */
+.dsc-indicator-btn.locked {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.05);
+    color: #8fa095;
+    opacity: 0.45;
+    cursor: not-allowed !important;
+}
+
+.dash-wrapper.dark .dsc-indicator-btn.locked {
+    background: rgba(255, 255, 255, 0.01);
+    border-color: var(--border);
+    color: var(--text-muted);
+    opacity: 0.45;
+}
+
+/* Hover scales */
+.dsc-indicator-btn:hover {
+    transform: translateY(-1px);
+}
+
+.dsc-indicator-btn.locked:hover {
+    transform: none !important;
+}
+
+.dsc-indicator-btn:active {
+    transform: scale(0.96);
+}
+
+.dsc-indicator-btn.locked:active {
+    transform: none !important;
+}
+
+/* ====================================================
+   🌙 FLOATING TOAST POPUP SYSTEM
+   ==================================================== */
+/* Capsule Bound Inline Toast Overlay */
+.dsc-toast-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 36, 30, 0.98);
+    backdrop-filter: blur(8px);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    z-index: 100;
+    animation: dscFadeIn 0.25s ease-out;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 16px;
+}
+
+.dash-wrapper.dark .dsc-toast-overlay {
+    background: rgba(14, 18, 16, 0.98);
+}
+
+.dsc-toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--dash-primary);
+}
+
+.dsc-toast-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+@keyframes dscFadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ====================================================
+   🌙 GENTLE SMART NUDGE BANNER
+   ==================================================== */
+.dash-nudge-banner {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #fdfbf7, #f5f1e6);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 20px;
+    padding: 20px 22px;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.08);
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+    animation: slideInBanner 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dash-wrapper.dark .dash-nudge-banner {
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-card));
+    border-color: rgba(163, 177, 155, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideInBanner {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dnb-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.dnb-crescent {
+    font-size: 1.4rem;
+    margin-top: 2px;
+}
+
+.dnb-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dnb-text h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.dash-wrapper.dark .dnb-text h4 {
+    color: var(--text-main);
+}
+
+.dnb-text p {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.dash-wrapper.dark .dnb-text p {
+    color: var(--text-muted);
+}
+
+.dnb-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.dnb-btn-confirm {
+    background: linear-gradient(135deg, #1a5c3a, #2e7d54);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    padding: 10px 18px;
+    min-height: unset;
+    box-shadow: 0 2px 6px rgba(26, 92, 58, 0.15);
+}
+
+.dash-wrapper.dark .dnb-btn-confirm {
+    background: linear-gradient(135deg, #34d399, var(--bg-card));
+    color: var(--bg-card);
+}
+
+.dnb-btn-dismiss {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    padding: 10px 18px;
+    min-height: unset;
+}
+
+.dash-wrapper.dark .dnb-btn-dismiss {
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+}
+
+.dnb-btn-confirm:hover, .dnb-btn-dismiss:hover {
+    transform: translateY(-1px);
+}
+
+.dnb-btn-confirm:active, .dnb-btn-dismiss:active {
+    transform: scale(0.96);
+}
+
+/* Sizing Adjustments for Date Card Container */
+.dash-date-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Responsive adjustment */
+@media (max-width: 380px) {
+    .dash-streak-capsule {
+        padding: 12px;
+        gap: 8px;
+    }
+    .dsc-streak-text {
+        font-size: 0.85rem;
+    }
+    .dsc-ratio {
+        font-size: 0.78rem;
+    }
+    .dsc-encourage {
+        font-size: 0.72rem;
+    }
+    .dsc-indicators {
+        gap: 4px;
+    }
+    .dsc-indicator-label {
+        font-size: 0.65rem;
+    }
+    .dsc-indicator-symbol {
+        font-size: 0.75rem;
+    }
+}
+
+

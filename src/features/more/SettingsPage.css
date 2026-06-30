@@ -1,0 +1,401 @@
+.settings-root {
+    min-height: 100vh;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    color: var(--text-color);
+    padding-bottom: 80px;
+}
+
+.dark-mode .settings-root {
+    background: rgba(17, 22, 20, 0.6);
+}
+
+.settings-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.settings-section-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-left: 16px;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.settings-section-title.no-margin {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    opacity: 1;
+}
+
+.settings-card {
+    background-color: rgba(255, 252, 245, 0.95); /* Warm ivory for light mode */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(197, 160, 89, 0.2); /* Soft gold accent border */
+    overflow: hidden;
+    position: relative;
+}
+
+.dark-mode .settings-card {
+    background-color: rgba(22, 29, 26, 0.85); /* Deep elegant green-black for dark mode */
+    border-color: rgba(197, 160, 89, 0.15); /* Soft gold border in dark mode */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.accordion-card {
+    padding: 0;
+}
+
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    cursor: pointer;
+    background-color: transparent !important;
+    transition: background-color 0.2s;
+}
+
+.accordion-header:active {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.dark-mode .accordion-header:active {
+    background-color: var(--text-muted) !important;
+}
+
+.accordion-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    transition: transform 0.3s ease;
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
+    opacity: 0;
+}
+
+.accordion-body.expanded {
+    max-height: 1000px;
+    opacity: 1;
+}
+
+.accordion-body .settings-item {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px !important;
+    background-color: transparent !important; /* overrides App.css */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 0 !important;
+}
+
+.dark-mode .settings-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.settings-item:last-child {
+    border-bottom: none !important;
+}
+
+.settings-item-info {
+    flex: 1;
+    padding-right: 16px;
+}
+
+.settings-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.settings-item-desc {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Toggle Switch Styling */
+.settings-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.settings-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--primary-color, #2E7D32);
+}
+
+input:focus + .toggle-slider {
+    box-shadow: 0 0 1px var(--primary-color, #2E7D32);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+}
+
+/* Clickable Item Styling */
+.settings-item.clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.settings-item.clickable:active {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.dark-mode .settings-item.clickable:active {
+    background-color: var(--text-muted) !important;
+}
+
+.settings-item-value {
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.settings-chevron-right {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    opacity: 0.5;
+}
+
+/* Bottom Sheet Styling */
+.sheet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+}
+
+.sheet-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--card-bg, #ffffff);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    padding: 16px 20px 24px;
+    z-index: 1001;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.dark-mode .bottom-sheet {
+    background-color: rgba(22, 29, 26, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bottom-sheet.open {
+    transform: translateY(0);
+}
+
+.sheet-drag-handle {
+    width: 36px;
+    height: 4px;
+    background-color: var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    margin: 0 auto 16px;
+}
+
+.dark-mode .sheet-drag-handle {
+    background-color: var(--text-muted);
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+
+.sheet-header-text h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.sheet-subtitle {
+    margin: 2px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+.sheet-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
+}
+
+.sheet-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 52px;
+    padding: 0 16px;
+    background-color: rgba(255, 252, 245, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.sheet-option:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.sheet-option:active {
+    transform: scale(0.98);
+}
+
+.sheet-option.selected {
+    background-color: rgba(46, 125, 50, 0.08);
+    border-color: var(--primary-color, #2E7D32);
+    color: var(--primary-color, #2E7D32);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+}
+
+.dark-mode .sheet-option {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+}
+
+.dark-mode .sheet-option:hover {
+    background-color: var(--text-muted);
+}
+
+.dark-mode .sheet-option.selected {
+    background-color: rgba(46, 125, 50, 0.15);
+    border-color: var(--primary-color, #2E7D32);
+}
+
+.check-icon {
+    color: var(--primary-color, #2E7D32);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.sheet-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.sheet-btn-cancel,
+.sheet-btn-save {
+    flex: 1;
+    height: 48px;
+    border-radius: 9999px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sheet-btn-cancel {
+    background-color: transparent;
+    border: 1px solid var(--border-color, #e0e0e0);
+    color: var(--text-color);
+}
+
+.dark-mode .sheet-btn-cancel {
+    border-color: var(--text-muted);
+}
+
+.sheet-btn-cancel:active {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .sheet-btn-cancel:active {
+    background-color: var(--text-muted);
+}

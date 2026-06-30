@@ -1,0 +1,529 @@
+/* =========================================================
+   TASBIH BACKGROUND SCENES
+   Each scene renders as layered divs behind the main UI.
+   ========================================================= */
+
+.tb-scene,
+.tasbih-wrapper > .tb-scene {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    overflow: hidden;
+    pointer-events: none;
+    animation: sceneEntry 0.8s ease-out forwards;
+}
+
+@keyframes sceneEntry {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ── Immersive background image styles ── */
+.tb-bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.75;
+    filter: brightness(0.9) contrast(1.1) saturate(1) blur(0.5px);
+    pointer-events: none;
+}
+
+.zoom-pan-animation {
+    animation: kenBurns 40s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+    0% {
+        transform: scale(1.02) translate(0px, 0px);
+    }
+    50% {
+        transform: scale(1.12) translate(-10px, 10px);
+    }
+    100% {
+        transform: scale(1.05) translate(10px, -5px);
+    }
+}
+
+/* ── Scene base gradients ── */
+.tb-emerald {
+    background: radial-gradient(ellipse at 30% 60%, #0a3d2e 0%, #041410 55%, #010806 100%);
+}
+.tb-forest {
+    background: linear-gradient(180deg, #061510 0%, #0d2b18 30%, #092213 70%, #020e09 100%);
+}
+.tb-moon {
+    background: linear-gradient(180deg, #010410 0%, #080d2e 55%, #0f172a 100%);
+}
+.tb-rain {
+    background: linear-gradient(150deg, #0a0e17 0%, #111827 45%, #1a2236 100%);
+}
+
+/* =========================================================
+   EMERALD GLOW
+   ========================================================= */
+.tb-orb {
+    position: absolute;
+    border-radius: 50%;
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    pointer-events: none;
+}
+.tb-orb-1 {
+    width: 320px; height: 320px;
+    top: 30%; left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%);
+    animation: orbPulse 8s ease-in-out infinite alternate;
+}
+.tb-orb-2 {
+    width: 220px; height: 220px;
+    top: 5%; left: 15%;
+    background: radial-gradient(circle, rgba(16,185,129,0.13) 0%, transparent 70%);
+    animation: orbPulse 12s ease-in-out infinite alternate-reverse;
+}
+.tb-orb-3 {
+    width: 260px; height: 260px;
+    bottom: 15%; right: 8%;
+    background: radial-gradient(circle, rgba(5,150,105,0.1) 0%, transparent 70%);
+    animation: orbPulse 10s ease-in-out infinite alternate;
+}
+@keyframes orbPulse {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 1;   }
+}
+.tb-orb-1 { animation-name: orbPulseCenter; }
+@keyframes orbPulseCenter {
+    0%   { transform: translateX(-50%) scale(1);   opacity: 0.6; }
+    100% { transform: translateX(-50%) scale(1.3); opacity: 1;   }
+}
+
+.tb-light-wave {
+    position: absolute;
+    bottom: -10%;
+    left: -50%; width: 200%; height: 60%;
+    background: radial-gradient(ellipse at center bottom, rgba(52,211,153,0.07) 0%, transparent 65%);
+    animation: waveFlow 11s ease-in-out infinite alternate;
+}
+@keyframes waveFlow {
+    0%   { transform: translateY(0)     scaleX(1);    opacity: 0.7; }
+    100% { transform: translateY(-25px) scaleX(1.06); opacity: 1;   }
+}
+
+.tb-particle {
+    position: absolute;
+    bottom: -8px;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(52,211,153,0.7);
+    box-shadow: 0 0 6px rgba(52,211,153,0.5);
+    animation: particleRise linear infinite;
+}
+@keyframes particleRise {
+    0%   { transform: translateY(0)     translateX(0);   opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.5; }
+    100% { transform: translateY(-100vh) translateX(25px); opacity: 0; }
+}
+
+/* =========================================================
+   FOREST WATERFALL
+   ========================================================= */
+.tb-stream {
+    position: absolute;
+    top: -10%; width: 90px; height: 125%;
+    background: linear-gradient(180deg, transparent 0%, rgba(52,211,153,0.09) 25%, rgba(16,185,129,0.14) 55%, rgba(52,211,153,0.07) 80%, transparent 100%);
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    animation: streamFall linear infinite;
+}
+.tb-stream-1 { left: 12%; animation-duration: 9s;  animation-delay: 0s;  }
+.tb-stream-2 { left: 43%; animation-duration: 13s; animation-delay: 3.5s;}
+.tb-stream-3 { left: 70%; animation-duration: 10s; animation-delay: 7s;  }
+@keyframes streamFall {
+    0%   { transform: translateY(-15%) scaleX(0.85); opacity: 0;   }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.8; }
+    100% { transform: translateY(15%)  scaleX(1.15); opacity: 0;   }
+}
+
+.tb-sun-rays {
+    position: absolute;
+    top: -20%; left: -10%;
+    width: 100%; height: 75%;
+    background: conic-gradient(from 15deg at 35% 0%,
+        rgba(250,204,21,0.07) 0deg, transparent 7deg,
+        rgba(250,204,21,0.05) 11deg, transparent 20deg,
+        rgba(250,204,21,0.06) 25deg, transparent 34deg,
+        rgba(250,204,21,0.04) 40deg, transparent 50deg
+    );
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    animation: sunSway 20s ease-in-out infinite alternate;
+}
+@keyframes sunSway {
+    0%   { transform: rotate(-6deg) scaleX(1);    opacity: 0.8; }
+    100% { transform: rotate(6deg)  scaleX(1.12); opacity: 1;   }
+}
+
+.tb-forest-mist {
+    position: absolute;
+    bottom: -5%; left: -10%;
+    width: 120%; height: 38%;
+    background: radial-gradient(ellipse at center bottom, rgba(52,211,153,0.07) 0%, transparent 70%);
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    animation: forestMist 14s ease-in-out infinite alternate;
+}
+@keyframes forestMist {
+    0%   { transform: translateY(0)     scaleX(1);    opacity: 0.6; }
+    100% { transform: translateY(-18px) scaleX(1.06); opacity: 1;   }
+}
+
+.tb-leaf {
+    position: absolute;
+    top: -30px;
+    font-size: 14px;
+    animation: leafFall ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+@keyframes leafFall {
+    0%   { transform: translateY(-30px)  rotate(0deg)   translateX(0);   opacity: 0;   }
+    10%  { opacity: 0.8; }
+    50%  { transform: translateY(48vh)   rotate(200deg) translateX(28px); opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(110vh)  rotate(380deg) translateX(-18px); opacity: 0;  }
+}
+
+/* =========================================================
+   MOONLIGHT NIGHT
+   ========================================================= */
+.tb-moon-circle {
+    position: absolute;
+    top: 7%; right: 12%;
+    width: 65px; height: 65px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f8fafc 0%, #cbd5e1 60%, #94a3b8 100%);
+    box-shadow: 0 0 40px rgba(226,232,240,0.4), 0 0 80px rgba(226,232,240,0.15);
+    animation: moonFloat 11s ease-in-out infinite alternate;
+}
+@keyframes moonFloat {
+    0%   { transform: translateY(0);   box-shadow: 0 0 40px rgba(226,232,240,0.4),  0 0 80px  rgba(226,232,240,0.15); }
+    100% { transform: translateY(-8px);box-shadow: 0 0 60px rgba(226,232,240,0.55), 0 0 120px rgba(226,232,240,0.2);  }
+}
+
+.tb-moon-glow {
+    position: absolute;
+    top: -2%; right: 4%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(226,232,240,0.14) 0%, transparent 70%);
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    animation: moonGlowPulse 9s ease-in-out infinite alternate;
+}
+@keyframes moonGlowPulse {
+    0%   { opacity: 0.6; transform: scale(1);   }
+    100% { opacity: 1;   transform: scale(1.25);}
+}
+
+.tb-star {
+    position: absolute;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 4px rgba(255,255,255,0.9);
+    animation: starTwinkle ease-in-out infinite alternate;
+    animation-duration: 2.5s;
+}
+@keyframes starTwinkle {
+    0%   { opacity: 0.15; transform: scale(0.7); }
+    100% { opacity: 1;    transform: scale(1.3); }
+}
+
+.tb-moon-dust {
+    position: absolute;
+    bottom: 0;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: rgba(226,232,240,0.45);
+    animation: dustFloat ease-in-out infinite;
+}
+@keyframes dustFloat {
+    0%   { transform: translateY(0)     translateX(0);   opacity: 0;   }
+    20%  { opacity: 0.6; }
+    80%  { opacity: 0.4; }
+    100% { transform: translateY(-65vh) translateX(22px); opacity: 0;  }
+}
+
+/* =========================================================
+   RAIN SERENITY
+   ========================================================= */
+.tb-raindrop {
+    position: absolute;
+    top: -100px;
+    width: 1.5px;
+    background: linear-gradient(180deg, transparent, rgba(147,197,253,0.55), transparent);
+    border-radius: 1px;
+    animation: rainfall linear infinite;
+}
+@keyframes rainfall {
+    0%   { transform: translateY(-80px)  translateX(0);   opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 0.7; }
+    100% { transform: translateY(110vh) translateX(-22px); opacity: 0; }
+}
+
+.tb-mist {
+    position: absolute;
+    left: -20%; width: 140%;
+    border-radius: 50%;
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    animation: mistDrift ease-in-out infinite alternate;
+}
+.tb-mist-1 {
+    bottom: -5%; height: 32%;
+    background: radial-gradient(ellipse at center, rgba(148,163,184,0.13) 0%, transparent 70%);
+    animation-duration: 16s;
+}
+.tb-mist-2 {
+    bottom: 12%; height: 22%;
+    background: radial-gradient(ellipse at center, rgba(100,116,139,0.09) 0%, transparent 70%);
+    animation-duration: 22s;
+    animation-delay: 5s;
+}
+@keyframes mistDrift {
+    0%   { transform: translateX(-6%) scaleY(1);    opacity: 0.6; }
+    100% { transform: translateX(6%)  scaleY(1.12); opacity: 1;   }
+}
+
+.tb-glass-reflection {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 28%;
+    background: linear-gradient(180deg, transparent 0%, rgba(147,197,253,0.03) 100%);
+}
+
+/* ============================================================
+   ☀️ NEW UPLIFTING TRANQUILITY SCENES
+   ============================================================ */
+
+.zoom-pan-slow {
+    animation: zoomPanSlow 30s infinite alternate ease-in-out;
+}
+
+@keyframes zoomPanSlow {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.1) translate(-2%, -2%); }
+}
+
+/* 1. Golden Sunrise Mosque */
+.tb-golden-sunrise { background: #0c0802; }
+.tb-sun-rays-warm {
+    position: absolute;
+    top: -20%; left: -20%; width: 140%; height: 140%;
+    background: radial-gradient(circle at 20% 30%, rgba(255, 220, 150, 0.25) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 2;
+    animation: sunRayPulse 8s infinite alternate ease-in-out;
+}
+
+@keyframes sunRayPulse {
+    0% { opacity: 0.4; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0.8; transform: scale(1.05) rotate(2deg); }
+}
+
+.tb-floating-dust {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 100px 100px;
+    z-index: 3;
+    opacity: 0.3;
+    animation: dustFloat 20s infinite linear;
+}
+
+@keyframes dustFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100px); }
+}
+
+/* 2. Peaceful Garden */
+.tb-peaceful-garden { background: #061008; }
+.tb-garden-bloom {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(139, 157, 131, 0.1) 0%, transparent 70%);
+    z-index: 2;
+    animation: bloomPulse 10s infinite alternate ease-in-out;
+}
+
+@keyframes bloomPulse {
+    from { opacity: 0.3; }
+    to { opacity: 0.6; }
+}
+
+.tb-petal {
+    position: absolute;
+    top: -20px;
+    font-size: 14px;
+    z-index: 4;
+    animation: petalFall linear infinite;
+}
+
+@keyframes petalFall {
+    0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
+}
+
+/* 3. Ocean Serenity */
+.tb-ocean-serenity { background: #040c14; }
+.tb-wave-shimmer {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 50%;
+    background: linear-gradient(180deg, transparent, rgba(52, 211, 153, 0.05));
+    z-index: 3;
+    animation: waveShimmer 6s infinite alternate ease-in-out;
+}
+
+@keyframes waveShimmer {
+    from { opacity: 0.2; transform: translateY(0); }
+    to { opacity: 0.5; transform: translateY(-10px); }
+}
+
+.tb-sunset-glow {
+    position: absolute;
+    top: 30%; left: 0; width: 100%; height: 20%;
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.15), transparent);
+    z-index: 2;
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+}
+
+/* ============================================================
+   🎬 CINEMATIC NATURE LIVING WALLPAPER (thasbeeh1)
+   ============================================================ */
+
+.tb-cinematic-nature {
+    background: #040d0a;
+}
+
+/* 1. Volumetric Sunlight Rays */
+.tb-sun-ray {
+    position: absolute;
+    top: -20%; left: 10%; width: 100%; height: 100%;
+    background: conic-gradient(from 180deg at 30% 0%, 
+        transparent 0deg, 
+        rgba(255, 250, 230, 0.05) 5deg, 
+        transparent 15deg,
+        rgba(255, 250, 230, 0.03) 25deg,
+        transparent 40deg
+    );
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    z-index: 2;
+    transform-origin: top left;
+    pointer-events: none;
+}
+
+.r-1 { animation: raySway 15s infinite alternate ease-in-out; }
+.r-2 { animation: raySway 22s infinite alternate-reverse ease-in-out; opacity: 0.6; }
+
+@keyframes raySway {
+    0% { transform: rotate(-3deg) scale(1); opacity: 0.05; }
+    100% { transform: rotate(4deg) scale(1.1); opacity: 0.15; }
+}
+
+/* 2. Atmospheric Mist Layer */
+.tb-mist-layer {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 120%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+    /* Removed heavy blur filter to prevent muddy foggy bleeding */
+    z-index: 3;
+    pointer-events: none;
+}
+
+.m-1 { animation: mistDriftCinematic 18s infinite alternate ease-in-out; }
+.m-2 { animation: mistDriftCinematic 25s infinite alternate-reverse ease-in-out; bottom: -10%; }
+
+@keyframes mistDriftCinematic {
+    0% { transform: translateY(0) scaleX(1); opacity: 0.3; }
+    100% { transform: translateY(-30px) scaleX(1.15); opacity: 0.6; }
+}
+
+/* 3. River Surface Shimmer & Flow Reflection */
+.tb-river-surface {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 40%;
+    overflow: hidden;
+    z-index: 4;
+    mask-image: linear-gradient(to top, black 20%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
+}
+
+.tb-water-reflection {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.02) 20%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        rgba(255, 255, 255, 0.02) 80%, 
+        transparent 100%);
+    background-size: 200% 100%;
+    filter: blur(8px);
+    animation: waterFlowShimmer 12s infinite linear;
+}
+
+@keyframes waterFlowShimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+
+/* 4. Ambient Floating Light Dust (High Refinement) */
+.tb-cinematic-dust {
+    position: absolute;
+    bottom: -10px;
+    width: 1.5px; height: 1.5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(0.8px);
+    z-index: 5;
+    animation: dustRiseCinematic linear infinite;
+}
+
+@keyframes dustRiseCinematic {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    20% { opacity: 0.05; }
+    80% { opacity: 0.03; }
+    100% { transform: translateY(-80vh) translateX(30px); opacity: 0; }
+}
+
+/* 5. Soft Cinematic Vignette */
+.tb-cinematic-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 40%, rgba(4, 13, 10, 0.3) 100%);
+    z-index: 6;
+    pointer-events: none;
+}
+
+/* ============================================================
+   🎥 VIDEO BACKGROUND
+   ============================================================ */
+.tb-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9; /* Preserve video brightness but slightly transparent for blending if needed */
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Very subtle dark overlay for UI readability */
+.tb-video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+

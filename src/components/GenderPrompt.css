@@ -1,0 +1,104 @@
+.gender-prompt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.gender-prompt-card {
+    background: var(--bg-card);
+    width: 100%;
+    max-width: 360px;
+    border-radius: 24px;
+    padding: 32px 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.gender-prompt-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.gender-prompt-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.gender-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.gender-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gender-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--gold);
+}
+
+.gender-btn:active {
+    transform: scale(0.98);
+}
+
+.gender-icon {
+    font-size: 24px;
+}
+
+.gender-prompt-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.skip-link {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px;
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.skip-link:hover {
+    opacity: 1;
+}
+
+/* Light Mode Adjustments */
+.light-mode .gender-btn {
+    background: #f8fafc;
+}
+
+.light-mode .gender-prompt-card {
+    background: #ffffff;
+}

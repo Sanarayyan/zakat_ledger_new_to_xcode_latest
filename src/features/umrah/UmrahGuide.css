@@ -1,0 +1,389 @@
+@import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.ug-root {
+  min-height: 100vh;
+  background: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.ug-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(12px + env(safe-area-inset-top, 0)) 16px 12px;
+  background: var(--header-bg, rgba(255,255,255,0.95));
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.ug-back-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-main); display: flex; align-items: center;
+  transition: transform 0.2s;
+}
+.ug-back-btn:hover {
+  transform: translateX(-3px);
+}
+.ug-title {
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--text-main); margin: 0;
+}
+
+/* Hero section with premium Islamic gradient */
+.ug-hero {
+  background: linear-gradient(150deg, #092013 0%, #1F5A3D 50%, #06150d 100%);
+  padding: 36px 20px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.ug-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(200,166,70,0.18) 0%, transparent 75%);
+  pointer-events: none;
+}
+.ug-hero-kaaba {
+  font-size: 54px;
+  margin-bottom: 12px;
+  display: block;
+  animation: float-kaaba 4s ease-in-out infinite;
+}
+@keyframes float-kaaba {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.ug-hero-title {
+  font-size: 1.6rem; font-weight: 800;
+  color: #C8A646; margin: 0 0 4px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+.ug-hero-sub {
+  font-size: 0.88rem; color: var(--text-muted);
+  margin: 0 0 16px;
+}
+.ug-hero-ayah {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(200,166,70,0.2);
+  border-radius: 16px;
+  padding: 14px 18px;
+  max-width: 360px;
+  margin: 0 auto 16px;
+  backdrop-filter: blur(10px);
+}
+.ug-ayah-arabic {
+  font-family: 'Scheherazade New', serif;
+  font-size: 1.4rem; color: #C8A646;
+  direction: rtl; margin: 0 0 6px;
+  line-height: 1.4;
+}
+.ug-ayah-ref {
+  font-size: 0.72rem; color: var(--text-muted);
+  margin: 0; text-transform: uppercase; letter-spacing: 1px;
+}
+.ug-hero-progress {
+  max-width: 360px; margin: 0 auto;
+}
+.ug-hero-progress span {
+  display: block; font-size: 0.78rem;
+  color: var(--text-muted); margin-bottom: 6px;
+}
+
+/* Search bar and Filters */
+.ug-search-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border);
+}
+.ug-search-input {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ug-search-input:focus {
+  border-color: #1F5A3D;
+  box-shadow: 0 0 0 3px rgba(31,90,61,0.15);
+}
+.ug-bookmark-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ug-bookmark-toggle-btn.active {
+  background: #1F5A3D;
+  color: #C8A646;
+  border-color: rgba(200,166,70,0.4);
+}
+
+/* Horizontal navigation tabs */
+.ug-nav-tabs {
+  display: flex; overflow-x: auto;
+  padding: 10px 8px; gap: 6px;
+  scrollbar-width: none;
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 51px; z-index: 99;
+}
+.ug-nav-tabs::-webkit-scrollbar { display: none; }
+.ug-nav-tab {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 6px 14px;
+  border-radius: 12px; border: 1.5px solid var(--border);
+  background: #fdfbf7; cursor: pointer;
+  white-space: nowrap; flex-shrink: 0;
+  transition: all 0.2s;
+}
+.ug-nav-tab.active {
+  background: #1F5A3D; 
+  border-color: rgba(200,166,70,0.4);
+}
+.ug-nav-icon { font-size: 1.2rem;  color: var(--text-muted); }
+.ug-nav-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); }
+.ug-nav-tab.active .ug-nav-label { color: #fdfbf7; }
+
+/* Content sections wrapper */
+.ug-content { padding: 16px; }
+.ug-section { display: flex; flex-direction: column; gap: 14px; }
+.ug-intro-tip {
+  background: var(--bg-card); border-radius: 14px;
+  padding: 12px 16px; border: 1.5px solid var(--border);
+}
+.ug-intro-tip p { margin: 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Main Cards template styles */
+.ug-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.ug-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.ug-card-header h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin: 0; }
+.ug-card-content-desc { font-size: 0.88rem; color: var(--text-main); line-height: 1.6; margin: 0; }
+.ug-intro-desc { font-size: 0.9rem; color: var(--text-main); line-height: 1.6; margin: 0; }
+
+/* Custom Action Bookmarks / Copy button styling */
+.ug-bookmark-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 4px; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s;
+}
+.ug-bookmark-btn:hover { transform: scale(1.15); }
+
+/* Timeline Journey step cards */
+.ug-step-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ug-step-card.completed {
+  border-color: rgba(31,90,61,0.4);
+  background: rgba(31,90,61,0.03);
+}
+.ug-step-header {
+  display: flex; align-items: center;
+  gap: 12px; padding: 14px 16px;
+  cursor: pointer;
+}
+.ug-step-icon-bg {
+  width: 44px; height: 44px;
+  border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+}
+.ug-step-info { flex: 1; min-width: 0; }
+.ug-step-index { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.ug-step-title { font-size: 0.98rem; font-weight: 700; color: var(--text-main); margin: 2px 0 0; }
+.ug-step-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.ug-check-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: none;
+  cursor: pointer; font-size: 1rem; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.ug-check-btn.done {
+  background: #1F5A3D; border-color: #1F5A3D;
+  color: white; font-weight: 700;
+}
+.ug-chevron-icon { font-size: 0.7rem; color: var(--text-muted); }
+
+.ug-step-body { padding: 0 18px 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+.ug-step-desc { font-size: 0.9rem; color: var(--text-main); line-height: 1.6; margin: 0 0 14px; }
+
+/* Tag boxes inside steps */
+.ug-tag-box { background: var(--bg-body); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.ug-tag-box.sunnah { border-left: 3.5px solid #C8A646; }
+.ug-tag-box.rules { border-left: 3.5px solid #1F5A3D; }
+.ug-tag-box.mistakes { border-left: 3.5px solid #ef4444; }
+.ug-tag-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+  display: block; margin-bottom: 6px; color: var(--text-muted);
+}
+.ug-tag-box p { margin: 0; font-size: 0.84rem; color: var(--text-main); line-height: 1.5; }
+
+/* Dua specific cards styling */
+.ug-dua-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.ug-dua-cat {
+  background: rgba(31,90,61,0.12); color: var(--primary);
+  font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+}
+.ug-dua-actions { display: flex; align-items: center; gap: 6px; }
+.ug-dua-action-icon {
+  background: none; border: 1px solid var(--border); cursor: pointer;
+  border-radius: 8px; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; color: var(--text-muted); transition: all 0.2s;
+}
+.ug-dua-action-icon:hover { background: var(--border); color: var(--text-main); }
+.ug-dua-title { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 0 0 12px; }
+.ug-dua-arabic {
+  font-family: 'Scheherazade New', serif;
+  font-size: 1.45rem; direction: rtl; color: #C8A646;
+  line-height: 2; margin-bottom: 12px; text-align: right;
+}
+.ug-dua-trans { font-size: 0.84rem; color: var(--text-muted); font-style: italic; margin-bottom: 8px; line-height: 1.5; }
+.ug-dua-meaning { font-size: 0.88rem; color: var(--text-main); line-height: 1.6; margin: 0; }
+
+.ug-step-dua-mini {
+  background: rgba(200,166,70,0.04);
+  border: 1px solid rgba(200,166,70,0.25);
+  border-radius: 14px; padding: 12px 14px; margin-top: 12px;
+}
+.ug-step-dua-arabic {
+  font-family: 'Scheherazade New', serif;
+  font-size: 1.2rem; color: #C8A646;
+  direction: rtl; line-height: 1.8; margin: 0 0 6px; text-align: right;
+}
+.ug-step-dua-trans { font-size: 0.78rem; color: var(--text-muted); margin: 0 0 4px; font-style: italic; }
+.ug-step-dua-meaning { font-size: 0.82rem; color: var(--text-main); margin: 0; }
+
+/* Interactive checklist styling */
+.ug-checklist-progress-card { background: var(--bg-card); border-radius: 14px; padding: 14px 16px; }
+.ug-checklist-progress-label { font-size: 0.84rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px; }
+.ug-progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.ug-progress-fill { height: 100%; background: linear-gradient(90deg, #1F5A3D, #C8A646); border-radius: 3px; transition: width 0.4s ease; }
+
+.ug-checklist-category-card { background: var(--bg-card); border-radius: 18px; padding: 16px; }
+.ug-checklist-cat-title { margin: 0 0 14px; font-size: 0.95rem; font-weight: 700; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.ug-checklist-items { display: flex; flex-direction: column; gap: 2px; }
+.ug-checklist-item-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 4px; cursor: pointer;
+  font-size: 0.88rem; color: var(--text-main);
+  border-bottom: 1px solid rgba(0,0,0,0.03); transition: background 0.2s;
+}
+.ug-checklist-item-row:last-child { border-bottom: none; }
+.ug-checklist-item-row.checked .ug-checklist-item-text { color: var(--text-muted); text-decoration: line-through; }
+.ug-checklist-box {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 1.5px solid var(--border); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+  transition: all 0.2s;
+}
+.ug-checklist-item-row.checked .ug-checklist-box { background: #1F5A3D; border-color: #1F5A3D; color: white; }
+
+/* Common Mistakes special styles */
+.ug-mistake-icon { font-size: 1.5rem; flex-shrink: 0; }
+.ug-mistake-title { font-size: 0.98rem; font-weight: 700; color: var(--text-main); margin: 0; flex: 1; }
+
+/* Micro interactions and animations */
+.pulse-green {
+  animation: pulse-audio 1.5s infinite;
+  background: #1F5A3D !important;
+  color: white !important;
+  border-color: #1F5A3D !important;
+}
+@keyframes pulse-audio {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); box-shadow: 0 0 10px rgba(31,90,61,0.4); }
+  100% { transform: scale(1); }
+}
+
+.animate-fade {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide {
+  animation: slideDown 0.25s ease-out;
+}
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; overflow: hidden; }
+  to { opacity: 1; max-height: 500px; }
+}
+
+/* Miqat & Ziyarah Premium additions */
+.ug-miqat-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ug-miqat-distance {
+  font-size: 0.72rem;
+  color: #C8A646;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ug-ziyarah-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.ug-ziyarah-group-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 2px solid rgba(31,90,61,0.15);
+  padding-bottom: 6px;
+  margin: 12px 0 4px;
+}
+
+/* Icon Standardization */
+.ug-nav-icon svg { width: 22px; height: 22px; stroke-width: 2px; }
+.ug-search-input-wrapper { display: flex; align-items: center; width: 100%; }
+.ug-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-muted); pointer-events: none; }
+.ug-search-input { padding-left: 40px !important; width: 100%; box-sizing: border-box; }
+.ug-bookmark-toggle-btn svg { width: 18px; height: 18px; margin-right: 4px; }
+.ug-tag-label svg { width: 16px; height: 16px; margin-right: 6px; flex-shrink: 0; }
+.ug-tag-label { display: flex; align-items: center; }
+.ug-bookmark-btn svg { width: 22px; height: 22px; stroke-width: 2px; }
