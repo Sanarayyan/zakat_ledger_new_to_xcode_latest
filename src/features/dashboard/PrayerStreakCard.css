@@ -1,0 +1,199 @@
+/* === Prayer Streak Card === */
+
+.psc-card {
+    background: var(--dash-card-bg);
+    border-radius: 20px;
+    padding: 16px 18px 0;
+    box-shadow: var(--dash-shadow-sm);
+    border: 1px solid var(--dash-border);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.psc-card.psc-complete {
+    border-color: rgba(230, 126, 34, 0.35);
+    box-shadow: 0 4px 20px rgba(230, 126, 34, 0.10);
+}
+
+/* Header row */
+.psc-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    padding-bottom: 14px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.psc-flame-box {
+    width: 46px;
+    height: 46px;
+    background: var(--dash-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.3s;
+}
+
+.psc-card.psc-complete .psc-flame-box {
+    background: rgba(230, 126, 34, 0.12);
+}
+
+.psc-streak-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.psc-streak-count {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dash-text-main);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.psc-badge {
+    font-size: 1rem;
+    animation: bounceIn 0.4s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.psc-streak-sub {
+    font-size: 0.82rem;
+    color: var(--dash-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.psc-chevron {
+    color: var(--dash-text-muted);
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.psc-chevron.open {
+    transform: rotate(90deg);
+}
+
+/* Progress bar */
+.psc-progress-track {
+    height: 4px;
+    background: var(--dash-accent);
+    border-radius: 4px;
+    margin: 0 -18px;
+    overflow: hidden;
+}
+
+.psc-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #E67E22, #f39c12);
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Expanded prayers list */
+.psc-prayers-list {
+    padding: 12px 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.psc-prayer-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: 'Outfit', sans-serif;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.psc-prayer-row:hover {
+    background: var(--dash-accent);
+}
+
+.psc-prayer-row.done {
+    background: rgba(230, 126, 34, 0.07);
+}
+
+.psc-prayer-emoji {
+    font-size: 1.2rem;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.psc-prayer-name {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dash-text-main);
+}
+
+.psc-prayer-row.done .psc-prayer-name {
+    text-decoration: line-through;
+    color: var(--dash-text-muted);
+}
+
+.psc-prayer-check {
+    color: var(--dash-text-muted);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.psc-prayer-row.done .psc-prayer-check {
+    color: #E67E22;
+    transform: scale(1.1);
+}
+
+/* Mark all btn */
+.psc-mark-all-btn {
+    margin: 10px 0 14px;
+    padding: 11px 16px;
+    background: linear-gradient(135deg, #E67E22, #f39c12);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.02em;
+    transition: opacity 0.2s, transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.psc-mark-all-btn:hover {
+    opacity: 0.92;
+}
+
+.psc-mark-all-btn:active {
+    transform: scale(0.98);
+}

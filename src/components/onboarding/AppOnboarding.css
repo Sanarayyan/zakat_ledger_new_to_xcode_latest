@@ -1,0 +1,356 @@
+/* AppOnboarding.css */
+:root {
+    --app-onboarding-bg: #FDFBF7;
+    --app-onboarding-text: #2C3E2D;
+    --app-onboarding-primary: #D4AF37;
+    --app-onboarding-card: #FFFFFF;
+    --app-onboarding-border: rgba(212, 175, 55, 0.2);
+    --app-onboarding-glass: rgba(255, 255, 255, 0.85);
+}
+
+.dark-mode {
+    --app-onboarding-bg: #0F1714;
+    --app-onboarding-text: #E5E7E1;
+    --app-onboarding-primary: #E5C158;
+    --app-onboarding-card: #1A2421;
+    --app-onboarding-border: rgba(229, 193, 88, 0.2);
+    --app-onboarding-glass: rgba(26, 36, 33, 0.85);
+}
+
+.app-onboarding-viewport {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--app-onboarding-bg);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--app-onboarding-text);
+    transition: opacity 0.8s ease-in-out;
+}
+
+.app-onboarding-viewport.exit {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Background Soft Glow */
+.app-onboarding-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, var(--app-onboarding-primary) 0%, transparent 70%);
+    opacity: 0.08;
+    border-radius: 50%;
+    filter: blur(40px);
+    z-index: 1;
+}
+.app-onboarding-glow.top-right {
+    top: -10%;
+    right: -10%;
+}
+.app-onboarding-glow.bottom-left {
+    bottom: -10%;
+    left: -10%;
+}
+
+.app-onboarding-container {
+    position: relative;
+    z-index: 10;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header & Navigation */
+.onboarding-header {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+}
+
+.btn-onboarding-back {
+    background: transparent;
+    border: none;
+    color: var(--app-onboarding-text);
+    padding: 10px;
+    margin-left: -10px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.btn-onboarding-back:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+.dark-mode .btn-onboarding-back:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.onboarding-step-counter {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--app-onboarding-text);
+    opacity: 0.5;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Step Transitions */
+.onboarding-step-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.onboarding-icon-wrapper {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: var(--app-onboarding-card);
+    border: 1px solid var(--app-onboarding-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    color: var(--app-onboarding-primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+}
+.dark-mode .onboarding-icon-wrapper {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.onboarding-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: -0.5px;
+}
+
+.onboarding-description {
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    opacity: 0.8;
+    margin-bottom: 32px;
+    max-width: 320px;
+}
+
+.onboarding-subtext {
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+    opacity: 0.6;
+    margin-top: -16px;
+    margin-bottom: 32px;
+    max-width: 300px;
+}
+
+/* Action Buttons */
+.onboarding-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-onboarding-primary, .btn-onboarding-ghost {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-onboarding-primary {
+    background: var(--app-onboarding-primary);
+    color: #FFF;
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+}
+.dark-mode .btn-onboarding-primary {
+    color: var(--text-main);
+    box-shadow: 0 8px 20px rgba(229, 193, 88, 0.2);
+}
+.btn-onboarding-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(212, 175, 55, 0.4);
+}
+.btn-onboarding-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-onboarding-ghost {
+    background: transparent;
+    color: var(--app-onboarding-text);
+    opacity: 0.7;
+}
+.btn-onboarding-ghost:hover {
+    opacity: 1;
+    background: rgba(0,0,0,0.03);
+}
+.dark-mode .btn-onboarding-ghost:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Selection Cards (Madhab, Gender) */
+.selection-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.selection-card {
+    width: 100%;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: var(--app-onboarding-card);
+    border: 1px solid var(--app-onboarding-border);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.selection-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--app-onboarding-primary);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.selection-card.active {
+    border-color: var(--app-onboarding-primary);
+    background: rgba(212, 175, 55, 0.05);
+}
+.dark-mode .selection-card.active {
+    background: rgba(229, 193, 88, 0.08);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--app-onboarding-text);
+}
+
+.card-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--app-onboarding-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.selection-card.active .card-indicator {
+    border-color: var(--app-onboarding-primary);
+    background: var(--app-onboarding-primary);
+}
+
+.card-indicator::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFF;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dark-mode .card-indicator::after {
+    background: var(--text-main);
+}
+
+.selection-card.active .card-indicator::after {
+    opacity: 1;
+}
+
+/* Progress Dots */
+.onboarding-progress {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--app-onboarding-text);
+    opacity: 0.2;
+    transition: all 0.4s ease;
+}
+
+.progress-dot.active {
+    width: 24px;
+    opacity: 1;
+    background: var(--app-onboarding-primary);
+}
+
+.location-detected-card {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--app-onboarding-card);
+    border: 1px solid var(--app-onboarding-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+.loc-city-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+.loc-change-btn {
+    background: none;
+    border: none;
+    color: var(--app-onboarding-primary);
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}

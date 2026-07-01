@@ -1,0 +1,850 @@
+/* ====================================================
+   📿 RATHEEB AL-HADDAD ULTIMATE SPOTIFY-STYLE CSS
+   ==================================================== */
+
+.ratheeb-root {
+    min-height: 100vh;
+    background: #fdfbf7; /* Luxury warm cream */
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Theme Midnight emerald */
+.ratheeb-root.dark-theme {
+    background: #0d120f;
+    color: #e2e8f0;
+}
+
+/* 1. Header bar glassmorphism */
+.ratheeb-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(253, 251, 247, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+    padding: calc(14px + env(safe-area-inset-top, 0)) 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ratheeb-root.dark-theme .ratheeb-header {
+    background: rgba(13, 18, 15, 0.85);
+    border-bottom-color: var(--border);
+}
+
+.rh-back-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.ratheeb-root.dark-theme .rh-back-btn {
+    color: #34d399;
+}
+
+.rh-back-btn:hover {
+    background: rgba(26, 92, 58, 0.05);
+    transform: translateX(-2px);
+}
+
+.rh-header-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    color: var(--primary);
+    margin: 0;
+}
+
+.ratheeb-root.dark-theme .rh-header-title {
+    color: #e2e8f0;
+}
+
+.rh-header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.rh-icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #bfa15f;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.rh-icon-btn:hover {
+    background: rgba(191, 161, 95, 0.1);
+    transform: scale(1.1);
+}
+
+/* 2. Scroll progress top */
+.rh-progress-bar {
+    position: fixed;
+    top: 58px;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #bfa15f, #1a5c3a);
+    z-index: 1001;
+    transition: width 0.1s ease;
+}
+
+.ratheeb-root.dark-theme .rh-progress-bar {
+    background: linear-gradient(90deg, #d4af37, #34d399);
+}
+
+/* 3. Reading Container */
+.rh-reading-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: padding-bottom 0.3s ease;
+}
+
+/* 4. Reminder panel */
+.rh-reminder-panel {
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.12);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.02);
+}
+
+.ratheeb-root.dark-theme .rh-reminder-panel {
+    background: #121815;
+    border-color: var(--border);
+}
+
+.rh-reminder-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.ratheeb-root.dark-theme .rh-reminder-title {
+    color: #34d399;
+}
+
+.rh-reminder-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    line-height: 1.35;
+}
+
+.ratheeb-root.dark-theme .rh-reminder-desc {
+    color: #9ba8a1;
+}
+
+/* Switch toggle */
+.rh-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.rh-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.rh-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.rh-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+input:checked + .rh-slider {
+    background-color: #1a5c3a;
+}
+
+.ratheeb-root.dark-theme input:checked + .rh-slider {
+    background-color: #34d399;
+}
+
+input:checked + .rh-slider:before {
+    transform: translateX(20px);
+}
+
+/* 5. Utility control bar */
+.rh-dashboard-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 6px;
+}
+
+.rh-badge-info {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(26, 92, 58, 0.06);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.ratheeb-root.dark-theme .rh-badge-info {
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.08);
+}
+
+.rh-control-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: transparent;
+    border: 1px solid rgba(26, 92, 58, 0.15);
+    border-radius: 30px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ratheeb-root.dark-theme .rh-control-btn {
+    color: #34d399;
+    border-color: rgba(52, 211, 153, 0.15);
+}
+
+.rh-control-btn:hover {
+    background: rgba(26, 92, 58, 0.05);
+}
+
+/* 6. Dhikr Liturgy Card */
+.rh-dhikr-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.35s ease;
+}
+
+.ratheeb-root.dark-theme .rh-dhikr-card {
+    background: #121815;
+    border-color: var(--border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ACTIVE HIGHLIGHT STATE */
+.rh-dhikr-card.active-reading {
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
+    transform: translateY(-2px) scale(1.005);
+    transition: all 0.35s ease;
+    z-index: 10;
+}
+
+.ratheeb-root.dark-theme .rh-dhikr-card.active-reading {
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
+    transform: translateY(-2px) scale(1.005);
+    transition: all 0.35s ease;
+    z-index: 10;
+}
+
+.rh-dhikr-card.card-completed {
+    border-color: rgba(26, 92, 58, 0.2);
+    background: linear-gradient(180deg, #ffffff, #f6faf7);
+}
+
+.ratheeb-root.dark-theme .rh-dhikr-card.card-completed {
+    border-color: rgba(52, 211, 153, 0.15);
+    background: linear-gradient(180deg, #121815, var(--bg-card)513);
+}
+
+/* Card metadata top row */
+.rh-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px dashed rgba(212, 175, 55, 0.1);
+    padding-bottom: 8px;
+}
+
+.rh-section-num {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #bfa15f;
+    background: rgba(191, 161, 95, 0.06);
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+.rh-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.2px;
+}
+
+.ratheeb-root.dark-theme .rh-section-title {
+    color: #9ba8a1;
+}
+
+.rh-bookmark-btn {
+    background: transparent;
+    border: none;
+    color: #c8cbd0;
+    cursor: pointer;
+    font-size: 1.05rem;
+    transition: all 0.2s ease;
+}
+
+.rh-bookmark-btn.bookmarked {
+    color: #bfa15f;
+}
+
+/* Arabic typography readability */
+.rh-arabic-text {
+    font-size: 1.55rem;
+    line-height: 2.2;
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    color: var(--text-main);
+    text-align: right;
+    direction: rtl;
+    padding: 6px 0;
+    word-spacing: 2px;
+    transition: color 0.2s ease;
+}
+
+.ratheeb-root.dark-theme .rh-arabic-text {
+    color: #e9ecef;
+}
+
+/* Active glowing text element */
+.active-reading .rh-arabic-text {
+    text-shadow: 0 0 1px rgba(191, 161, 95, 0.2);
+    color: var(--text-main); /* Brighter for light theme */
+}
+
+.ratheeb-root.dark-theme .active-reading .rh-arabic-text {
+    color: var(--text-main); /* Brilliant white for dark theme */
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.active-reading .rh-transliteration {
+    color: var(--text-muted); /* Stronger gold */
+    background: rgba(191, 161, 95, 0.05);
+}
+
+.ratheeb-root.dark-theme .active-reading .rh-transliteration {
+    color: #d4af37;
+}
+
+.active-reading .rh-translation {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.ratheeb-root.dark-theme .active-reading .rh-translation {
+    color: #e2e8f0;
+}
+
+/* Transliterations and Translations */
+.rh-transliteration {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    font-style: italic;
+    color: #bfa15f;
+    background: rgba(191, 161, 95, 0.02);
+    padding: 10px 14px;
+    border-left: 2px solid #bfa15f;
+    border-radius: 0 10px 10px 0;
+}
+
+.rh-translation {
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+
+.ratheeb-root.dark-theme .rh-translation {
+    color: #9ba8a1;
+}
+
+/* Counters */
+.rh-counter-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.rh-counter-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(212, 175, 55, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.12);
+    border-radius: 40px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #bfa15f;
+    font-weight: 700;
+}
+
+.rh-counter-button:hover {
+    background: rgba(212, 175, 55, 0.06);
+    transform: translateY(-1px);
+}
+
+.rh-counter-button.completed {
+    background: #1a5c3a;
+    border-color: #1a5c3a;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(26, 92, 58, 0.12);
+}
+
+.ratheeb-root.dark-theme .rh-counter-button.completed {
+    background: #34d399;
+    border-color: #34d399;
+    color: var(--bg-card)827;
+}
+
+.rh-counter-num {
+    font-size: 0.85rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+.rh-counter-target {
+    font-size: 0.72rem;
+    opacity: 0.85;
+}
+
+/* ====================================================
+   🎵 7. PREMIUM SPOTIFY-STYLE DOCKED AUDIO PLAYER
+   ==================================================== */
+
+.rh-spotify-player {
+    position: fixed;
+    bottom: 80px; /* Sits perfectly above bottom nav bar */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 520px;
+    background: rgba(18, 25, 21, 0.98); /* Spotify-inspired sleek deep green-black */
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    z-index: 999;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+/* COLLAPSED STATE SLIM DESIGN */
+.rh-spotify-player.collapsed {
+    height: 70px;
+}
+
+/* EXPANDED STATE COMPACT LAYOUT */
+.rh-spotify-player.expanded {
+    height: 160px;
+}
+
+/* ERROR STATE ADAPTABILITY */
+.rh-spotify-player.has-error.collapsed {
+    height: 104px;
+}
+.rh-spotify-player.has-error.expanded {
+    height: 194px;
+}
+
+/* Audio Error Banner */
+.rh-player-error-banner {
+    background: #8b2619;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.rh-retry-btn {
+    background: #ffffff;
+    color: #8b2619;
+    border: none;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.rh-retry-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Seeker slider timeline bar */
+.rh-player-progress-container {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.rh-player-seek {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 5;
+    margin: 0;
+}
+
+.rh-progress-fill-visual {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #bfa15f, #34d399);
+    width: 0%;
+    z-index: 1;
+}
+
+/* Collapsed Mini layout */
+.rh-collapsed-inner-row {
+    display: flex;
+    align-items: center;
+    height: 66px;
+    padding: 0 16px;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.rh-mini-play-btn {
+    background: #bfa15f;
+    color: var(--text-main);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(191, 161, 95, 0.35);
+    transition: all 0.2s ease;
+}
+
+.rh-mini-play-btn:hover {
+    transform: scale(1.06);
+    background: #d4af37;
+}
+
+.rh-spinner-mini {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(18, 24, 21, 0.25);
+    border-top-color: #121815;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.rh-mini-info-block {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.rh-mini-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rh-mini-duration {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+.rh-mini-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 6px;
+}
+
+.rh-mini-arrow:hover {
+    color: #bfa15f;
+    transform: translateY(-2px);
+}
+
+/* Expanded Layout State */
+.rh-expanded-inner-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 156px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+}
+
+.rh-expanded-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 50px;
+}
+
+.rh-expanded-info-box {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.rh-expanded-section-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rh-expanded-subtitle {
+    font-size: 0.72rem;
+    color: rgba(191,161,95,0.9);
+    margin-top: 2px;
+}
+
+.rh-expanded-controls-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.rh-control-trigger {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.rh-control-trigger:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.rh-control-trigger:hover:not(:disabled) {
+    color: #bfa15f;
+    transform: scale(1.08);
+}
+
+.rh-control-trigger.secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.12);
+    color: #d4af37;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.rh-control-trigger.secondary svg {
+    width: 18px;
+    height: 18px;
+}
+
+.rh-control-trigger.secondary:hover:not(:disabled) {
+    background: rgba(212, 175, 55, 0.22);
+    color: #ebd074;
+    transform: scale(1.08);
+}
+
+
+.rh-control-trigger.play-round {
+    background: #bfa15f;
+    color: var(--text-main);
+    width: 36px;
+    height: 36px;
+    box-shadow: 0 3px 10px rgba(191, 161, 95, 0.3);
+}
+
+.rh-control-trigger.play-round:hover {
+    background: #d4af37;
+    transform: scale(1.05);
+}
+
+.rh-spinner-expanded {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(18, 24, 21, 0.25);
+    border-top-color: #121815;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.rh-expanded-collapse-chevron {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.rh-expanded-collapse-chevron:hover {
+    color: #bfa15f;
+}
+
+/* Expanded Settings configurations Row */
+.rh-expanded-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 8px;
+}
+
+.rh-setting-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rh-setting-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.rh-pill-selectors {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 30px;
+    padding: 2px;
+    display: flex;
+    gap: 2px;
+}
+
+.rh-pill-opt {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rh-pill-opt:hover {
+    color: #ffffff;
+}
+
+.rh-pill-opt.selected {
+    background: #bfa15f;
+    color: var(--text-main);
+}
+
+/* Bookmarks notice */
+.rh-empty-notice {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Malayalam Readability typography specs */
+.rh-translation {
+    font-size: 0.92rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.ratheeb-root.dark-theme .rh-translation {
+    color: #a0b0a6;
+}

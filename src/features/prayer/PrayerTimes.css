@@ -1,0 +1,801 @@
+/* Base Page Variables & Atmosphere */
+.prayer-page {
+    min-height: 100vh;
+    transition: background 1s ease-in-out, color 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+    /* Default Colors */
+    --p-text-main: var(--text-main); 
+    --p-text-muted: #4b5563;
+    --p-card-bg: rgba(255, 255, 255, 0.95); /* Solid clean white */
+    --p-card-border: rgba(0, 0, 0, 0.05); /* Subtle dark border */
+    --p-card-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Soft clean shadow */
+    --p-accent: #c5a059;
+    --p-overlay-dim: rgba(0, 0, 0, 0.4); /* Just a clean dark dim over the background image */
+}
+
+.prayer-page.dark {
+    --p-text-main: #ffffff;
+    --p-text-muted: #9ca3af;
+    --p-card-bg: rgba(24, 24, 24, 0.95); /* Solid dark */
+    --p-card-border: rgba(255, 255, 255, 0.05);
+    --p-card-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    --p-overlay-dim: rgba(0, 0, 0, 0.6);
+}
+
+/* Atmospheric Themes (Removed solid gradients to stop fog, using dim layers instead) */
+.prayer-page.theme-dawn {
+    --p-overlay-dim: rgba(28, 43, 57, 0.6);
+    --p-accent: #d97706; 
+}
+.prayer-page.theme-morning {
+    --p-overlay-dim: rgba(0, 0, 0, 0.3);
+    --p-accent: #d97706; 
+}
+.prayer-page.theme-day {
+    --p-overlay-dim: rgba(0, 0, 0, 0.3);
+    --p-accent: #b8860b;
+}
+.prayer-page.theme-afternoon {
+    --p-overlay-dim: rgba(43, 37, 30, 0.5);
+    --p-accent: #b45309;
+}
+.prayer-page.theme-sunset {
+    --p-overlay-dim: rgba(44, 26, 53, 0.6);
+    --p-accent: #d97706;
+}
+.prayer-page.theme-night {
+    --p-overlay-dim: rgba(15, 23, 42, 0.7);
+    --p-accent: #0284c7;
+}
+
+/* Applying Background */
+.atmosphere-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--p-overlay-dim); /* Clean dark dim to allow background image to be visible but not overpower */
+    z-index: 0;
+    transition: background 1s ease-in-out;
+}
+
+.prayer-container {
+    position: relative;
+    z-index: 1;
+    padding: 16px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    max-width: 420px;
+    margin: 0 auto;
+    font-family: var(--font-primary, 'Inter', sans-serif);
+    color: var(--p-text-main);
+}
+
+/* Header */
+.prayer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-top: env(safe-area-inset-top, 12px);
+}
+
+.prayer-back-btn, .prayer-settings-btn {
+    background: var(--p-card-bg);
+    border: 1px solid var(--p-card-border);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--p-text-main);
+    transition: transform 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.prayer-back-btn:active, .prayer-settings-btn:active {
+    transform: scale(0.95);
+}
+
+.prayer-header h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* Solid Premium Hero Card - NO BLUR */
+.prayer-hero-card {
+    position: relative;
+    background: var(--p-card-bg);
+    border-radius: 24px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--p-card-border);
+    box-shadow: var(--p-card-shadow);
+    overflow: hidden;
+    animation: fadeInSlideUp 0.6s ease-out forwards;
+}
+
+.hero-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--p-particle);
+    filter: blur(20px);
+    animation: floatParticle 8s infinite alternate ease-in-out;
+}
+
+.p1 { width: 150px; height: 150px; top: -50px; left: -50px; }
+.p2 { width: 100px; height: 100px; bottom: -20px; right: -30px; animation-delay: -3s; }
+.p3 { width: 80px; height: 80px; top: 40%; left: 40%; animation-delay: -5s; }
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-header-row {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.hero-greeting {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--p-accent);
+    letter-spacing: 0.5px;
+}
+
+.hero-hijri-date {
+    font-size: 0.75rem;
+    color: var(--p-text-muted);
+    font-weight: 500;
+}
+
+.hero-next-prayer-details {
+    margin-bottom: 16px;
+}
+
+.prayer-next-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--p-text-muted);
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.prayer-next-name {
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin: 0 0 12px 0;
+    line-height: 1;
+    color: var(--p-text-main);
+}
+
+.prayer-timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.prayer-timer-glow {
+    display: none; /* Removed excessive glow */
+}
+
+.prayer-timer {
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--p-text-main);
+    background: rgba(0, 0, 0, 0.05); /* Clean contrast block */
+    padding: 8px 24px;
+    border-radius: 20px;
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.prayer-page.dark .prayer-timer {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prayer-timer-text {
+    font-size: 0.7rem;
+    color: var(--p-text-muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hero-footer-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px solid var(--p-card-border);
+}
+
+.prayer-location-subtle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--p-text-muted);
+}
+
+.prayer-madhab-subtle {
+    font-size: 0.75rem;
+    background: var(--p-accent);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Redesigned Prayer List */
+.prayer-list-elegant {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.prayer-row {
+    background: var(--p-card-bg);
+    border: 1px solid var(--p-card-border);
+    border-radius: 16px;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--p-card-shadow);
+    margin-bottom: 2px;
+}
+
+.prayer-row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--p-card-shadow);
+}
+
+.prayer-row-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.prayer-icon-wrapper {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-text-muted);
+    transition: all 0.3s ease;
+}
+.prayer-icon-svg {
+    width: 18px;
+    height: 18px;
+}
+
+.prayer-page.dark .prayer-icon-wrapper {
+    background: var(--border);
+}
+
+.prayer-row-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-text-main);
+    letter-spacing: 0.5px;
+}
+
+.prayer-row-time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-text-main);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Active Prayer State */
+.prayer-row.active {
+    background: var(--p-accent);
+    border-color: transparent;
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.prayer-row.active .prayer-icon-wrapper {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    box-shadow: none;
+}
+
+.prayer-row.active .prayer-row-name,
+.prayer-row.active .prayer-row-time {
+    color: #fff;
+}
+
+/* Loading & Error */
+.prayer-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    color: var(--p-text-muted);
+}
+
+.prayer-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--p-card-border);
+    border-top-color: var(--p-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+/* Premium Bottom Sheet Modal */
+.prayer-modal-overlay {
+    position: fixed; 
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex; 
+    align-items: flex-end; 
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.4s ease;
+}
+
+.prayer-modal-sheet {
+    background: linear-gradient(180deg, rgba(253, 251, 247, 0.95) 0%, rgba(245, 240, 230, 0.98) 100%);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 36px 36px 0 0;
+    padding: 20px 28px 40px;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.06), inset 0 2px 4px rgba(255,255,255,0.7);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-bottom: none;
+    color: var(--text-main);
+    animation: slideUpSheet 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+}
+
+.prayer-page.dark .prayer-modal-sheet {
+    background: linear-gradient(180deg, rgba(35, 35, 35, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.4), inset 0 2px 4px var(--border);
+    border-color: rgba(212, 175, 55, 0.1);
+    color: #f5f5f5;
+}
+
+/* Modal Drag Handle */
+.modal-drag-handle {
+    width: 40px;
+    height: 4px;
+    background: rgba(212, 175, 55, 0.25);
+    border-radius: 4px;
+    margin: 0 auto 24px;
+}
+.prayer-page.dark .modal-drag-handle { background: rgba(212, 175, 55, 0.15); }
+
+/* Elegant Header */
+.modal-header-elegant {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.modal-header-elegant h2 { 
+    font-size: 1.3rem; 
+    font-weight: 600; 
+    color: var(--text-muted);
+    margin: 0 0 12px 0; 
+    letter-spacing: -0.5px;
+}
+.prayer-page.dark .modal-header-elegant h2 { color: #d4af37; }
+
+/* Islamic Decorative Divider */
+.islamic-decorative-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0.6;
+}
+.divider-line {
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c5a059, transparent);
+}
+.divider-diamond {
+    width: 6px;
+    height: 6px;
+    background: #c5a059;
+    transform: rotate(45deg);
+}
+
+/* Sections & Spacing */
+.prayer-form-section { 
+    margin-bottom: 24px; 
+}
+
+.section-label { 
+    display: block; 
+    font-size: 0.75rem; 
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #999; 
+    margin-bottom: 12px; 
+    font-weight: 600; 
+}
+.prayer-page.dark .section-label { color: var(--text-muted); }
+
+.mb-0 { margin-bottom: 4px; }
+.section-subtext { font-size: 0.8rem; color: #a5a5a5; margin: 0; }
+
+/* Elegant Location Card */
+.prayer-location-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02), inset 0 2px 4px rgba(255,255,255,0.4);
+    backdrop-filter: blur(10px);
+}
+.prayer-page.dark .prayer-location-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(212, 175, 55, 0.08);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1), inset 0 2px 4px var(--border);
+}
+
+.loc-left { display: flex; align-items: center; gap: 12px; }
+.loc-icon { font-size: 1.1rem; opacity: 0.85; }
+.detected-city { font-weight: 500; font-size: 0.95rem; color: var(--text-muted); }
+.prayer-page.dark .detected-city { color: var(--text-main); }
+
+.prayer-btn-change {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.03));
+    color: #b8860b;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.prayer-btn-change:hover { background: rgba(212, 175, 55, 0.15); }
+.prayer-page.dark .prayer-btn-change { color: #d4af37; border-color: rgba(212, 175, 55, 0.2); }
+
+.prayer-btn-use-location {
+    width: 100%; padding: 14px; border-radius: 16px;
+    font-size: 0.95rem; font-weight: 500; cursor: pointer;
+    background: rgba(212, 175, 55, 0.04);
+    color: #b8860b;
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s ease;
+}
+.prayer-btn-use-location:active { background: rgba(212, 175, 55, 0.08); }
+.prayer-page.dark .prayer-btn-use-location { color: #d4af37; border-color: rgba(212, 175, 55, 0.25); }
+
+/* Rounded Segmented Pills */
+.segmented-control {
+    display: flex;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 4px;
+    border-radius: 16px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+.prayer-page.dark .segmented-control { background: rgba(0, 0, 0, 0.2); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+
+.segment-btn {
+    flex: 1; padding: 10px; border: none; background: transparent;
+    color: var(--text-muted); font-size: 0.85rem; font-weight: 500;
+    border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.prayer-page.dark .segment-btn { color: var(--text-muted); }
+
+.segment-btn.active {
+    background: white; color: var(--text-muted);
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+}
+.prayer-page.dark .segment-btn.active {
+    background: #2a2a2a; color: #d4af37;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Toggle Section */
+.toggle-section {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 14px 20px; border-radius: 16px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02), inset 0 2px 4px rgba(255,255,255,0.4);
+    backdrop-filter: blur(10px);
+}
+.prayer-page.dark .toggle-section {
+    background: rgba(0, 0, 0, 0.2); border-color: rgba(212, 175, 55, 0.08);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1), inset 0 2px 4px var(--border);
+}
+
+.premium-switch { position: relative; width: 44px; height: 24px; }
+.premium-switch input { opacity: 0; width: 0; height: 0; }
+.premium-slider { 
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+    background-color: rgba(0,0,0,0.08); border-radius: 24px; transition: .4s cubic-bezier(0.2, 0.8, 0.2, 1); 
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+.prayer-page.dark .premium-slider { background-color: var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+.premium-slider:before { 
+    position: absolute; content: ""; height: 18px; width: 18px; 
+    left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s cubic-bezier(0.2, 0.8, 0.2, 1); 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+input:checked + .premium-slider { background-color: rgba(197, 160, 89, 0.8); box-shadow: 0 0 8px rgba(197, 160, 89, 0.2); }
+input:checked + .premium-slider:before { transform: translateX(20px); }
+
+/* Elegant Beige/Gold Save Button */
+.modal-actions { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+
+.prayer-btn-save-premium {
+    width: 100%; padding: 16px; border-radius: 16px; 
+    font-size: 1rem; font-weight: 600; cursor: pointer; border: none;
+    background: linear-gradient(135deg, #d8b87a 0%, #b88d44 100%);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(184, 141, 68, 0.25), inset 0 1px 2px rgba(255,255,255,0.4);
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+    letter-spacing: 0.5px;
+}
+.prayer-page.dark .prayer-btn-save-premium {
+    background: linear-gradient(135deg, #ae853f 0%, #8b6628 100%);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.1);
+    color: var(--text-main);
+}
+.prayer-btn-save-premium:active { transform: scale(0.98); box-shadow: 0 4px 10px rgba(184, 141, 68, 0.15); }
+.prayer-btn-save-premium:disabled { background: rgba(0,0,0,0.08); box-shadow: none; cursor: not-allowed; color: #999; }
+.prayer-page.dark .prayer-btn-save-premium:disabled { background: var(--border); color: var(--text-muted); }
+
+.prayer-btn-cancel {
+    width: 100%; padding: 14px; background: transparent; border: none;
+    color: #a0a0a0; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+    transition: color 0.2s ease;
+}
+.prayer-btn-cancel:hover { color: var(--text-muted); }
+.prayer-page.dark .prayer-btn-cancel { color: var(--text-muted); }
+.prayer-page.dark .prayer-btn-cancel:hover { color: var(--text-muted); }
+
+
+/* Quick Edit Buttons (Hero Footer) */
+.quick-edit-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    color: var(--p-text-main);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.quick-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.prayer-page.dark .quick-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.quick-edit-btn:active {
+    transform: translateY(0) scale(0.97);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.prayer-page.dark .quick-edit-btn:active {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.truncate-text {
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Quick Edit Sheets */
+.quick-edit-sheet {
+    padding: 24px 24px 32px;
+}
+.quick-edit-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 24px 0;
+    color: var(--text-muted);
+}
+.prayer-page.dark .quick-edit-title { color: var(--text-main); }
+
+/* Location Search */
+.search-input-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+}
+.premium-search-input {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    background: rgba(255,255,255,0.8);
+    font-size: 1rem;
+    color: var(--text-main);
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+}
+.premium-search-input:focus {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+.prayer-page.dark .premium-search-input {
+    background: rgba(0,0,0,0.2);
+    border-color: rgba(212, 175, 55, 0.1);
+    color: var(--text-main);
+}
+.mini-spinner {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    border-top-color: #c5a059;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+.mini-loc-btn {
+    margin-bottom: 16px;
+    padding: 12px;
+}
+.search-results-list {
+    max-height: 250px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+.search-results-list::-webkit-scrollbar { width: 4px; }
+.search-results-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+.search-result-item {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.04);
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.prayer-page.dark .search-result-item {
+    background: rgba(0,0,0,0.15);
+    border-color: var(--border);
+}
+.search-result-item:hover {
+    background: white;
+    transform: translateX(4px);
+    border-color: rgba(212, 175, 55, 0.2);
+}
+.prayer-page.dark .search-result-item:hover { background: var(--border); }
+
+.res-title { font-weight: 600; font-size: 1rem; color: var(--text-main); margin-bottom: 4px; }
+.prayer-page.dark .res-title { color: var(--text-main); }
+.res-subtitle { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Madhab Quick List */
+.quick-madhab-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.quick-madhab-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.5);
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.05);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.prayer-page.dark .quick-madhab-item {
+    background: rgba(0,0,0,0.2);
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+.quick-madhab-item:hover {
+    background: rgba(255,255,255,0.8);
+    transform: scale(1.02);
+}
+.prayer-page.dark .quick-madhab-item:hover { background: var(--border); }
+
+.quick-madhab-item.active {
+    background: white;
+    color: #b8860b;
+    font-weight: 600;
+    border-color: rgba(212, 175, 55, 0.2);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+}
+.prayer-page.dark .quick-madhab-item.active {
+    background: #2a2a2a;
+    color: #d4af37;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.active-check { color: #b8860b; font-weight: bold; }
+
+
+/* Animations */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes floatParticle {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(20px, -20px) scale(1.1); }
+}
+@keyframes pulseGlow {
+    0% { opacity: 0.1; transform: translate(-50%, -50%) scale(0.9); }
+    100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1.1); }
+}
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUpSheet {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}

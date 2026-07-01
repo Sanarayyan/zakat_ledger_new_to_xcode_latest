@@ -1,0 +1,149 @@
+:root {
+  --primary: #c5a059;
+  /* Gold/Bronze */
+  --primary-glow: rgba(197, 160, 89, 0.4);
+  --secondary: #a67c00;
+  --bg-dark: #070b14;
+  /* Deeper dark */
+  --bg-card: rgba(15, 23, 42, 0.7);
+  /* Semi-transparent for glassmorphism */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #d4af37;
+  --danger: #f43f5e;
+  --success: #10b981;
+  --border: rgba(255, 255, 255, 0.08);
+  --font-family: 'Outfit', sans-serif;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.light-mode {
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #2D3436;
+  --text-muted: #636E72;
+  --border: rgba(255, 255, 255, 0.5);
+  --success: #8cdfb3; /* Pastel Green */
+  --danger: #fab1a0;  /* Pastel Red */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background: 
+    linear-gradient(rgba(7, 11, 20, 0.4), rgba(7, 11, 20, 0.8)),
+    url('./assets/serene_bg.png') no-repeat center center fixed;
+  background-size: cover;
+  transition: background 0.5s ease, color 0.3s ease;
+  color: var(--text-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px;
+  width: 100%;
+  min-height: 100vh;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+body.light-mode {
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.6)),
+    url('./assets/daytime_bg.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  padding: 12px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px var(--primary-glow);
+  }
+
+  50% {
+    box-shadow: 0 0 15px var(--primary-glow);
+  }
+
+  100% {
+    box-shadow: 0 0 5px var(--primary-glow);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+/* Safe Area Insets for iOS */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 47px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 34px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}

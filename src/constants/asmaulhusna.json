@@ -1,0 +1,992 @@
+[
+  {
+    "id": 1,
+    "arabic": "ٱلرَّحْمَٰنُ",
+    "transliteration": "Ar-Rahman",
+    "name_en": "The Beneficent",
+    "meaning_en": "The One who wills goodness and mercy for all His creatures",
+    "meaning_ml": "പരമദയാലു",
+    "audio": "/audio/asma/1.mp3",
+    "desc_ml": "സൃഷ്ടികളോട് മുഴുവനും, അവർ വിശ്വാസികളാണെങ്കിലും അല്ലെങ്കിലും ഇഹലോകത്ത് അതിരറ്റ കാരുണ്യം ചൊരിയുന്നവൻ."
+  },
+  {
+    "id": 2,
+    "arabic": "ٱلرَّحِيمُ",
+    "transliteration": "Ar-Raheem",
+    "name_en": "The Merciful",
+    "meaning_en": "The One who acts with extreme kindness",
+    "meaning_ml": "കരുണാനിധി",
+    "audio": "/audio/asma/2.mp3",
+    "desc_ml": "പരലോകത്ത് സത്യവിശ്വാസികളോട് മാത്രം കാരുണ്യം കാണിക്കുന്നവൻ."
+  },
+  {
+    "id": 3,
+    "arabic": "ٱلْمَلِكُ",
+    "transliteration": "Al-Malik",
+    "name_en": "The King",
+    "meaning_en": "The Sovereign Lord, The One with the complete Dominion",
+    "meaning_ml": "സർവ്വാധിപതി",
+    "audio": "/audio/asma/3.mp3",
+    "desc_ml": "സർവ്വലോകങ്ങളുടെയും യഥാർത്ഥ രാജാവും പരമാധികാരിയും."
+  },
+  {
+    "id": 4,
+    "arabic": "ٱلْقُدُّوسُ",
+    "transliteration": "Al-Quddus",
+    "name_en": "The Most Holy",
+    "meaning_en": "The One who is pure from any imperfection",
+    "meaning_ml": "പരിശുദ്ധൻ",
+    "audio": "/audio/asma/4.mp3",
+    "desc_ml": "എല്ലാവിധ ന്യൂനതകളിൽ നിന്നും പോരായ്മകളിൽ നിന്നും പൂർണ്ണമായി മുക്തനായ പരിശുദ്ധൻ."
+  },
+  {
+    "id": 5,
+    "arabic": "ٱلسَّلَامُ",
+    "transliteration": "As-Salam",
+    "name_en": "The Giver of Peace",
+    "meaning_en": "The One who is free from every imperfection",
+    "meaning_ml": "സമാധാനം നൽകുന്നവൻ",
+    "audio": "/audio/asma/5.mp3",
+    "desc_ml": "സൃഷ്ടികൾക്ക് ശാന്തിയും സമാധാനവും അഭയവും നൽകുന്നവൻ."
+  },
+  {
+    "id": 6,
+    "arabic": "ٱلْمُؤْمِنُ",
+    "transliteration": "Al-Mu'min",
+    "name_en": "The Giver of Faith",
+    "meaning_en": "The One who witnessed for Himself that no one is God but Him",
+    "meaning_ml": "അഭയം നൽകുന്നവൻ",
+    "audio": "/audio/asma/6.mp3",
+    "desc_ml": "സത്യവിശ്വാസികൾക്ക് നിർഭയത്വം നൽകുന്നവനും തനിക്ക് തുല്യനായി മറ്റാരുമില്ലെന്ന് സ്വയം സാക്ഷ്യപ്പെടുത്തുന്നവനും."
+  },
+  {
+    "id": 7,
+    "arabic": "ٱلْمُهَيْمِنُ",
+    "transliteration": "Al-Muhaymin",
+    "name_en": "The Guardian",
+    "meaning_en": "The One who witnesses the saying and deeds of His creatures",
+    "meaning_ml": "സംരക്ഷകൻ",
+    "audio": "/audio/asma/7.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങളെയും നിരീക്ഷിക്കുകയും സംരക്ഷിക്കുകയും നിയന്ത്രിക്കുകയും ചെയ്യുന്നവൻ."
+  },
+  {
+    "id": 8,
+    "arabic": "ٱلْعَزِيزُ",
+    "transliteration": "Al-Aziz",
+    "name_en": "The All Mighty",
+    "meaning_en": "The Defeater who is not defeated",
+    "meaning_ml": "പ്രതാപശാലി",
+    "audio": "/audio/asma/8.mp3",
+    "desc_ml": "ആർക്കും പരാജയപ്പെടുത്താൻ കഴിയാത്ത സർവ്വശക്തനും പ്രതാപശാലിയും."
+  },
+  {
+    "id": 9,
+    "arabic": "ٱلْجَبَّارُ",
+    "transliteration": "Al-Jabbar",
+    "name_en": "The Compeller",
+    "meaning_en": "The One that nothing happens in His Dominion except that which He willed",
+    "meaning_ml": "പരമാധികാരി",
+    "audio": "/audio/asma/9.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നതെന്തും തന്റെ സൃഷ്ടികളിൽ നടപ്പിലാക്കാൻ കഴിവുള്ള പരമാധികാരി."
+  },
+  {
+    "id": 10,
+    "arabic": "ٱلْمُتَكَبِّرُ",
+    "transliteration": "Al-Mutakabbir",
+    "name_en": "The Supreme",
+    "meaning_en": "The One who is clear from the attributes of the creatures",
+    "meaning_ml": "അഹങ്കാരത്തിന് അർഹൻ",
+    "audio": "/audio/asma/10.mp3",
+    "desc_ml": "എല്ലാ സൃഷ്ടികളുടെയും വിശേഷണങ്ങളിൽ നിന്നെല്ലാം ഉന്നതനും മഹത്വത്തിന് അർഹനുമായവൻ."
+  },
+  {
+    "id": 11,
+    "arabic": "ٱلْخَالِقُ",
+    "transliteration": "Al-Khaliq",
+    "name_en": "The Creator",
+    "meaning_en": "The One who brings everything from non-existence to existence",
+    "meaning_ml": "സ്രഷ്ടാവ്",
+    "audio": "/audio/asma/11.mp3",
+    "desc_ml": "ഇല്ലാത്തതിൽ നിന്നും എല്ലാത്തിനെയും സൃഷ്ടിച്ചവൻ."
+  },
+  {
+    "id": 12,
+    "arabic": "ٱلْبَارِئُ",
+    "transliteration": "Al-Baari",
+    "name_en": "The Evolver",
+    "meaning_en": "The Maker, The Creator who has the Power to turn the entities",
+    "meaning_ml": "രൂപം നൽകുന്നവൻ",
+    "audio": "/audio/asma/12.mp3",
+    "desc_ml": "സൃഷ്ടികൾക്ക് ഏറ്റവും അനുയോജ്യമായ രൂപവും ഘടനയും നൽകി അവയെ പരിപാലിക്കുന്നവൻ."
+  },
+  {
+    "id": 13,
+    "arabic": "ٱلْمُصَوِّرُ",
+    "transliteration": "Al-Musawwir",
+    "name_en": "The Fashioner",
+    "meaning_en": "The One who forms His creatures in different pictures",
+    "meaning_ml": "രൂപകല്പന ചെയ്യുന്നവൻ",
+    "audio": "/audio/asma/13.mp3",
+    "desc_ml": "ഓരോ സൃഷ്ടിക്കും അതിന്റേതായ പ്രത്യേക രൂപവും ഭാവവും നൽകി രൂപകൽപന ചെയ്യുന്നവൻ."
+  },
+  {
+    "id": 14,
+    "arabic": "ٱلْقَهَّارُ",
+    "transliteration": "Al-Qahhar",
+    "name_en": "The Subduer",
+    "meaning_en": "The One who has the perfect Power and is dominant over everything",
+    "meaning_ml": "അടങ്ങാത്തവൻ",
+    "audio": "/audio/asma/14.mp3",
+    "desc_ml": "സർവ്വ ചരാചരങ്ങളെയും തന്റെ അധികാരത്തിന് കീഴിൽ അടക്കിഭരിക്കുന്നവൻ."
+  },
+  {
+    "id": 15,
+    "arabic": "ٱلْوَهَّابُ",
+    "transliteration": "Al-Wahhab",
+    "name_en": "The Bestower",
+    "meaning_en": "The One who is Generous in giving plenty without any return",
+    "meaning_ml": "ഏറെ നൽകുന്നവൻ",
+    "audio": "/audio/asma/15.mp3",
+    "desc_ml": "യാതൊരു പ്രതിഫലവും ആഗ്രഹിക്കാതെ സൃഷ്ടികൾക്ക് ധാരാളമായി അനുഗ്രഹങ്ങൾ നൽകുന്നവൻ."
+  },
+  {
+    "id": 16,
+    "arabic": "ٱلرَّزَّاقُ",
+    "transliteration": "Ar-Razzaq",
+    "name_en": "The Provider",
+    "meaning_en": "The Provider, The Sustainer",
+    "meaning_ml": "ഭക്ഷണം നൽകുന്നവൻ",
+    "audio": "/audio/asma/16.mp3",
+    "desc_ml": "എല്ലാ സൃഷ്ടികൾക്കും ജീവിക്കാനാവശ്യമായ ഉപജീവനം (ഭക്ഷണം, വസ്ത്രം, പാർപ്പിടം) നൽകുന്നവൻ."
+  },
+  {
+    "id": 17,
+    "arabic": "ٱلْفَتَّاحُ",
+    "transliteration": "Al-Fattah",
+    "name_en": "The Opener",
+    "meaning_en": "The Opener, The Reliever, The Judge",
+    "meaning_ml": "വിജയം നൽകുന്നവൻ",
+    "audio": "/audio/asma/17.mp3",
+    "desc_ml": "സത്യവും അസത്യവും വേർതിരിക്കുകയും, അനുഗ്രഹങ്ങളുടെയും കാരുണ്യത്തിന്റെയും വാതിലുകൾ തുറന്നുകൊടുക്കുകയും ചെയ്യുന്നവൻ."
+  },
+  {
+    "id": 18,
+    "arabic": "ٱلْعَلِيمُ",
+    "transliteration": "Al-Alim",
+    "name_en": "The All-Knowing",
+    "meaning_en": "The Knowledgeable; The One nothing is absent from His knowledge",
+    "meaning_ml": "സർവ്വജ്ഞൻ",
+    "audio": "/audio/asma/18.mp3",
+    "desc_ml": "രഹസ്യവും പരസ്യവുമായ എല്ലാം സൂക്ഷ്മമായി അറിയുന്ന സർവ്വജ്ഞൻ."
+  },
+  {
+    "id": 19,
+    "arabic": "ٱلْقَابِضُ",
+    "transliteration": "Al-Qabid",
+    "name_en": "The Withholder",
+    "meaning_en": "The Withholder, The Straightener",
+    "meaning_ml": "പിടിച്ചുവെക്കുന്നവൻ",
+    "audio": "/audio/asma/19.mp3",
+    "desc_ml": "തന്റെ യുക്തിക്കനുസരിച്ച് ഉപജീവനവും അനുഗ്രഹങ്ങളും പിടിച്ചുവെക്കുകയും ചുരുക്കുകയും ചെയ്യുന്നവൻ."
+  },
+  {
+    "id": 20,
+    "arabic": "ٱلْبَاسِطُ",
+    "transliteration": "Al-Basit",
+    "name_en": "The Extender",
+    "meaning_en": "The Enlarger, The One who expands the provision",
+    "meaning_ml": "വിശാലമാക്കുന്നവൻ",
+    "audio": "/audio/asma/20.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നവർക്ക് ഉപജീവനവും അനുഗ്രഹങ്ങളും വിശാലമാക്കി നൽകുന്നവൻ."
+  },
+  {
+    "id": 21,
+    "arabic": "ٱلْخَافِضُ",
+    "transliteration": "Al-Khafid",
+    "name_en": "The Reducer",
+    "meaning_en": "The Abaser, The One who lowers whoever He willed",
+    "meaning_ml": "താഴ്ത്തുന്നവൻ",
+    "audio": "/audio/asma/21.mp3",
+    "desc_ml": "അഹങ്കാരികളെയും അക്രമികളെയും അസത്യത്തെയും താഴ്ത്തുന്നവൻ."
+  },
+  {
+    "id": 22,
+    "arabic": "ٱلرَّافِعُ",
+    "transliteration": "Ar-Rafi",
+    "name_en": "The Exalter",
+    "meaning_en": "The Exalter, The One who raises whoever He willed",
+    "meaning_ml": "ഉയർത്തുന്നവൻ",
+    "audio": "/audio/asma/22.mp3",
+    "desc_ml": "സത്യവിശ്വാസികളെയും സൽക്കർമ്മികളെയും പദവികളിൽ ഉയർത്തുന്നവൻ."
+  },
+  {
+    "id": 23,
+    "arabic": "ٱلمُعِزُّ",
+    "transliteration": "Al-Mu'izz",
+    "name_en": "The Bestower of Honors",
+    "meaning_en": "He gives esteem to whoever He willed",
+    "meaning_ml": "പ്രതാപം നൽകുന്നവൻ",
+    "audio": "/audio/asma/23.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നവർക്ക് പ്രതാപവും അധികാരവും നൽകി ആദരിക്കുന്നവൻ."
+  },
+  {
+    "id": 24,
+    "arabic": "ٱلمُذِلُّ",
+    "transliteration": "Al-Mudhill",
+    "name_en": "The Humiliator",
+    "meaning_en": "The One who humiliates whoever He willed",
+    "meaning_ml": "നിന്ദിക്കുന്നവൻ",
+    "audio": "/audio/asma/24.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നവരെ നിന്ദ്യരും വഷളന്മാരുമാക്കി മാറ്റുന്നവൻ."
+  },
+  {
+    "id": 25,
+    "arabic": "ٱلسَّمِيعُ",
+    "transliteration": "As-Sami",
+    "name_en": "The All-Hearing",
+    "meaning_en": "The One who Hears everything",
+    "meaning_ml": "എല്ലാം കേൾക്കുന്നവൻ",
+    "audio": "/audio/asma/25.mp3",
+    "desc_ml": "രഹസ്യവും പരസ്യവുമായ എല്ലാം കേൾക്കുന്നവൻ."
+  },
+  {
+    "id": 26,
+    "arabic": "ٱلبَصِيرُ",
+    "transliteration": "Al-Basir",
+    "name_en": "The All-Seeing",
+    "meaning_en": "The One who Sees everything",
+    "meaning_ml": "എല്ലാം കാണുന്നവൻ",
+    "audio": "/audio/asma/26.mp3",
+    "desc_ml": "ചെറുതും വലുതുമായ എല്ലാം സൂക്ഷ്മമായി കാണുന്നവൻ."
+  },
+  {
+    "id": 27,
+    "arabic": "ٱلحَكَمُ",
+    "transliteration": "Al-Hakam",
+    "name_en": "The Judge",
+    "meaning_en": "He is the Ruler and His judgment is Justice",
+    "meaning_ml": "വിധി കൽപ്പിക്കുന്നവൻ",
+    "audio": "/audio/asma/27.mp3",
+    "desc_ml": "ഏറ്റവും നീതിപൂർവ്വകമായ വിധി കൽപ്പിക്കുന്നവനും അന്തിമ തീരുമാനമെടുക്കുന്നവനും."
+  },
+  {
+    "id": 28,
+    "arabic": "ٱلعَدْلُ",
+    "transliteration": "Al-Adl",
+    "name_en": "The Just",
+    "meaning_en": "The One who is entitled to do what He does",
+    "meaning_ml": "നീതിമാൻ",
+    "audio": "/audio/asma/28.mp3",
+    "desc_ml": "യാതൊരു അനീതിയും പ്രവർത്തിക്കാത്ത, തികഞ്ഞ നീതിമാൻ."
+  },
+  {
+    "id": 29,
+    "arabic": "ٱللَّطِيفُ",
+    "transliteration": "Al-Latif",
+    "name_en": "The Subtle One",
+    "meaning_en": "The One who is kind to His creatures",
+    "meaning_ml": "സൂക്ഷ്മജ്ഞൻ",
+    "audio": "/audio/asma/29.mp3",
+    "desc_ml": "സൃഷ്ടികളുടെ ഏറ്റവും സൂക്ഷ്മമായ കാര്യങ്ങൾ പോലും അറിയുന്നവനും അവരോട് ദയ കാണിക്കുന്നവനും."
+  },
+  {
+    "id": 30,
+    "arabic": "ٱلخَبِيرُ",
+    "transliteration": "Al-Khabir",
+    "name_en": "The All-Aware",
+    "meaning_en": "The One who knows the internal reality of things",
+    "meaning_ml": "خبر നൽകുന്നവൻ",
+    "audio": "/audio/asma/30.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങളുടെയും ഉള്ളറകളെക്കുറിച്ചും രഹസ്യങ്ങളെക്കുറിച്ചും തികഞ്ഞ ബോധ്യമുള്ളവൻ."
+  },
+  {
+    "id": 31,
+    "arabic": "ٱلحَلِيمُ",
+    "transliteration": "Al-Halim",
+    "name_en": "The Forbearing",
+    "meaning_en": "The One who delays the punishment for those who deserve it",
+    "meaning_ml": "ക്ഷമയുള്ളവൻ",
+    "audio": "/audio/asma/31.mp3",
+    "desc_ml": "തെറ്റുകൾ ചെയ്യുന്നവർക്ക് ശിക്ഷ നൽകാൻ തിടുക്കം കാണിക്കാതെ അവർക്ക് വിട്ടുവീഴ്ച നൽകുന്നവൻ."
+  },
+  {
+    "id": 32,
+    "arabic": "ٱلعَظِيمُ",
+    "transliteration": "Al-Azim",
+    "name_en": "The Magnificent",
+    "meaning_en": "The One deserving the attributes of Exaltation",
+    "meaning_ml": "മഹാൻ",
+    "audio": "/audio/asma/32.mp3",
+    "desc_ml": "മഹത്വത്തിലും പദവിയിലും സമാനതകളില്ലാത്ത ഏറ്റവും വലിയവൻ."
+  },
+  {
+    "id": 33,
+    "arabic": "ٱلغَفُورُ",
+    "transliteration": "Al-Ghafur",
+    "name_en": "The Forgiving",
+    "meaning_en": "The One who forgives a lot",
+    "meaning_ml": "പാപങ്ങൾ പൊറുക്കുന്നവൻ",
+    "audio": "/audio/asma/33.mp3",
+    "desc_ml": "പാപങ്ങൾ എത്ര വലുതാണെങ്കിലും ആത്മാർത്ഥമായി പശ്ചാത്തപിക്കുന്നവർക്ക് പൊറുത്തുകൊടുക്കുന്നവൻ."
+  },
+  {
+    "id": 34,
+    "arabic": "ٱلشَّكُورُ",
+    "transliteration": "Ash-Shakur",
+    "name_en": "The Grateful",
+    "meaning_en": "The One who gives a lot of reward for a little obedience",
+    "meaning_ml": "നന്ദിയുള്ളവൻ",
+    "audio": "/audio/asma/34.mp3",
+    "desc_ml": "ചെറിയ സൽക്കർമ്മങ്ങൾക്ക് പോലും വലിയ പ്രതിഫലം നൽകുന്നവൻ."
+  },
+  {
+    "id": 35,
+    "arabic": "ٱلعَلِيُّ",
+    "transliteration": "Al-Ali",
+    "name_en": "The Most High",
+    "meaning_en": "The One who is clear from the attributes of the creatures",
+    "meaning_ml": "ഉന്നതൻ",
+    "audio": "/audio/asma/35.mp3",
+    "desc_ml": "മറ്റെല്ലാവർക്കും മീതെ ഏറ്റവും ഉന്നതമായ പദവികളും സ്ഥാനവുമുള്ളവൻ."
+  },
+  {
+    "id": 36,
+    "arabic": "ٱلكَبِيرُ",
+    "transliteration": "Al-Kabir",
+    "name_en": "The Most Great",
+    "meaning_en": "The One who is greater than everything",
+    "meaning_ml": "ഏറ്റവും വലിയവൻ",
+    "audio": "/audio/asma/36.mp3",
+    "desc_ml": "വലുപ്പത്തിലും പദവിയിലും ഏറ്റവും വലിയവനായ സർവ്വാധിപതി."
+  },
+  {
+    "id": 37,
+    "arabic": "ٱلحَفِيظُ",
+    "transliteration": "Al-Hafiz",
+    "name_en": "The Preserver",
+    "meaning_en": "The One who protects whatever He willed to protect",
+    "meaning_ml": "സംരക്ഷകൻ",
+    "audio": "/audio/asma/37.mp3",
+    "desc_ml": "ആകാശഭൂമികളെയും അതിലുള്ളതിനെയും നശിക്കാതെ സംരക്ഷിക്കുന്നവൻ."
+  },
+  {
+    "id": 38,
+    "arabic": "ٱلمُقِيتُ",
+    "transliteration": "Al-Muqit",
+    "name_en": "The Sustainer",
+    "meaning_en": "The Sustainer, The Maintainer",
+    "meaning_ml": "ആഹാരം നൽകുന്നവൻ",
+    "audio": "/audio/asma/38.mp3",
+    "desc_ml": "എല്ലാ സൃഷ്ടികൾക്കും അവരുടെ ഉപജീവനവും ശക്തിയും കൃത്യമായി എത്തിച്ചുകൊടുക്കുന്നവൻ."
+  },
+  {
+    "id": 39,
+    "arabic": "ٱلحَسِيبُ",
+    "transliteration": "Al-Hasib",
+    "name_en": "The Reckoner",
+    "meaning_en": "The One who gives the satisfaction",
+    "meaning_ml": "വിചാരണ ചെയ്യുന്നവൻ",
+    "audio": "/audio/asma/39.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങളുടെയും വിചാരണ നടത്താനും സൃഷ്ടികൾക്ക് മതിയായവനുമായവൻ."
+  },
+  {
+    "id": 40,
+    "arabic": "ٱلجَلِيلُ",
+    "transliteration": "Al-Jalil",
+    "name_en": "The Sublime One",
+    "meaning_en": "The One who is attributed with greatness of Power and Glory",
+    "meaning_ml": "പ്രതാപശാലി",
+    "audio": "/audio/asma/40.mp3",
+    "desc_ml": "തന്റെ സത്തയിലും ഗുണങ്ങളിലും ഏറ്റവും വലിയ മഹത്വവും പ്രതാപവുമുള്ളവൻ."
+  },
+  {
+    "id": 41,
+    "arabic": "ٱلكَرِيمُ",
+    "transliteration": "Al-Karim",
+    "name_en": "The Generous One",
+    "meaning_en": "The One who is clear from abjectness",
+    "meaning_ml": "ഉദാരൻ",
+    "audio": "/audio/asma/41.mp3",
+    "desc_ml": "ചോദിക്കാതെ തന്നെ ആവശ്യങ്ങൾ നിറവേറ്റിക്കൊടുക്കുന്ന ഉദാരമതി."
+  },
+  {
+    "id": 42,
+    "arabic": "ٱلرَّقِيبُ",
+    "transliteration": "Ar-Raqib",
+    "name_en": "The Watchful",
+    "meaning_en": "The One that nothing is absent from Him",
+    "meaning_ml": "നിരീക്ഷിക്കുന്നവൻ",
+    "audio": "/audio/asma/42.mp3",
+    "desc_ml": "സൃഷ്ടികളുടെ എല്ലാ ചലനങ്ങളെയും പ്രവർത്തനങ്ങളെയും എപ്പോഴും നിരീക്ഷിക്കുന്നവൻ."
+  },
+  {
+    "id": 43,
+    "arabic": "ٱلمُجِيبُ",
+    "transliteration": "Al-Mujib",
+    "name_en": "The Responsive",
+    "meaning_en": "The One who answers the one in need if he asks Him",
+    "meaning_ml": "ഉത്തരം നൽകുന്നവൻ",
+    "audio": "/audio/asma/43.mp3",
+    "desc_ml": "പ്രാർത്ഥിക്കുന്നവന്റെ പ്രാർത്ഥനകൾ കേട്ട് ഉത്തരം നൽകുന്നവൻ."
+  },
+  {
+    "id": 44,
+    "arabic": "ٱلوَاسِعُ",
+    "transliteration": "Al-Wasi",
+    "name_en": "The All-Pervading",
+    "meaning_en": "The Knowledgeable",
+    "meaning_ml": "വിശാലൻ",
+    "audio": "/audio/asma/44.mp3",
+    "desc_ml": "അറിവിലും കാരുണ്യത്തിലും അനുഗ്രഹങ്ങളിലും അതിവിശാലമായവൻ."
+  },
+  {
+    "id": 45,
+    "arabic": "ٱلحَكِيمُ",
+    "transliteration": "Al-Hakim",
+    "name_en": "The Wise",
+    "meaning_en": "The One who is correct in His doings",
+    "meaning_ml": "യുക്തിമാൻ",
+    "audio": "/audio/asma/45.mp3",
+    "desc_ml": "തന്റെ സൃഷ്ടിപ്പിലും കൽപ്പനകളിലും അതിയായ യുക്തിയുള്ളവൻ."
+  },
+  {
+    "id": 46,
+    "arabic": "ٱلوَدُودُ",
+    "transliteration": "Al-Wadud",
+    "name_en": "The Loving",
+    "meaning_en": "The One who loves His believing slaves",
+    "meaning_ml": "സ്നേഹനിധി",
+    "audio": "/audio/asma/46.mp3",
+    "desc_ml": "സത്യവിശ്വാസികളെ അതിയായി സ്നേഹിക്കുന്നവനും അവരുടെ സ്നേഹത്തിന് പാത്രമായവനും."
+  },
+  {
+    "id": 47,
+    "arabic": "ٱلمَجِيدُ",
+    "transliteration": "Al-Majid",
+    "name_en": "The Most Glorious One",
+    "meaning_en": "The One who is with perfect Power, High Status",
+    "meaning_ml": "മഹത്വമുള്ളവൻ",
+    "audio": "/audio/asma/47.mp3",
+    "desc_ml": "അത്യുന്നതനായ മഹത്വവും പൂർണ്ണതയുമുള്ളവൻ."
+  },
+  {
+    "id": 48,
+    "arabic": "ٱلبَاعِثُ",
+    "transliteration": "Al-Baith",
+    "name_en": "The Resurrector",
+    "meaning_en": "The One who resurrects the creatures after death",
+    "meaning_ml": "പുനർജീവിപ്പിക്കുന്നവൻ",
+    "audio": "/audio/asma/48.mp3",
+    "desc_ml": "മരണശേഷം സർവ്വ സൃഷ്ടികളെയും ജീവിയോടെ എഴുന്നേൽപ്പിക്കുന്നവൻ."
+  },
+  {
+    "id": 49,
+    "arabic": "ٱلشَّهِيدُ",
+    "transliteration": "Ash-Shahid",
+    "name_en": "The Witness",
+    "meaning_en": "The One who witnessed for Himself that no one is God but Him",
+    "meaning_ml": "സാക്ഷി",
+    "audio": "/audio/asma/49.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങൾക്കും സാക്ഷിയായവനും ഒന്നും മറഞ്ഞിരിക്കാത്തവനുമായവൻ."
+  },
+  {
+    "id": 50,
+    "arabic": "ٱلحَقُّ",
+    "transliteration": "Al-Haqq",
+    "name_en": "The Truth",
+    "meaning_en": "The One who truly exists",
+    "meaning_ml": "സത്യം",
+    "audio": "/audio/asma/50.mp3",
+    "desc_ml": "യാതൊരു മാറ്റവുമില്ലാത്ത, സ്ഥിരമായി നിലനിൽക്കുന്ന പരമസത്യം."
+  },
+  {
+    "id": 51,
+    "arabic": "ٱلوَكِيلُ",
+    "transliteration": "Al-Wakil",
+    "name_en": "The Trustee",
+    "meaning_en": "The One who gives the satisfaction and is relied upon",
+    "meaning_ml": "ഏല്പിക്കപ്പെടുന്നവൻ",
+    "audio": "/audio/asma/51.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങളുടെയും ഉത്തരവാദിത്തം ഏൽപ്പിക്കപ്പെടാൻ ഏറ്റവും അർഹനായവൻ."
+  },
+  {
+    "id": 52,
+    "arabic": "ٱلقَوِيُّ",
+    "transliteration": "Al-Qawiy",
+    "name_en": "The Most Strong",
+    "meaning_en": "The One with the complete Power",
+    "meaning_ml": "ശക്തൻ",
+    "audio": "/audio/asma/52.mp3",
+    "desc_ml": "യാതൊന്നിനും കീഴ്പ്പെടുത്താൻ കഴിയാത്ത അതിയായ ശക്തിയുള്ളവൻ."
+  },
+  {
+    "id": 53,
+    "arabic": "ٱلمَتِينُ",
+    "transliteration": "Al-Matin",
+    "name_en": "The Firm One",
+    "meaning_en": "The One with extreme Power which is un-interrupted",
+    "meaning_ml": "കരുത്തൻ",
+    "audio": "/audio/asma/53.mp3",
+    "desc_ml": "യാതൊരു ദൗർബല്യവുമില്ലാത്ത, തികഞ്ഞ കരുത്തനായവൻ."
+  },
+  {
+    "id": 54,
+    "arabic": "ٱلوَلِيُّ",
+    "transliteration": "Al-Waliy",
+    "name_en": "The Protecting Friend",
+    "meaning_en": "The Supporter, The Helper",
+    "meaning_ml": "രക്ഷാധികാരി",
+    "audio": "/audio/asma/54.mp3",
+    "desc_ml": "സത്യവിശ്വാസികളുടെ ഏറ്റവും അടുത്ത മിത്രവും അവരെ സഹായിക്കുന്നവനും."
+  },
+  {
+    "id": 55,
+    "arabic": "ٱلحَمِيدُ",
+    "transliteration": "Al-Hamid",
+    "name_en": "The Praiseworthy",
+    "meaning_en": "The praised One who deserves to be praised",
+    "meaning_ml": "സ്തുത്യർഹൻ",
+    "audio": "/audio/asma/55.mp3",
+    "desc_ml": "എല്ലാവിധ സ്തുതികൾക്കും പ്രകീർത്തനങ്ങൾക്കും അർഹനായവൻ."
+  },
+  {
+    "id": 56,
+    "arabic": "ٱلمُحْصِي",
+    "transliteration": "Al-Muhsi",
+    "name_en": "The Counter",
+    "meaning_en": "The One who knows the count of everything",
+    "meaning_ml": "ക്ലിപ്തമാക്കുന്നവൻ",
+    "audio": "/audio/asma/56.mp3",
+    "desc_ml": "ചെറുതും വലുതുമായ എല്ലാ കാര്യങ്ങളെയും സൂക്ഷ്മമായി എണ്ണിത്തിട്ടപ്പെടുത്തുന്നവൻ."
+  },
+  {
+    "id": 57,
+    "arabic": "ٱلمُبْدِئُ",
+    "transliteration": "Al-Mubdi",
+    "name_en": "The Originator",
+    "meaning_en": "The One who started the human being",
+    "meaning_ml": "തുടങ്ങുന്നവൻ",
+    "audio": "/audio/asma/57.mp3",
+    "desc_ml": "എല്ലാ സൃഷ്ടികൾക്കും ആദ്യമായി അസ്തിത്വം നൽകിയവൻ."
+  },
+  {
+    "id": 58,
+    "arabic": "ٱلمُعِيدُ",
+    "transliteration": "Al-Muid",
+    "name_en": "The Restorer",
+    "meaning_en": "The One who brings back the creatures after death",
+    "meaning_ml": "മടക്കിവിളിക്കുന്നവൻ",
+    "audio": "/audio/asma/58.mp3",
+    "desc_ml": "മരണശേഷം സൃഷ്ടികളെ വീണ്ടും പഴയ രൂപത്തിൽ മടക്കിക്കൊണ്ടുവരുന്നവൻ."
+  },
+  {
+    "id": 59,
+    "arabic": "ٱلمُحْيِي",
+    "transliteration": "Al-Muhyi",
+    "name_en": "The Giver of Life",
+    "meaning_en": "The One who took out a living human from semen",
+    "meaning_ml": "ജീവിപ്പിക്കുന്നവൻ",
+    "audio": "/audio/asma/59.mp3",
+    "desc_ml": "ജീവനില്ലാത്തതിൽ നിന്നും ജീവനെ സൃഷ്ടിക്കുന്നവനും ജീവൻ നിലനിർത്തുന്നവനും."
+  },
+  {
+    "id": 60,
+    "arabic": "ٱلمُمِيتُ",
+    "transliteration": "Al-Mumit",
+    "name_en": "The Creator of Death",
+    "meaning_en": "The One who renders the living dead",
+    "meaning_ml": "മരിപ്പിക്കുന്നവൻ",
+    "audio": "/audio/asma/60.mp3",
+    "desc_ml": "ജീവികളുടെ ജീവനെടുക്കുന്നവനും അവർക്ക് മരണം നൽകുന്നവനും."
+  },
+  {
+    "id": 61,
+    "arabic": "ٱلحَيُّ",
+    "transliteration": "Al-Hayy",
+    "name_en": "The Alive",
+    "meaning_en": "The One attributed with a life that is unlike our life",
+    "meaning_ml": "എന്നും ജീവിച്ചിരിക്കുന്നവൻ",
+    "audio": "/audio/asma/61.mp3",
+    "desc_ml": "എന്നും ജീവിച്ചിരിക്കുന്നവനും ഒരിക്കലും മരണമില്ലാത്തവനും."
+  },
+  {
+    "id": 62,
+    "arabic": "ٱلقَيُّومُ",
+    "transliteration": "Al-Qayyum",
+    "name_en": "The Self-Subsisting",
+    "meaning_en": "The One who remains and does not end",
+    "meaning_ml": "എന്തിനും ആശ്രയമായവൻ",
+    "audio": "/audio/asma/62.mp3",
+    "desc_ml": "മറ്റാരുടെയും ആശ്രയമില്ലാതെ സ്വയം നിലനിൽക്കുന്നവനും സർവ്വതിനെയും നിയന്ത്രിക്കുന്നവനും."
+  },
+  {
+    "id": 63,
+    "arabic": "ٱلوَاجِدُ",
+    "transliteration": "Al-Wajid",
+    "name_en": "The Perceiver",
+    "meaning_en": "The Rich who is never poor",
+    "meaning_ml": "കണ്ടെത്തുന്നവൻ",
+    "audio": "/audio/asma/63.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നതെല്ലാം കണ്ടെത്താനും നേടാനും കഴിയുന്നവൻ."
+  },
+  {
+    "id": 64,
+    "arabic": "ٱلمَاجِدُ",
+    "transliteration": "Al-Majid",
+    "name_en": "The Noble",
+    "meaning_en": "The One who is Majid",
+    "meaning_ml": "ഔന്നത്യമുള്ളവൻ",
+    "audio": "/audio/asma/64.mp3",
+    "desc_ml": "എല്ലാ മഹത്വങ്ങളുടെയും ഉടമയായ, അതിമഹത്വമുള്ളവൻ."
+  },
+  {
+    "id": 65,
+    "arabic": "ٱلوَاحِدُ",
+    "transliteration": "Al-Wahid",
+    "name_en": "The Unique",
+    "meaning_en": "The One without a partner",
+    "meaning_ml": "ഏകൻ",
+    "audio": "/audio/asma/65.mp3",
+    "desc_ml": "തന്റെ സത്തയിലും ഗുണങ്ങളിലും ഒരേയൊരുവനായ, പങ്കുകാറില്ലാത്തവൻ."
+  },
+  {
+    "id": 66,
+    "arabic": "ٱلأَحَدُ",
+    "transliteration": "Al-Ahad",
+    "name_en": "The One",
+    "meaning_en": "The One",
+    "meaning_ml": "അദ്വിതീയൻ",
+    "audio": "/audio/asma/66.mp3",
+    "desc_ml": "എല്ലാ അർത്ഥത്തിലും ഏകനായ, മറ്റൊന്നിനോടും സാമ്യമില്ലാത്തവൻ."
+  },
+  {
+    "id": 67,
+    "arabic": "ٱلصَّمَدُ",
+    "transliteration": "As-Samad",
+    "name_en": "The Eternal",
+    "meaning_en": "The Lord who is needed by all",
+    "meaning_ml": "അഭയകേന്ദ്രം",
+    "audio": "/audio/asma/67.mp3",
+    "desc_ml": "എല്ലാവരും ആശ്രയിക്കുന്നവനും എന്നാൽ ആരെയും ആശ്രയിക്കാത്തവനുമായ അനാശ്രയൻ."
+  },
+  {
+    "id": 68,
+    "arabic": "ٱلقَادِرُ",
+    "transliteration": "Al-Qadir",
+    "name_en": "The Able",
+    "meaning_en": "The One attributed with Power",
+    "meaning_ml": "കഴിവുള്ളവൻ",
+    "audio": "/audio/asma/68.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങൾക്കും കഴിവുള്ളവനായ സർവ്വശക്തൻ."
+  },
+  {
+    "id": 69,
+    "arabic": "ٱلمُقْتَدِرُ",
+    "transliteration": "Al-Muqtadir",
+    "name_en": "The Powerful",
+    "meaning_en": "The One with the perfect Power",
+    "meaning_ml": "പരമാധികാരി",
+    "audio": "/audio/asma/69.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നതെന്തും അനായാസം പ്രവർത്തിക്കാൻ കഴിവുള്ളവൻ."
+  },
+  {
+    "id": 70,
+    "arabic": "ٱلمُقَدِّمُ",
+    "transliteration": "Al-Muqaddim",
+    "name_en": "The Expediter",
+    "meaning_en": "The One who puts things in their right places",
+    "meaning_ml": "മുന്തിക്കുന്നവൻ",
+    "audio": "/audio/asma/70.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നവരെയും കാര്യങ്ങളെയും മുന്നോട്ട് കൊണ്ടുവരുന്നവൻ."
+  },
+  {
+    "id": 71,
+    "arabic": "ٱلمُؤَخِّرُ",
+    "transliteration": "Al-Mu'akhkhir",
+    "name_en": "The Delayer",
+    "meaning_en": "The One who delays whatever He willed",
+    "meaning_ml": "പിന്തിക്കുന്നവൻ",
+    "audio": "/audio/asma/71.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നവരെയും കാര്യങ്ങളെയും പിന്നിലേക്ക് ആക്കുന്നവൻ."
+  },
+  {
+    "id": 72,
+    "arabic": "ٱلأَوَّلُ",
+    "transliteration": "Al-Awwal",
+    "name_en": "The First",
+    "meaning_en": "The One whose Existence is without a beginning",
+    "meaning_ml": "ആദ്യൻ",
+    "audio": "/audio/asma/72.mp3",
+    "desc_ml": "എല്ലാത്തിനും മുമ്പുള്ളവനും തുടക്കമില്ലാത്തവനുമായ ആദ്യവൻ."
+  },
+  {
+    "id": 73,
+    "arabic": "ٱلآخِرُ",
+    "transliteration": "Al-Akhir",
+    "name_en": "The Last",
+    "meaning_en": "The One whose Existence is without an end",
+    "meaning_ml": "അന്ത്യൻ",
+    "audio": "/audio/asma/73.mp3",
+    "desc_ml": "എല്ലാം നശിച്ചാലും അവശേഷിക്കുന്നവനും അവസാനമില്ലാത്തവനുമായ അന്തിമൻ."
+  },
+  {
+    "id": 74,
+    "arabic": "ٱلظَّاهِرُ",
+    "transliteration": "Az-Zahir",
+    "name_en": "The Manifest",
+    "meaning_en": "The One that nothing is above Him and nothing is underneath Him",
+    "meaning_ml": "പ്രത്യക്ഷൻ",
+    "audio": "/audio/asma/74.mp3",
+    "desc_ml": "തന്റെ സൃഷ്ടികളിലൂടെ വ്യക്തമായി അറിയപ്പെടുന്നവൻ."
+  },
+  {
+    "id": 75,
+    "arabic": "ٱلبَاطِنُ",
+    "transliteration": "Al-Batin",
+    "name_en": "The Hidden",
+    "meaning_en": "The One that nothing is above Him and nothing is underneath Him",
+    "meaning_ml": "പരോക്ഷൻ",
+    "audio": "/audio/asma/75.mp3",
+    "desc_ml": "ദൃഷ്ടികൾക്ക് ഗോചരമല്ലാത്തവനും നിഗൂഢതകൾ അറിയുന്നവനും."
+  },
+  {
+    "id": 76,
+    "arabic": "ٱلوَالِي",
+    "transliteration": "Al-Waali",
+    "name_en": "The Governor",
+    "meaning_en": "The One who owns things and manages them",
+    "meaning_ml": "ഭരിക്കുന്നവൻ",
+    "audio": "/audio/asma/76.mp3",
+    "desc_ml": "സർവ്വ ലോകങ്ങളുടെയും കാര്യങ്ങൾ നിയന്ത്രിക്കുന്ന ഭരണാധികാരി."
+  },
+  {
+    "id": 77,
+    "arabic": "ٱلمُتَعَالِي",
+    "transliteration": "Al-Muta'ali",
+    "name_en": "The Most Exalted",
+    "meaning_en": "The One who is clear from the attributes of the creatures",
+    "meaning_ml": "അത്യുന്നതൻ",
+    "audio": "/audio/asma/77.mp3",
+    "desc_ml": "സൃഷ്ടികളുടെ ഗുണവിശേഷങ്ങളിൽ നിന്നെല്ലാം തികച്ചും പരിശുദ്ധനായവൻ."
+  },
+  {
+    "id": 78,
+    "arabic": "ٱلبَرُّ",
+    "transliteration": "Al-Barr",
+    "name_en": "The Source of All Goodness",
+    "meaning_en": "The One who is kind to His creatures",
+    "meaning_ml": "നന്മ ചെയ്യുന്നവൻ",
+    "audio": "/audio/asma/78.mp3",
+    "desc_ml": "സൃഷ്ടികളോട് ഏറ്റവും നന്നായി പെരുമാറുന്നവനും നന്മ ചെയ്യുന്നവനും."
+  },
+  {
+    "id": 79,
+    "arabic": "ٱلتَّوَّابُ",
+    "transliteration": "At-Tawwab",
+    "name_en": "The Acceptor of Repentance",
+    "meaning_en": "The One who grants repentance to whoever He willed",
+    "meaning_ml": "പശ്ചാത്താപം സ്വീകരിക്കുന്നവൻ",
+    "audio": "/audio/asma/79.mp3",
+    "desc_ml": "പാപികൾ പശ്ചാത്തപിക്കുമ്പോൾ അത് സ്വീകരിച്ച് അവർക്ക് മാപ്പ് നൽകുന്നവൻ."
+  },
+  {
+    "id": 80,
+    "arabic": "ٱلمُنْتَقِمُ",
+    "transliteration": "Al-Muntaqim",
+    "name_en": "The Avenger",
+    "meaning_en": "The One who victoriously prevails over His enemies",
+    "meaning_ml": "ശിക്ഷിക്കുന്നവൻ",
+    "audio": "/audio/asma/80.mp3",
+    "desc_ml": "അക്രമികൾക്കും ധിക്കാരികൾക്കും അർഹമായ ശിക്ഷ നൽകുന്നവൻ."
+  },
+  {
+    "id": 81,
+    "arabic": "ٱلعَفُوُّ",
+    "transliteration": "Al-Afuww",
+    "name_en": "The Pardoner",
+    "meaning_en": "The One with wide forgiveness",
+    "meaning_ml": "മാപ്പ് നൽകുന്നവൻ",
+    "audio": "/audio/asma/81.mp3",
+    "desc_ml": "തെറ്റുകൾ ക്ഷമിക്കുകയും യാതൊരു ശിക്ഷയുമില്ലാതെ മാപ്പ് നൽകുകയും ചെയ്യുന്നവൻ."
+  },
+  {
+    "id": 82,
+    "arabic": "ٱلرَّؤُوفُ",
+    "transliteration": "Ar-Ra'uf",
+    "name_en": "The Compassionate",
+    "meaning_en": "The One with extreme Mercy",
+    "meaning_ml": "അങ്ങേയറ്റം ദയയുള്ളവൻ",
+    "audio": "/audio/asma/82.mp3",
+    "desc_ml": "സൃഷ്ടികളോട് അതിയായ കൃപയും ദയയും കാണിക്കുന്നവൻ."
+  },
+  {
+    "id": 83,
+    "arabic": "مَالِكُ ٱلْمُلْكِ",
+    "transliteration": "Malikul-Mulk",
+    "name_en": "The Eternal Owner of Sovereignty",
+    "meaning_en": "The One who controls the Dominion and gives dominion to whoever He willed",
+    "meaning_ml": "രാജാധിരാജൻ",
+    "audio": "/audio/asma/83.mp3",
+    "desc_ml": "എല്ലാ അധികാരങ്ങളുടെയും പരമാധികാരിയായ രാജാധിരാജൻ."
+  },
+  {
+    "id": 84,
+    "arabic": "ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ",
+    "transliteration": "Dhul-Jalali wal-Ikram",
+    "name_en": "The Lord of Majesty and Bounty",
+    "meaning_en": "The One who deserves to be Exalted and not denied",
+    "meaning_ml": "മഹത്വവും ആദരവുമുള്ളവൻ",
+    "audio": "/audio/asma/84.mp3",
+    "desc_ml": "മഹത്വത്തിന്റെയും ആദരവിന്റെയും പരിപൂർണ്ണ ഉടമസ്ഥൻ."
+  },
+  {
+    "id": 85,
+    "arabic": "ٱلمُقْسِطُ",
+    "transliteration": "Al-Muqsit",
+    "name_en": "The Equitable",
+    "meaning_en": "The One who is Just in His judgment",
+    "meaning_ml": "നീതി നടപ്പിലാക്കുന്നവൻ",
+    "audio": "/audio/asma/85.mp3",
+    "desc_ml": "എല്ലാ കാര്യങ്ങളും അതിന്റേതായ കൃത്യതയോടെ നിർവ്വഹിക്കുന്ന നീതിമാൻ."
+  },
+  {
+    "id": 86,
+    "arabic": "ٱلجَامِعُ",
+    "transliteration": "Al-Jami",
+    "name_en": "The Gatherer",
+    "meaning_en": "The One who gathers the creatures on a Day that there is no doubt about",
+    "meaning_ml": "ഒരുമിച്ചുകൂട്ടുന്നവൻ",
+    "audio": "/audio/asma/86.mp3",
+    "desc_ml": "അന്ത്യനാളിൽ സർവ്വ സൃഷ്ടികളെയും ഒരുമിച്ചുകൂട്ടുന്നവൻ."
+  },
+  {
+    "id": 87,
+    "arabic": "ٱلغَنِيُّ",
+    "transliteration": "Al-Ghaniy",
+    "name_en": "The Self-Sufficient",
+    "meaning_en": "The One who does not need the creatures",
+    "meaning_ml": "ഐശ്വര്യമുള്ളവൻ",
+    "audio": "/audio/asma/87.mp3",
+    "desc_ml": "യാതൊരു ആവശ്യങ്ങളുമില്ലാത്തവനും എല്ലാം തികഞ്ഞവനുമായ സമ്പന്നൻ."
+  },
+  {
+    "id": 88,
+    "arabic": "ٱلمُغْنِي",
+    "transliteration": "Al-Mughni",
+    "name_en": "The Enricher",
+    "meaning_en": "The One who satisfies the necessities of the creatures",
+    "meaning_ml": "ഐശ്വര്യം നൽകുന്നവൻ",
+    "audio": "/audio/asma/88.mp3",
+    "desc_ml": "മറ്റുള്ളവരെ സമ്പന്നരാക്കുകയും അവരുടെ ആവശ്യങ്ങൾ നിറവേറ്റുകയും ചെയ്യുന്നവൻ."
+  },
+  {
+    "id": 89,
+    "arabic": "ٱلمَانِعُ",
+    "transliteration": "Al-Mani",
+    "name_en": "The Preventer",
+    "meaning_en": "The Withholder",
+    "meaning_ml": "തടയുന്നവൻ",
+    "audio": "/audio/asma/89.mp3",
+    "desc_ml": "താൻ ഉദ്ദേശിക്കുന്നതിനെ തടയാൻ കഴിവുള്ളവനും സംരക്ഷണം നൽകുന്നവനും."
+  },
+  {
+    "id": 90,
+    "arabic": "ٱلضَّارُّ",
+    "transliteration": "Ad-Darr",
+    "name_en": "The Distresser",
+    "meaning_en": "The One who makes harm reach to whoever He willed",
+    "meaning_ml": "ഉപദ്രവം നൽകുന്നവൻ",
+    "audio": "/audio/asma/90.mp3",
+    "desc_ml": "തന്റെ യുക്തിക്കനുസരിച്ച് ഉപദ്രവങ്ങൾ വരുത്താൻ കഴിവുള്ളവൻ."
+  },
+  {
+    "id": 91,
+    "arabic": "ٱلنَّافِعُ",
+    "transliteration": "An-Nafi",
+    "name_en": "The Propitious",
+    "meaning_en": "The One who makes good reach to whoever He willed",
+    "meaning_ml": "ഗുണം നൽകുന്നവൻ",
+    "audio": "/audio/asma/91.mp3",
+    "desc_ml": "ഉപകാരങ്ങൾ നൽകുന്നവനും നന്മ ചെയ്യുന്നവനും."
+  },
+  {
+    "id": 92,
+    "arabic": "ٱلنُّورُ",
+    "transliteration": "An-Nur",
+    "name_en": "The Light",
+    "meaning_en": "The One who guides",
+    "meaning_ml": "പ്രകാശം",
+    "audio": "/audio/asma/92.mp3",
+    "desc_ml": "ആകാശഭൂമികളെ പ്രകാശിപ്പിക്കുന്നവനും സത്യത്തിലേക്ക് വഴി കാട്ടുന്നവനും."
+  },
+  {
+    "id": 93,
+    "arabic": "ٱلهَادِي",
+    "transliteration": "Al-Hadi",
+    "name_en": "The Guide",
+    "meaning_en": "The One whom with His Guidance His believers were guided",
+    "meaning_ml": "സന്മാർഗ്ഗം കാണിക്കുന്നവൻ",
+    "audio": "/audio/asma/93.mp3",
+    "desc_ml": "സത്യവിശ്വാസികളെ നേർവഴിയിലേക്ക് നയിക്കുന്നവൻ."
+  },
+  {
+    "id": 94,
+    "arabic": "ٱلبَدِيعُ",
+    "transliteration": "Al-Badi",
+    "name_en": "The Incomparable",
+    "meaning_en": "The One who created the creatures and designed them without any prior picture",
+    "meaning_ml": "അപൂർവ്വമായത് സൃഷ്ടിക്കുന്നവൻ",
+    "audio": "/audio/asma/94.mp3",
+    "desc_ml": "മുൻമാതൃകകളില്ലാതെ പ്രപഞ്ചത്തെ പുതുതായി സൃഷ്ടിച്ചവൻ."
+  },
+  {
+    "id": 95,
+    "arabic": "ٱلبَاقِي",
+    "transliteration": "Al-Baqi",
+    "name_en": "The Everlasting",
+    "meaning_en": "The One that the state of non-existence is impossible for Him",
+    "meaning_ml": "ശേഷിക്കുന്നവൻ",
+    "audio": "/audio/asma/95.mp3",
+    "desc_ml": "എല്ലാം നശിച്ചാലും യാതൊരു മാറ്റവുമില്ലാതെ ശാശ്വതമായി നിലനിൽക്കുന്നവൻ."
+  },
+  {
+    "id": 96,
+    "arabic": "ٱلوَارِثُ",
+    "transliteration": "Al-Warith",
+    "name_en": "The Ultimate Inheritor",
+    "meaning_en": "The One whose Existence remains after all His creatures perish",
+    "meaning_ml": "അനന്തരാവകാശി",
+    "audio": "/audio/asma/96.mp3",
+    "desc_ml": "സർവ്വലോകങ്ങളുടെയും അവകാശിയും അവസാനത്തെ ഉടമസ്ഥനും."
+  },
+  {
+    "id": 97,
+    "arabic": "ٱلرَّشِيدُ",
+    "transliteration": "Ar-Rashid",
+    "name_en": "The Guide to the Right Path",
+    "meaning_en": "The One who guides the creatures to what is beneficial for them",
+    "meaning_ml": "നേർവഴി കാണിക്കുന്നവൻ",
+    "audio": "/audio/asma/97.mp3",
+    "desc_ml": "ഏറ്റവും ശരിയായ മാർഗ്ഗത്തിലേക്ക് നയിക്കുന്നവനും യുക്തിയോടെ കാര്യങ്ങൾ ചെയ്യുന്നവനും."
+  },
+  {
+    "id": 98,
+    "arabic": "ٱلصَّبُورُ",
+    "transliteration": "As-Sabur",
+    "name_en": "The Patient",
+    "meaning_en": "The One who does not quickly punish the sinners",
+    "meaning_ml": "ക്ഷമാലു",
+    "audio": "/audio/asma/98.mp3",
+    "desc_ml": "ധിക്കാരികളെ ഉടൻ ശിക്ഷിക്കാതെ അവർക്ക് സാവകാശം നൽകുന്ന അങ്ങേയറ്റം ക്ഷമാശീലൻ."
+  },
+  {
+    "id": 99,
+    "arabic": "ٱللَّهُ",
+    "transliteration": "Allah",
+    "name_en": "The God",
+    "meaning_en": "The One who is worshipped in truth",
+    "meaning_ml": "അല്ലാഹു",
+    "audio": "/audio/asma/99.mp3",
+    "desc_ml": "സർവ്വലോകങ്ങളുടെയും നാഥനായ അല്ലാഹു."
+  }
+]

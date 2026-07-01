@@ -1,0 +1,217 @@
+.update-manager-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999; /* Highest priority */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Force Update Specific Overlay */
+.update-manager-overlay.force-update {
+    background: var(--bg-main, #0B1120); /* Solid background for force */
+    backdrop-filter: none;
+}
+
+body.light-mode .update-manager-overlay.force-update {
+    background: #f8fafc;
+}
+
+.update-card {
+    background: var(--card, #1E293B);
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    border-radius: 24px;
+    padding: 32px 24px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    text-align: center;
+    color: var(--text-main, #fff);
+    animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+body.light-mode .update-card {
+    background: #ffffff;
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    color: var(--text-main);
+}
+
+.update-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+    color: var(--gold, #D4AF37);
+    font-size: 28px;
+}
+
+.update-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.update-versions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.version-badge {
+    background: rgba(255,255,255,0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: var(--text-muted, rgba(255,255,255,0.7));
+}
+
+body.light-mode .version-badge {
+    background: rgba(0,0,0,0.05);
+    color: rgba(0,0,0,0.6);
+}
+
+.version-arrow {
+    color: var(--gold, #D4AF37);
+}
+
+.update-message {
+    font-size: 15px;
+    color: var(--text-muted, rgba(255,255,255,0.7));
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+body.light-mode .update-message {
+    color: rgba(0,0,0,0.6);
+}
+
+.update-changelog {
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: left;
+    margin-bottom: 24px;
+}
+
+body.light-mode .update-changelog {
+    background: rgba(0,0,0,0.03);
+}
+
+.update-changelog h4 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted, rgba(255,255,255,0.5));
+}
+
+body.light-mode .update-changelog h4 {
+    color: rgba(0,0,0,0.5);
+}
+
+.update-changelog ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.update-changelog li {
+    font-size: 14px;
+    color: var(--text-main, #fff);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body.light-mode .update-changelog li {
+    color: var(--text-main);
+}
+
+.update-changelog li:last-child {
+    margin-bottom: 0;
+}
+
+.update-changelog li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold, #D4AF37);
+}
+
+.update-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-update-primary {
+    background: var(--gold, #D4AF37);
+    color: var(--text-main);
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.btn-update-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-update-secondary {
+    background: transparent;
+    color: var(--text-muted, rgba(255,255,255,0.6));
+    border: none;
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+body.light-mode .btn-update-secondary {
+    color: rgba(0,0,0,0.5);
+}
+
+.btn-update-secondary:active {
+    background: rgba(255,255,255,0.05);
+}
+
+body.light-mode .btn-update-secondary:active {
+    background: rgba(0,0,0,0.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}

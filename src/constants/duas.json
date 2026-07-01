@@ -1,0 +1,1332 @@
+{
+  "categories": [
+    {
+      "id": "daily",
+      "title": {
+        "en": "Daily",
+        "ml": "ദൈനംദിനം"
+      },
+      "icon": "☀️"
+    },
+    {
+      "id": "azkar",
+      "title": {
+        "en": "Azkar",
+        "ml": "ദിക്റുകൾ"
+      },
+      "icon": "📿"
+    },
+    {
+      "id": "occasional",
+      "title": {
+        "en": "Occasional",
+        "ml": "അവസരോചിതമായവ"
+      },
+      "icon": "✨"
+    }
+  ],
+  "subcategories": [
+    {
+      "id": "sleeping",
+      "category": "daily",
+      "title": {
+        "en": "Sleeping",
+        "ml": "ഉറക്കം"
+      },
+      "icon": "🌙"
+    },
+    {
+      "id": "toilet",
+      "category": "daily",
+      "title": {
+        "en": "Toilet",
+        "ml": "ശുചിമുറി"
+      },
+      "icon": "🚿"
+    },
+    {
+      "id": "ablution",
+      "category": "daily",
+      "title": {
+        "en": "Ablution (Wudu)",
+        "ml": "വുദു"
+      },
+      "icon": "💧"
+    },
+    {
+      "id": "mosque",
+      "category": "daily",
+      "title": {
+        "en": "Mosque",
+        "ml": "പള്ളി"
+      },
+      "icon": "🕌"
+    },
+    {
+      "id": "prayer",
+      "category": "daily",
+      "title": {
+        "en": "Prayer",
+        "ml": "നമസ്കാരം"
+      },
+      "icon": "🧎"
+    },
+    {
+      "id": "home",
+      "category": "daily",
+      "title": {
+        "en": "Home",
+        "ml": "വീട്"
+      },
+      "icon": "🏠"
+    },
+    {
+      "id": "garment",
+      "category": "daily",
+      "title": {
+        "en": "Garment",
+        "ml": "വസ്ത്രം"
+      },
+      "icon": "👕"
+    },
+    {
+      "id": "travel",
+      "category": "daily",
+      "title": {
+        "en": "Travel",
+        "ml": "യാത്ര"
+      },
+      "icon": "🚗"
+    },
+    {
+      "id": "food",
+      "category": "daily",
+      "title": {
+        "en": "Food",
+        "ml": "ഭക്ഷണം"
+      },
+      "icon": "🍲"
+    },
+    {
+      "id": "dailyDhikr",
+      "category": "azkar",
+      "title": {
+        "en": "Daily Dhikr",
+        "ml": "ദൈനംദിന ദിക്റുകൾ"
+      },
+      "icon": "🧎"
+    },
+    {
+      "id": "remembrance",
+      "category": "azkar",
+      "title": {
+        "en": "Daily Remembrance",
+        "ml": "ദൈനംദിന സ്മരണകൾ"
+      },
+      "icon": "📜"
+    },
+    {
+      "id": "morning",
+      "category": "azkar",
+      "title": {
+        "en": "Morning Azkar",
+        "ml": "രാവിലെയുള്ള ദിക്റുകൾ"
+      },
+      "icon": "🌅"
+    },
+    {
+      "id": "evening",
+      "category": "azkar",
+      "title": {
+        "en": "Evening Azkar",
+        "ml": "വൈകുന്നേരത്തെ ദിക്റുകൾ"
+      },
+      "icon": "🌇"
+    },
+    {
+      "id": "afterPrayer",
+      "category": "azkar",
+      "title": {
+        "en": "After Prayers",
+        "ml": "നമസ്കാരത്തിന് ശേഷം"
+      },
+      "icon": "🧎"
+    },
+    {
+      "id": "rizq",
+      "category": "azkar",
+      "title": {
+        "en": "Rizq (Sustenance)",
+        "ml": "ഭക്ഷണം / ഉപജീവനം"
+      },
+      "icon": "🌾"
+    },
+    {
+      "id": "knowledge",
+      "category": "azkar",
+      "title": {
+        "en": "Knowledge",
+        "ml": "അറിവ്"
+      },
+      "icon": "📚"
+    },
+    {
+      "id": "faith",
+      "category": "azkar",
+      "title": {
+        "en": "Faith (Iman)",
+        "ml": "ഈമാൻ (വിശ്വാസം)"
+      },
+      "icon": "💖"
+    },
+    {
+      "id": "istighfar",
+      "category": "azkar",
+      "title": {
+        "en": "Seeking Forgiveness",
+        "ml": "പാപമോചനം തേടുക"
+      },
+      "icon": "🤲"
+    },
+    {
+      "id": "protection",
+      "category": "azkar",
+      "title": {
+        "en": "Protection",
+        "ml": "സംരക്ഷണം"
+      },
+      "icon": "🛡️"
+    },
+    {
+      "id": "family",
+      "category": "azkar",
+      "title": {
+        "en": "Family",
+        "ml": "കുടുംബം"
+      },
+      "icon": "🏠"
+    },
+    {
+      "id": "health",
+      "category": "azkar",
+      "title": {
+        "en": "Health / Illness",
+        "ml": "ആരോഗ്യം / രോഗം"
+      },
+      "icon": "💊"
+    },
+    {
+      "id": "loss",
+      "category": "azkar",
+      "title": {
+        "en": "Loss / Failure",
+        "ml": "നഷ്ടം / പരാജയം"
+      },
+      "icon": "🕯️"
+    },
+    {
+      "id": "sorrow",
+      "category": "azkar",
+      "title": {
+        "en": "Sorrow / Joy",
+        "ml": "ദുഃഖം / സന്തോഷം"
+      },
+      "icon": "🌈"
+    },
+    {
+      "id": "ramadan",
+      "category": "occasional",
+      "title": {
+        "en": "Ramadan",
+        "ml": "റമദാൻ"
+      },
+      "icon": "🌙"
+    },
+    {
+      "id": "deceased",
+      "category": "occasional",
+      "title": {
+        "en": "Deceased",
+        "ml": "മരണപ്പെട്ടവർക്ക്"
+      },
+      "icon": "⚰️"
+    },
+    {
+      "id": "hajj",
+      "category": "occasional",
+      "title": {
+        "en": "Hajj & Umrah",
+        "ml": "ഹജ്ജ് & ഉംറ"
+      },
+      "icon": "🕋"
+    },
+    {
+      "id": "nature",
+      "category": "occasional",
+      "title": {
+        "en": "Nature",
+        "ml": "പ്രകൃതി"
+      },
+      "icon": "🌿"
+    }
+  ],
+  "duas": [
+    {
+      "id": "sleep_1",
+      "category": "daily",
+      "subcategory": "sleeping",
+      "title": {
+        "en": "Before Sleeping",
+        "ml": "ഉറങ്ങുന്നതിന് മുമ്പ്"
+      },
+      "arabic": "بِاسْمِكَ اللّهُمَّ أَمُوتُ وَأَحْيَا",
+      "transliteration": "Bismika Allahumma amutu wa ahya",
+      "translation": {
+        "en": "In Your name O Allah, I die and I live.",
+        "ml": "അല്ലാഹുവേ, നിന്റെ നാമത്തിൽ ഞാൻ മരിക്കുകയും ജീവിക്കുകയും ചെയ്യുന്നു."
+      },
+      "reference": "Sahih Bukhari: 6324",
+      "audio": "/audio/duas/sleep_before.mp3"
+    },
+    {
+      "id": "sleep_2",
+      "category": "daily",
+      "subcategory": "sleeping",
+      "title": {
+        "en": "When Waking Up",
+        "ml": "ഉറക്കമുണരുമ്പോൾ"
+      },
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+      "transliteration": "Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur",
+      "translation": {
+        "en": "All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.",
+        "ml": "നമ്മെ മരിപ്പിച്ചതിന് ശേഷം ജീവിപ്പിച്ച അല്ലാഹുവിനാകുന്നു എല്ലാ സ്തുതിയും. അവങ്കലേക്കാണ് മടക്കം."
+      },
+      "reference": "Sahih Bukhari: 6312",
+      "audio": "/audio/duas/sleep_waking.mp3"
+    },
+    {
+      "id": "toilet_1",
+      "category": "daily",
+      "subcategory": "toilet",
+      "title": {
+        "en": "Before Entering",
+        "ml": "പ്രവേശിക്കുന്നതിന് മുമ്പ്"
+      },
+      "arabic": "اللّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الخُبُثِ وَالخَبَائِثِ",
+      "transliteration": "Allahumma inni a'udhu bika minal khubuthi wal khabaa'ith",
+      "translation": {
+        "en": "O Allah, I seek refuge in You from male and female devils.",
+        "ml": "അല്ലാഹുവേ, മ്ലേച്ഛതകളിൽ നിന്നും മ്ലേച്ഛജീവികളിൽ നിന്നും ഞാൻ നിന്നോട് കാവൽ തേടുന്നു."
+      },
+      "reference": "Sahih Bukhari: 142",
+      "audio": "/audio/duas/toilet_before.mp3"
+    },
+    {
+      "id": "toilet_2",
+      "category": "daily",
+      "subcategory": "toilet",
+      "title": {
+        "en": "After Leaving",
+        "ml": "പുറത്തിറങ്ങിയ ശേഷം"
+      },
+      "arabic": "غُفْرَانَكَ",
+      "transliteration": "Ghufranaka",
+      "translation": {
+        "en": "I seek Your forgiveness",
+        "ml": "നിന്റെ പാപമോചനം ഞാൻ തേടുന്നു"
+      },
+      "reference": "Abu Dawud: 30",
+      "audio": "/audio/duas/toilet_after_short.mp3",
+      "secondary": {
+        "arabic": "غُفْرَانَكَ، الحَمْدُ لِلَّهِ الَّذِي أَذْهَبَ عَنِّي الأَذَى وَعَافَانِي",
+        "transliteration": "Ghufranaka, Alhamdulillahil-ladhi adh-haba ‘anni al-adha wa ‘afani",
+        "translation": {
+          "en": "I seek Your forgiveness. All praise is for Allah who removed harm from me and granted me relief",
+          "ml": "നിന്റെ പാപമോചനം ഞാൻ തേടുന്നു. എന്നിൽ നിന്ന് ബുദ്ധിമുട്ടുകൾ നീക്കുകയും എനിക്ക് ആശ്വാസം നൽകുകയും ചെയ്ത അല്ലാഹുവിനാണ് സർവ്വ സ്തുതിയും."
+        },
+        "reference": "Sunan an-Nasa'i: 19",
+        "audio": "/audio/duas/toilet_after_full.mp3"
+      }
+    },
+    {
+      "id": "wudu_1",
+      "category": "daily",
+      "subcategory": "ablution",
+      "title": {
+        "en": "Before Starting",
+        "ml": "വുദു തുടങ്ങുന്നതിന് മുമ്പ്"
+      },
+      "arabic": "بِسْمِ اللَّهِ",
+      "transliteration": "Bismillah",
+      "translation": {
+        "en": "In the name of Allah.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ."
+      },
+      "reference": "Abu Dawud: 101",
+      "audio": "/audio/duas/wudu_before.mp3"
+    },
+    {
+      "id": "wudu_2",
+      "category": "daily",
+      "subcategory": "ablution",
+      "title": {
+        "en": "After Completing",
+        "ml": "വുദുവിന് ശേഷം"
+      },
+      "arabic": "أَشْهَدُ أَنْ لا إِلٰهَ إِلَّا اللَّهُ وَحْدَهُ لا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+      "transliteration": "Ash-hadu an la ilaha illallahu wahdahu la sharika lahu wa ash-hadu anna Muhammadan 'abduhu wa Rasuluhu",
+      "translation": {
+        "en": "I bear witness that none has the right to be worshipped except Allah, alone, without partner, and I bear witness that Muhammad is His slave and Messenger.",
+        "ml": "അല്ലാഹുവല്ലാതെ ആരാധനക്കർഹനില്ലെന്നും അവൻ ഏകനാണെന്നും അവന് പങ്കുകാരില്ലെന്നും ഞാൻ സാക്ഷ്യം വഹിക്കുന്നു. മുഹമ്മദ് അല്ലാഹുവിന്റെ ദാസനും ദൂതനുമാണെന്നും ഞാൻ സാക്ഷ്യം വഹിക്കുന്നു."
+      },
+      "reference": "Sahih Muslim: 234",
+      "audio": "/audio/duas/wudu_after_short.mp3",
+      "secondary": {
+        "arabic": "أَشْهَدُ أَنْ لا إِلٰهَ إِلَّا اللَّهُ وَحْدَهُ لا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ، اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ، وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ",
+        "transliteration": "Ash-hadu an la ilaha illallahu... Allahummaj-'alni minat-tawwabina waj-'alni minal-mutatahhirin",
+        "translation": {
+          "en": "I bear witness... O Allah, make me of those who return to You often in repentance and make me of those who remain clean and pure.",
+          "ml": "ഞാൻ സാക്ഷ്യം വഹിക്കുന്നു... അല്ലാഹുവേ, നീ എന്നെ പാപമോചനം തേടി മടങ്ങുന്നവരിലും ശുദ്ധി പാലിക്കുന്നവരിലും ഉൾപ്പെടുത്തേണമേ."
+        },
+        "reference": "At-Tirmidhi: 55",
+        "audio": "/audio/duas/wudu_after_full.mp3"
+      }
+    },
+    {
+      "id": "mosque_1",
+      "category": "daily",
+      "subcategory": "mosque",
+      "title": {
+        "en": "Entering the Mosque",
+        "ml": "പള്ളിയിൽ പ്രവേശിക്കുമ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+      "transliteration": "Allahummaf-tah li abwaba rahmatik",
+      "translation": {
+        "en": "O Allah, open for me the gates of Your mercy.",
+        "ml": "അല്ലാഹുവേ, നിന്റെ കാരുണ്യത്തിന്റെ കവാടങ്ങൾ എനിക്ക് തുറന്നു തരേണമേ."
+      },
+      "reference": "Sahih Muslim: 713",
+      "audio": "/audio/duas/mosque_entering.mp3"
+    },
+    {
+      "id": "mosque_2",
+      "category": "daily",
+      "subcategory": "mosque",
+      "title": {
+        "en": "Leaving the Mosque",
+        "ml": "പള്ളിയിൽ നിന്ന് പുറത്തിറങ്ങുമ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+      "transliteration": "Allahumma inni as'aluka min fadlik",
+      "translation": {
+        "en": "O Allah, I ask You from Your bounty.",
+        "ml": "അല്ലാഹുവേ, നിന്റെ അനുഗ്രഹത്തിൽ നിന്ന് ഞാൻ നിന്നോട് ചോദിക്കുന്നു."
+      },
+      "reference": "Sahih Muslim: 713",
+      "audio": "/audio/duas/mosque_going.mp3"
+    },
+    {
+      "id": "prayer_1",
+      "category": "daily",
+      "subcategory": "prayer",
+      "title": {
+        "en": "Opening Supplication",
+        "ml": "നമസ്കാരത്തിന്റെ തുടക്കത്തിൽ"
+      },
+      "arabic": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلاَ إِلَهَ غَيْرُكَ",
+      "transliteration": "Subhanakal-lahumma wa bihamdika, wa tabarakas-muka, wa ta'ala jadduka, wa la ilaha ghayruka",
+      "translation": {
+        "en": "Glory is to You O Allah, and praise. Blessed is Your Name and Exalted is Your Majesty. There is none worthy of worship but You.",
+        "ml": "അല്ലാഹുവേ, നീ എത്ര പരിശുദ്ധൻ! നിനക്ക് സർവ്വ സ്തുതിയും. നിന്റെ നാമം അനുഗ്രഹീതം, നിന്റെ മഹത്വം ഉന്നതം. നീയല്ലാതെ ആരാധനക്കർഹനില്ല."
+      },
+      "reference": "Abu Dawud: 775",
+      "audio": ""
+    },
+    {
+      "id": "home_1",
+      "category": "daily",
+      "subcategory": "home",
+      "title": {
+        "en": "Entering Home",
+        "ml": "വീട്ടിൽ പ്രവേശിക്കുമ്പോൾ"
+      },
+      "arabic": "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى رَبِّنَا تَوَكَّلْنَا",
+      "transliteration": "Bismillahi walajna, wa bismillahi kharajna, wa 'ala Rabbina tawakkalna",
+      "translation": {
+        "en": "In the name of Allah we enter, in the name of Allah we leave, and upon our Lord we rely.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ നാം പ്രവേശിക്കുന്നു, അല്ലാഹുവിന്റെ നാമത്തിൽ നാം പുറത്തിറങ്ങുന്നു. നമ്മുടെ രക്ഷിതാവിൽ നാം ഭരമേൽപ്പിക്കുന്നു."
+      },
+      "reference": "Abu Dawud: 5096",
+      "audio": "/audio/duas/home_entering.mp3"
+    },
+    {
+      "id": "home_2",
+      "category": "daily",
+      "subcategory": "home",
+      "title": {
+        "en": "Leaving Home",
+        "ml": "വീട്ടിൽ നിന്ന് പുറത്തിറങ്ങുമ്പോൾ"
+      },
+      "arabic": "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ",
+      "transliteration": "Bismillahi, tawakkaltu 'alallahi, wa la hawla wa la quwwata illa billah",
+      "translation": {
+        "en": "In the name of Allah, I place my trust in Allah, and there is no might nor power except with Allah.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ, ഞാൻ അല്ലാഹുവിൽ ഭരമേൽപ്പിക്കുന്നു. അല്ലാഹുവെക്കൊണ്ടല്ലാതെ യാതൊരു തന്ത്രവും ശക്തിയുമില്ല."
+      },
+      "reference": "Abu Dawud: 5095",
+      "audio": ""
+    },
+    {
+      "id": "garment_1",
+      "category": "daily",
+      "subcategory": "garment",
+      "title": {
+        "en": "Wearing a Garment",
+        "ml": "വസ്ത്രം ധരിക്കുമ്പോൾ"
+      },
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلاَ قُوَّةٍ",
+      "transliteration": "Alhamdu lillahil-ladhi kasani hadha wa razaqanihi min ghayri hawlin minni wa la quwwatin",
+      "translation": {
+        "en": "Praise be to Allah Who has clothed me with this and provided it for me without any might or power on my part.",
+        "ml": "എന്റെ യാതൊരു കഴിവും കരുത്തുമില്ലാതെ ഇത് എനിക്ക് ധരിപ്പിക്കുകയും എനിക്കിത് നൽകുകയും ചെയ്ത അല്ലാഹുവിനാണ് സർവ്വ സ്തുതിയും."
+      },
+      "reference": "Abu Dawud: 4023",
+      "audio": "/audio/duas/garment_wearing.mp3"
+    },
+    {
+      "id": "travel_1",
+      "category": "daily",
+      "subcategory": "travel",
+      "title": {
+        "en": "Mounting Vehicle",
+        "ml": "വാഹനത്തിൽ കയറുമ്പോൾ"
+      },
+      "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",
+      "transliteration": "Subhanal-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinina wa inna ila Rabbina lamunqalibun",
+      "translation": {
+        "en": "Glory is to Him Who has subjected this to us, and we were not able to do it ourselves. And surely, to our Lord we are returning.",
+        "ml": "നമുക്കിതിനെ കീഴ്പ്പെടുത്തിത്തന്നവൻ എത്ര പരിശുദ്ധൻ! നമുക്കതിന് കഴിയുമായിരുന്നില്ല. തീർച്ചയായും നാം നമ്മുടെ രക്ഷിതാവിങ്കലേക്ക് മടങ്ങുന്നവരാണ്."
+      },
+      "reference": "Surah Az-Zukhruf 43:13-14",
+      "audio": "/audio/duas/travel_dua.mp3"
+    },
+    {
+      "id": "food_1",
+      "category": "daily",
+      "subcategory": "food",
+      "title": {
+        "en": "Before Eating",
+        "ml": "ഭക്ഷണത്തിന് മുമ്പ്"
+      },
+      "arabic": "بِسْمِ اللَّهِ",
+      "transliteration": "Bismillahi",
+      "translation": {
+        "en": "In the name of Allah.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ."
+      },
+      "reference": "Sahih Bukhari: 5376",
+      "audio": "/audio/duas/food_before.mp3"
+    },
+    {
+      "id": "food_2",
+      "category": "daily",
+      "subcategory": "food",
+      "title": {
+        "en": "After Eating",
+        "ml": "ഭക്ഷണത്തിന് ശേഷം"
+      },
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
+      "transliteration": "Alhamdu lillahil-ladhi at'amana wa saqana wa ja'alana Muslimin",
+      "translation": {
+        "en": "Praise be to Allah Who has fed us and given us drink and made us Muslims.",
+        "ml": "നമുക്ക് ഭക്ഷണം നൽകുകയും കുടിപ്പിക്കുകയും നമ്മെ മുസ്ലിങ്ങളാക്കുകയും ചെയ്ത അല്ലാഹുവിന് സർവ്വ സ്തുതിയും."
+      },
+      "reference": "Abu Dawud: 3850",
+      "audio": "/audio/duas/food_after.mp3"
+    },
+    {
+      "id": "dhikr_1",
+      "category": "azkar",
+      "subcategory": "dailyDhikr",
+      "title": {
+        "en": "SubhanAllah (33x)",
+        "ml": "സുബ്ഹാനള്ളാഹ് (33 തവണ)"
+      },
+      "arabic": "سُبْحَانَ اللَّهِ",
+      "transliteration": "SubhanAllah",
+      "translation": {
+        "en": "Glory be to Allah.",
+        "ml": "അല്ലാഹു എത്ര പരിശുദ്ധൻ."
+      },
+      "reference": "Sahih Muslim: 597",
+      "audio": ""
+    },
+    {
+      "id": "dhikr_2",
+      "category": "azkar",
+      "subcategory": "dailyDhikr",
+      "title": {
+        "en": "Alhamdulillah (33x)",
+        "ml": "അൽഹംദുലില്ലാഹ് (33 തവണ)"
+      },
+      "arabic": "الْحَمْدُ لِلَّهِ",
+      "transliteration": "Alhamdulillah",
+      "translation": {
+        "en": "All praise is due to Allah.",
+        "ml": "സർവ്വ സ്തുതിയും അല്ലാഹുവിനാണ്."
+      },
+      "reference": "Sahih Muslim: 597",
+      "audio": ""
+    },
+    {
+      "id": "dhikr_3",
+      "category": "azkar",
+      "subcategory": "dailyDhikr",
+      "title": {
+        "en": "Allahu Akbar (34x)",
+        "ml": "അള്ളാഹു അക്ബർ (34 തവണ)"
+      },
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "translation": {
+        "en": "Allah is the Greatest.",
+        "ml": "അല്ലാഹു ഏറ്റവും വലിയവനാണ്."
+      },
+      "reference": "Sahih Muslim: 597",
+      "audio": ""
+    },
+    {
+      "id": "dhikr_4",
+      "category": "azkar",
+      "subcategory": "dailyDhikr",
+      "title": {
+        "en": "La ilaha illa Allah...",
+        "ml": "ലാ ഇലാഹ ഇല്ലള്ളാഹ്..."
+      },
+      "arabic": "لا إِلَهَ إِلا اللَّهُ وَحْدَهُ لا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "La ilaha illallahu wahdahu la sharika lahu, lahul-mulku wa lahul-hamdu, wa Huwa 'ala kulli shay'in Qadir",
+      "translation": {
+        "en": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent.",
+        "ml": "അല്ലാഹുവല്ലാതെ ആരാധനക്കർഹനില്ല. അവൻ ഏകനാണ്. അവന് പങ്കുകാരില്ല. ആധിപത്യവും സ്തുതിയും അവനാണ്. അവൻ എല്ലാ കാര്യങ്ങൾക്കും കഴിവുള്ളവനാണ്."
+      },
+      "reference": "Sahih Bukhari: 3293",
+      "audio": ""
+    },
+    {
+      "id": "dhikr_5",
+      "category": "azkar",
+      "subcategory": "dailyDhikr",
+      "title": {
+        "en": "Astaghfirullah (100x)",
+        "ml": "അസ്തഗ്ഫിറുള്ളാഹ് (100 തവണ)"
+      },
+      "arabic": "أَسْتَغْفِرُ اللَّهَ",
+      "transliteration": "Astaghfirullah",
+      "translation": {
+        "en": "I seek forgiveness from Allah.",
+        "ml": "അല്ലാഹുവിനോട് ഞാൻ പാപമോചനം തേടുന്നു."
+      },
+      "reference": "Sahih Muslim: 2702",
+      "audio": ""
+    },
+    {
+      "id": "dhikr_6",
+      "category": "azkar",
+      "subcategory": "dailyDhikr",
+      "title": {
+        "en": "Darood Ibrahim",
+        "ml": "സ്വലാത്ത് (ഇബ്രാഹീമിയ്യ)"
+      },
+      "arabic": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+      "transliteration": "Allahumma salli 'ala Muhammadin wa 'ala ali Muhammadin kama sallayta 'ala Ibrahima wa 'ala ali Ibrahima innaka Hamidun Majid",
+      "translation": {
+        "en": "O Allah, bestow Your favor upon Muhammad and the family of Muhammad as You bestowed Your favor upon Ibrahim and the family of Ibrahim. Verily, You are Praiseworthy, Most Glorious.",
+        "ml": "അല്ലാഹുവേ, ഇബ്രാഹീം നബിക്കും കുടുംബത്തിനും നീ അനുഗ്രഹം നൽകിയത് പോലെ മുഹമ്മദ് നബിക്കും കുടുംബത്തിനും നീ അനുഗ്രഹം നൽകേണമേ. തീർച്ചയായും നീ സ്തുത്യർഹനും മഹാനുമാണ്."
+      },
+      "reference": "Sahih Bukhari: 3370",
+      "audio": ""
+    },
+    {
+      "id": "rem_1",
+      "category": "azkar",
+      "subcategory": "remembrance",
+      "title": {
+        "en": "Ayatul Kursi",
+        "ml": "ആയത്തുൽ കുർസി"
+      },
+      "arabic": "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوةُ الْعَلِيُّ الْعَظِيمُ",
+      "transliteration": "Allahu la ilaha illa Huwal-Hayyul-Qayyum, la ta'khudhuhu sinatun wala nawm, lahu ma fis-samawati wama fil-ard, man dhal-ladhi yashfa'u 'indahu illa bi-idhnih, ya'lamu ma bayna aydihim wama khalfahum, wala yuhituna bishay'im-min 'ilmihi illa bima sha', wasi'a kursiyyuhus-samawati wal-arda wala ya'uduhu hifdhuhuma, wa Huwal-'Aliyyul-'Adhim",
+      "translation": {
+        "en": "Allah! There is no deity but Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.",
+        "ml": "അല്ലാഹു - അവനല്ലാതെ യാതൊരു ദൈവവുമില്ല. എന്നെന്നും ജീവിച്ചിരിക്കുന്നവനും എല്ലാം നിയന്ത്രിക്കുന്നവനുമാണവൻ. മയക്കമോ ഉറക്കമോ അവനെ ബാധിക്കുകയില്ല. ആകാശഭൂമികളിലുള്ളതെല്ലാം അവന്റേതാണ്. അവന്റെ അനുവാദമില്ലാതെ അവന്റെ അടുക്കൽ ശുപാർശ ചെയ്യാൻ കഴിയുന്നവൻ ആരാണ്? അവരുടെ മുമ്പിലുള്ളതും പിന്നിലുള്ളതും അവൻ അറിയുന്നു. അവന്റെ അറിവിൽ നിന്ന് അവൻ ഇച്ഛിക്കുന്നതല്ലാതെ യാതൊന്നും അവർക്ക് ഗ്രഹിക്കാൻ കഴിയില്ല. അവന്റെ സിംഹാസനം ആകാശഭൂമികളെ മുഴുവൻ ഉൾക്കൊള്ളുന്നതാകുന്നു. അവയുടെ സംരക്ഷണം അവന് ഒട്ടും ഭാരമുള്ളതല്ല. അവൻ അത്യുന്നതനും മഹാനുമാകുന്നു."
+      },
+      "reference": "Surah Al-Baqarah 2:255",
+      "audio": ""
+    },
+    {
+      "id": "rem_2",
+      "category": "azkar",
+      "subcategory": "remembrance",
+      "title": {
+        "en": "Surah Ikhlas (3x)",
+        "ml": "സൂറത്തുൽ ഇഖ്ലാസ് (3 തവണ)"
+      },
+      "arabic": "قُلْ هُوَ اللَّهُ أَحَدٌ...",
+      "transliteration": "Qul Huwallahu Ahad...",
+      "translation": {
+        "en": "Say: He is Allah, [who is] One...",
+        "ml": "പറയുക: അവൻ അല്ലാഹുവാകുന്നു; ഏകൻ..."
+      },
+      "reference": "Surah Al-Ikhlas",
+      "audio": ""
+    },
+    {
+      "id": "morning_1",
+      "category": "azkar",
+      "subcategory": "morning",
+      "title": {
+        "en": "Morning Remembrance",
+        "ml": "രാവിലെയുള്ള പ്രാർത്ഥന"
+      },
+      "arabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ",
+      "transliteration": "Asbahna wa asbahal-mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la sharika lah",
+      "translation": {
+        "en": "We have reached the morning and at this very time unto Allah belongs all sovereignty, and all praise is for Allah.",
+        "ml": "അല്ലാഹുവിന്റെ ആധിപത്യത്തിൽ നാം പ്രഭാതത്തിലെത്തിയിരിക്കുന്നു. സർവ്വ സ്തുതിയും അല്ലാഹുവിനാണ്."
+      },
+      "reference": "Sahih Muslim: 2723",
+      "audio": ""
+    },
+    {
+      "id": "evening_1",
+      "category": "azkar",
+      "subcategory": "evening",
+      "title": {
+        "en": "Evening Remembrance",
+        "ml": "വൈകുന്നേരത്തെ പ്രാർത്ഥന"
+      },
+      "arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ",
+      "transliteration": "Amsayna wa amsal-mulku lillah walhamdu lillah",
+      "translation": {
+        "en": "We have reached the evening and at this very time unto Allah belongs all sovereignty, and all praise is for Allah.",
+        "ml": "അല്ലാഹുവിന്റെ ആധിപത്യത്തിൽ നാം പ്രദോഷത്തിലെത്തിയിരിക്കുന്നു. സർവ്വ സ്തുതിയും അല്ലാഹുവിനാണ്."
+      },
+      "reference": "Sahih Muslim: 2723",
+      "audio": ""
+    },
+    {
+      "id": "hajj_1",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "Talbiyah",
+        "ml": "തൽബിയത്ത്"
+      },
+      "arabic": "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لاَ شَرِيكَ لَكَ لَبَّيْكَ",
+      "transliteration": "Labbaykallahumma Labbayk, Labbayka la sharika laka Labbayk",
+      "translation": {
+        "en": "Ever at Your service, O Allah, ever at Your service. Ever at Your service, You have no partner, ever at Your service.",
+        "ml": "അല്ലാഹുവേ, ഇതാ ഞാൻ നിന്റെ വിളിക്ക് ഉത്തരം നൽകി വന്നിരിക്കുന്നു. നിനക്ക് യാതൊരു പങ്കുകാരനുമില്ല."
+      },
+      "reference": "Sahih Bukhari: 1548",
+      "audio": ""
+    },
+    {
+      "id": "deceased_2",
+      "category": "occasional",
+      "subcategory": "deceased",
+      "title": {
+        "en": "Visiting Graves",
+        "ml": "ഖബർ സന്ദർശിക്കുമ്പോൾ"
+      },
+      "arabic": "السَّلامُ عَلَيْكُمْ أَهْلَ الدِّيَارِ مِنَ الْمُؤْمِنِينَ وَالْمُسْلِمِينَ",
+      "transliteration": "Assalamu 'alaikum ahlad-diyari minal-mu'minina wal-muslimin",
+      "translation": {
+        "en": "Peace be upon you, O inhabitants of the graves, among the believers and the Muslims.",
+        "ml": "സത്യവിശ്വാസികളും മുസ്ലിംകളുമായ ഈ ഖബറിസ്ഥാൻ നിവാസികളേ, നിങ്ങൾക്ക് സമാധാനം ഉണ്ടാകട്ടെ."
+      },
+      "reference": "Sahih Muslim: 974",
+      "audio": ""
+    },
+    {
+      "id": "deceased_3",
+      "category": "occasional",
+      "subcategory": "deceased",
+      "title": {
+        "en": "Offering Condolence",
+        "ml": "അനുശോചനം അറിയിക്കുമ്പോൾ"
+      },
+      "arabic": "إِنَّ لِلَّهِ مَا أَخَذَ وَلَهُ مَا أَعْطَى وَكُلُّ شَيْءٍ عِنْدَهُ بِأَجَلٍ مُسَمًّى",
+      "transliteration": "Inna lillahi ma akhadha wa lahu ma a'ta, wa kullu shay'in 'indahu bi-ajalin musamma",
+      "translation": {
+        "en": "To Allah belongs what He has taken and to Him belongs what He has given, and everything with Him has an appointed time.",
+        "ml": "അല്ലാഹു എടുത്തത് അവന്റേതാണ്, അവൻ നൽകിയതും അവന്റേതാണ്. ഓരോ കാര്യത്തിനും അവന്റെ അടുക്കൽ നിശ്ചിത സമയമുണ്ട്."
+      },
+      "reference": "Sahih Bukhari: 1284",
+      "audio": ""
+    },
+    {
+      "id": "ramadan_2",
+      "category": "occasional",
+      "subcategory": "ramadan",
+      "title": {
+        "en": "For the night of destiny (Lailatul Qadr)",
+        "ml": "ലൈലത്തുൽ ഖദ്റിലെ പ്രാർത്ഥന"
+      },
+      "arabic": "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+      "transliteration": "Allahumma innaka 'afuwwun tuhibbul-'afwa fa'fu 'anni",
+      "translation": {
+        "en": "O Allah, You are forgiving and You love forgiveness, so forgive me.",
+        "ml": "അല്ലാഹുവേ, നീ ഏറെ മാപ്പ് നൽകുന്നവനാണ്, മാപ്പ് നൽകാൻ നീ ഇഷ്ടപ്പെടുന്നു. അതിനാൽ എനിക്ക് മാപ്പ് നൽകേണമേ."
+      },
+      "reference": "At-Tirmidhi: 3513",
+      "audio": ""
+    },
+    {
+      "id": "nature_1",
+      "category": "occasional",
+      "subcategory": "nature",
+      "title": {
+        "en": "When it Rains",
+        "ml": "മഴ പെയ്യുമ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ صَيِّبًا نَافِعًا",
+      "transliteration": "Allahumma sayyiban nafi'an",
+      "translation": {
+        "en": "O Allah, may it be a beneficial rain.",
+        "ml": "അല്ലാഹുവേ, ഇത് ഉപകാരപ്രദമായ ഒരു മഴയാക്കേണമേ."
+      },
+      "reference": "Sahih Bukhari: 1032",
+      "audio": ""
+    },
+    {
+      "id": "nature_2",
+      "category": "occasional",
+      "subcategory": "nature",
+      "title": {
+        "en": "Hearing Thunder",
+        "ml": "ഇടിമിന്നൽ കേൾക്കുമ്പോൾ"
+      },
+      "arabic": "سُبْحَانَ الَّذِي يُسَبِّحُ الرَّعْدُ بِحَمْدِهِ وَالْمَلاَئِكَةُ مِنْ خِيفَتِهِ",
+      "transliteration": "Subhanal-ladhi yusabbihur-ra'du bihamdihi wal-mala'ikatu min khifatih",
+      "translation": {
+        "en": "Glory is to Him Whom the thunder exalts with praise and the angels from fear of Him.",
+        "ml": "ഇടിമുഴക്കം അവന്റെ സ്തുതിയോടു കൂടി അവനെ പ്രകീർത്തിക്കുന്നു. മലക്കുകൾ അവനെ പേടിച്ചും പ്രകീർത്തിക്കുന്നു."
+      },
+      "reference": "Muwatta Malik: 1801",
+      "audio": ""
+    },
+    {
+      "id": "nature_3",
+      "category": "occasional",
+      "subcategory": "nature",
+      "title": {
+        "en": "Strong Winds",
+        "ml": "ശക്തമായ കാറ്റുള്ളപ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا وَأَعُوذُ بِكَ مِنْ شَرِّهَا",
+      "transliteration": "Allahumma inni as'aluka khayraha wa a'udhu bika min sharriha",
+      "translation": {
+        "en": "O Allah, I ask You for its goodness and I seek refuge in You from its evil.",
+        "ml": "അല്ലാഹുവേ, ഇതിലെ നന്മ ഞാൻ നിന്നോട് ചോദിക്കുന്നു, ഇതിലെ തിന്മയിൽ നിന്ന് ഞാൻ നിന്നോട് കാവൽ തേടുന്നു."
+      },
+      "reference": "Sahih Muslim: 899",
+      "audio": ""
+    },
+    {
+      "id": "ap_1",
+      "category": "azkar",
+      "subcategory": "afterPrayer",
+      "title": {
+        "en": "Seeking Peace",
+        "ml": "സമാധാനത്തിനായി"
+      },
+      "arabic": "اللَّهُمَّ أَنْتَ السَّلامُ وَمِنْكَ السَّلامُ، تَبَارَكْتَ يَا ذَا الْجَلالِ وَالإِكْرَامِ",
+      "transliteration": "Allahumma Antas-Salamu wa minkas-salamu, tabarakta ya Dhal-Jalali wal-Ikram",
+      "translation": {
+        "en": "O Allah, You are As-Salam (the One Who is free from all defects and deficiencies) and from You is all peace, blessed are You, O Possessor of majesty and honor.",
+        "ml": "അല്ലാഹുവേ, നീയാണ് സമാധാനം. നിന്നിൽ നിന്നാണ് സമാധാനം വരുന്നത്. മഹത്വവും ആദരവുമുള്ളവനേ, നീ അനുഗ്രഹീതനാകുന്നു."
+      },
+      "reference": "Sahih Muslim: 591",
+      "audio": "/audio/duas/dua_peace.mp3"
+    },
+    {
+      "id": "rizq_1",
+      "category": "azkar",
+      "subcategory": "rizq",
+      "title": {
+        "en": "Seeking Beneficial Provision",
+        "ml": "ഉത്തമമായ ഉപജീവനം തേടുന്നു"
+      },
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلاً مُتَقَبَّلاً",
+      "transliteration": "Allahumma inni as'aluka 'ilman nafi'an, wa rizqan tayyiban, wa 'amalan mutaqabbalan",
+      "translation": {
+        "en": "O Allah, I ask You for knowledge that is of benefit, a good provision and deeds that will be accepted.",
+        "ml": "അല്ലാഹുവേ, ഉപകാരപ്രദമായ അറിവും ഉത്തമമായ ഉപജീവനവും സ്വീകാര്യമായ കർമ്മങ്ങളും ഞാൻ നിന്നോട് ചോദിക്കുന്നു."
+      },
+      "reference": "Ibn Majah: 925",
+      "audio": ""
+    },
+    {
+      "id": "knowledge_1",
+      "category": "azkar",
+      "subcategory": "knowledge",
+      "title": {
+        "en": "Increase in Knowledge",
+        "ml": "അറിവ് വർദ്ധിപ്പിക്കാൻ"
+      },
+      "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni 'ilman",
+      "translation": {
+        "en": "My Lord, increase me in knowledge.",
+        "ml": "എന്റെ രക്ഷിതാവേ, എനിക്ക് അറിവ് വർദ്ധിപ്പിച്ചു നൽകേണമേ."
+      },
+      "reference": "Surah Taha 20:114",
+      "audio": ""
+    },
+    {
+      "id": "faith_1",
+      "category": "azkar",
+      "subcategory": "faith",
+      "title": {
+        "en": "Firmness in Faith",
+        "ml": "വിശ്വാസത്തിൽ ഉറച്ചു നിൽക്കാൻ"
+      },
+      "arabic": "يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ",
+      "transliteration": "Ya Muqallibal-qulubi thabbit qalbi 'ala dinik",
+      "translation": {
+        "en": "O Turner of the hearts, make my heart firm upon Your religion.",
+        "ml": "ഹൃദയങ്ങളെ മാറ്റിമറിക്കുന്നവനേ, എന്റെ ഹൃദയത്തെ നിന്റെ മതത്തിൽ ഉറപ്പിച്ചു നിർത്തേണമേ."
+      },
+      "reference": "At-Tirmidhi: 2140",
+      "audio": "/audio/duas/dua_trust.mp3"
+    },
+    {
+      "id": "istighfar_1",
+      "category": "azkar",
+      "subcategory": "istighfar",
+      "title": {
+        "en": "Sayyidul Istighfar",
+        "ml": "സയ്യിദുൽ ഇസ്തിഗ്ഫാർ"
+      },
+      "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ...",
+      "transliteration": "Allahumma Anta Rabbi la ilaha illa Anta, khalaqtani wa ana 'abduka...",
+      "translation": {
+        "en": "O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant...",
+        "ml": "അല്ലാഹുവേ, നീ എന്റെ രക്ഷിതാവാണ്. നീയല്ലാതെ ആരാധനക്കർഹനില്ല. നീ എന്നെ പടച്ചു, ഞാൻ നിന്റെ ദാസനാണ്..."
+      },
+      "reference": "Sahih Bukhari: 6306",
+      "audio": "/audio/duas/dua_forgiveness.mp3"
+    },
+    {
+      "id": "prot_1",
+      "category": "azkar",
+      "subcategory": "protection",
+      "title": {
+        "en": "Protection from Evil",
+        "ml": "തിന്മകളിൽ നിന്നുള്ള സംരക്ഷണം"
+      },
+      "arabic": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّماءِ",
+      "transliteration": "Bismillahil-ladhi la yadurru ma'as-mihi shay'un fil-ardi wa la fis-sama'i",
+      "translation": {
+        "en": "In the Name of Allah, Who with His Name nothing can cause harm in the earth nor in the heavens.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ, അവന്റെ നാമത്തോടൊപ്പം ഭൂമിയിലോ ആകാശത്തോ യാതൊന്നും ഉപദ്രവം വരുത്തുകയില്ല."
+      },
+      "reference": "Abu Dawud: 5088",
+      "audio": ""
+    },
+    {
+      "id": "fam_1",
+      "category": "azkar",
+      "subcategory": "family",
+      "title": {
+        "en": "Dua for Parents",
+        "ml": "മാതാപിതാക്കൾക്ക് വേണ്ടി"
+      },
+      "arabic": "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+      "transliteration": "Rabbir-hamhuma kama rabbayani saghira",
+      "translation": {
+        "en": "My Lord, have mercy upon them as they brought me up [when I was] small.",
+        "ml": "എന്റെ രക്ഷിതാവേ, ചെറുപ്പത്തിൽ അവർ എന്നെ വളർത്തിയത് പോലെ നീ അവരോട് കരുണ കാണിക്കേണമേ."
+      },
+      "reference": "Surah Al-Isra 17:24",
+      "audio": ""
+    },
+    {
+      "id": "health_1",
+      "category": "azkar",
+      "subcategory": "health",
+      "title": {
+        "en": "Dua for Healing",
+        "ml": "രോഗശമനത്തിന്"
+      },
+      "arabic": "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ، اشْفِ أَنْتَ الشَّافِي",
+      "transliteration": "Allahumma Rabban-nasi adh-hibil-ba'sa, ishfi Antash-Shafi",
+      "translation": {
+        "en": "O Allah, Lord of mankind, remove the hardship. Grant cure, You are the Curer.",
+        "ml": "മനുഷ്യരുടെ രക്ഷിതാവായ അല്ലാഹുവേ, നീ ഈ പ്രയാസം നീക്കേണമേ. നീ ശിഫ നൽകേണമേ, നീയാണ് ശിഫ നൽകുന്നവൻ."
+      },
+      "reference": "Sahih Bukhari: 5675",
+      "audio": "/audio/duas/dua_pain.mp3"
+    },
+    {
+      "id": "loss_1",
+      "category": "azkar",
+      "subcategory": "loss",
+      "title": {
+        "en": "In Times of Affliction",
+        "ml": "വിപത്തുകൾ ഉണ്ടാകുമ്പോൾ"
+      },
+      "arabic": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ",
+      "transliteration": "Inna lillahi wa inna ilayhi raji'un",
+      "translation": {
+        "en": "To Allah we belong and to Him is our return.",
+        "ml": "തീർച്ചയായും നാം അല്ലാഹുവിനുള്ളതാണ്, അവങ്കലേക്കാണ് നാം മടങ്ങുന്നതും."
+      },
+      "reference": "Surah Al-Baqarah 2:156",
+      "audio": "/audio/duas/dua_hardship.mp3"
+    },
+    {
+      "id": "sorrow_1",
+      "category": "azkar",
+      "subcategory": "sorrow",
+      "title": {
+        "en": "Dua Against Anxiety",
+        "ml": "ഉത്കണ്ഠയ്ക്കെതിരെ"
+      },
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ",
+      "transliteration": "Allahumma inni a'udhu bika minal-hammi wal-hazan",
+      "translation": {
+        "en": "O Allah, I seek refuge in You from anxiety and sorrow.",
+        "ml": "അല്ലാഹുവേ, ഉത്കണ്ഠയിൽ നിന്നും ദുഃഖത്തിൽ നിന്നും ഞാൻ നിന്നോട് കാവൽ തേടുന്നു."
+      },
+      "reference": "Sahih Bukhari: 2893",
+      "audio": "/audio/duas/dua_anxiety.mp3"
+    },
+    {
+      "id": "ramadan_1",
+      "category": "occasional",
+      "subcategory": "ramadan",
+      "title": {
+        "en": "When opening your fast",
+        "ml": "നോമ്പ് തുറക്കുമ്പോൾ"
+      },
+      "arabic": "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
+      "transliteration": "Dhahabadh-dhama'u wabtallatil-'uruqu wa thabatal-ajru in sha' Allah",
+      "translation": {
+        "en": "The thirst is gone, the veins are moistened and the reward is confirmed, if Allah wills.",
+        "ml": "ദാഹം തീർന്നു, ഞരമ്പുകൾ നനഞ്ഞു, അല്ലാഹു ഉദ്ദേശിച്ചാൽ പ്രതിഫലം ഉറപ്പായി."
+      },
+      "reference": "Abu Dawud: 2357",
+      "audio": ""
+    },
+    {
+      "id": "deceased_1",
+      "category": "occasional",
+      "subcategory": "deceased",
+      "title": {
+        "en": "Funeral Prayer",
+        "ml": "മയ്യിത്ത് നമസ്കാരത്തിൽ"
+      },
+      "arabic": "اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ",
+      "transliteration": "Allahummagh-fir lahu warhamhu",
+      "translation": {
+        "en": "O Allah, forgive him and have mercy on him.",
+        "ml": "അല്ലാഹുവേ, അയാൾക്ക് പൊറുത്തു കൊടുക്കേണമേ, കരുണ കാണിക്കേണമേ."
+      },
+      "reference": "Sahih Muslim: 963",
+      "audio": ""
+    },
+    {
+      "id": "hajj_1",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "Talbiyah",
+        "ml": "തൽബിയത്ത്"
+      },
+      "arabic": "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لاَ شَرِيكَ لَكَ لَبَّيْكَ",
+      "transliteration": "Labbaykallahumma Labbayk, Labbayka la sharika laka Labbayk",
+      "translation": {
+        "en": "Ever at Your service, O Allah, ever at Your service. Ever at Your service, You have no partner, ever at Your service.",
+        "ml": "അല്ലാഹുവേ, ഇതാ ഞാൻ നിന്റെ വിളിക്ക് ഉത്തരം നൽകി വന്നിരിക്കുന്നു. നിനക്ക് യാതൊരു പങ്കുകാരനുമില്ല."
+      },
+      "reference": "Sahih Bukhari: 1548",
+      "audio": ""
+    },
+    {
+      "id": "deceased_4",
+      "category": "occasional",
+      "subcategory": "deceased",
+      "title": {
+        "en": "When a loss occurs",
+        "ml": "വിപത്തുണ്ടാകുമ്പോൾ"
+      },
+      "arabic": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ، اللَّهُمَّ أْجُرْنِي فِي مُصِيبَتِي وَأَخْلِفْ لِي خَيْرًا مِنْهَا",
+      "transliteration": "Inna lillahi wa inna ilayhi raji'un, Allahumma-jurni fi musibati wa akhlif li khayran minha",
+      "translation": {
+        "en": "To Allah we belong and unto Him is our return. O Allah, recompense me for my affliction and replace it for me with something better.",
+        "ml": "തീർച്ചയായും നാം അല്ലാഹുവിനുള്ളതാണ്, അവങ്കലേക്കാണ് നാം മടങ്ങുന്നതും. അല്ലാഹുവേ, എന്റെ ഈ വിപത്തിൽ എനിക്ക് പ്രതിഫലം നൽകുകയും ഇതിനേക്കാൾ ഉത്തമമായത് എനിക്ക് പകരമായി നൽകുകയും ചെയ്യേണമേ."
+      },
+      "reference": "Sahih Muslim: 918",
+      "audio": ""
+    },
+    {
+      "id": "deceased_5",
+      "category": "occasional",
+      "subcategory": "deceased",
+      "title": {
+        "en": "When closing the eyes of the deceased",
+        "ml": "മരണപ്പെട്ടയാളുടെ കണ്ണ് ചിമ്മുമ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ اغْفِرْ لِفُلاَنٍ وَارْفَعْ دَرَجَتَهُ فِي الْمَهْدِيِّينَ، وَاخْلُفْهُ فِي عَقِبِهِ فِي الْغَابِرِينَ",
+      "transliteration": "Allahummaghfir li-fulan (mention name) warfa' darajatahu fil-mahdiyyin, wakhlufhu fi 'aqibihi fil-ghabirin",
+      "translation": {
+        "en": "O Allah, forgive [name] and elevate his station among those who are guided. Send him along the path of those who came before, and forgive us and him.",
+        "ml": "അല്ലാഹുവേ, (പേര് പറയുക) പാപങ്ങൾ പൊറുത്തു കൊടുക്കേണമേ. സന്മാർഗ്ഗികളോടൊപ്പം അവന്റെ പദവി ഉയർത്തേണമേ. അവന്റെ പിൻഗാമികളിൽ അവന് പകരക്കാരനെ നൽകേണമേ."
+      },
+      "reference": "Sahih Muslim: 920",
+      "audio": ""
+    },
+    {
+      "id": "deceased_6",
+      "category": "occasional",
+      "subcategory": "deceased",
+      "title": {
+        "en": "When placing the deceased in the grave",
+        "ml": "ഖബറിൽ വെക്കുമ്പോൾ"
+      },
+      "arabic": "بِسْمِ اللَّهِ وَعَلَى سُنَّةِ رَسُولِ اللَّهِ",
+      "transliteration": "Bismillahi wa 'ala sunnati Rasulillahi",
+      "translation": {
+        "en": "In the name of Allah and upon the Sunnah of the Messenger of Allah.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ, അല്ലാഹുവിന്റെ ദൂതന്റെ ചര്യയിൽ."
+      },
+      "reference": "Abu Dawud: 3213",
+      "audio": ""
+    },
+    {
+      "id": "hajj_2",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "Takbeer when passing the black stone",
+        "ml": "ഹജറുൽ അസ്‌വദിനെ ചുംബിക്കുമ്പോൾ / അഭിമുഖീകരിക്കുമ്പോൾ"
+      },
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "translation": {
+        "en": "Allah is the Greatest.",
+        "ml": "അല്ലാഹു ഏറ്റവും വലിയവനാണ്."
+      },
+      "reference": "Sahih Bukhari: 1613",
+      "audio": ""
+    },
+    {
+      "id": "hajj_3",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "Upon reaching the Yemeni corner during Tawaf",
+        "ml": "റുക്നുൽ യമാനിയെ അഭിമുഖീകരിക്കുമ്പോൾ"
+      },
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
+      "translation": {
+        "en": "Our Lord, grant us good in this world and good in the hereafter, and save us from the punishment of the Fire.",
+        "ml": "ഞങ്ങളുടെ രക്ഷിതാവേ, ഞങ്ങൾക്ക് ഈ ദുനിയാവിലും ആഖിറത്തിലും നന്മ നൽകേണമേ. നരകശിക്ഷയിൽ നിന്ന് ഞങ്ങളെ കാക്കേണമേ."
+      },
+      "reference": "Abu Dawud: 1892",
+      "audio": ""
+    },
+    {
+      "id": "hajj_4",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "When at Mount Safa and Mount Marwah",
+        "ml": "സഫയിലും മർവയിലും"
+      },
+      "arabic": "إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ... أَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ",
+      "transliteration": "Innas-Safa wal-Marwata min sha'airillahi... Abda'u bima bada'allahu bihi",
+      "translation": {
+        "en": "Verily, Safa and Marwah are among the symbols of Allah... I begin with what Allah began with.",
+        "ml": "തീർച്ചയായും സഫയും മർവയും അല്ലാഹുവിന്റെ അടയാളങ്ങളിൽ പെട്ടതാണ്... അല്ലാഹു എവിടെ നിന്നാണോ തുടങ്ങിയത് അവിടെ നിന്ന് ഞാനും തുടങ്ങുന്നു."
+      },
+      "reference": "Sahih Muslim: 1218",
+      "audio": ""
+    },
+    {
+      "id": "hajj_5",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "For reciting at Al-Mash'ar Al-Haraam",
+        "ml": "മശ്അറുൽ ഹറാമിൽ വെച്ച്"
+      },
+      "arabic": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "La ilaha illallahu wahdahu la sharika lahu, lahul-mulku wa lahul-hamdu, wa Huwa 'ala kulli shay'in Qadir",
+      "translation": {
+        "en": "There is none worthy of worship but Allah alone, Who has no partner. His is the dominion and His is the praise, and He is Able to do all things.",
+        "ml": "അല്ലാഹുവല്ലാതെ ആരാധനക്കർഹനില്ല. അവൻ ഏകനാണ്. അവന് പങ്കുകാരില്ല. ആധിപത്യവും സ്തുതിയും അവനാണ്. അവൻ എല്ലാ കാര്യങ്ങൾക്കും കഴിവുള്ളവനാണ്."
+      },
+      "reference": "Sahih Muslim: 1218",
+      "audio": ""
+    },
+    {
+      "id": "hajj_6",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "When throwing stones at Jamaraat",
+        "ml": "ജമറകളിൽ കല്ലെറിയുമ്പോൾ"
+      },
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "translation": {
+        "en": "Allah is the Greatest.",
+        "ml": "അല്ലാഹു ഏറ്റവും വലിയവനാണ്."
+      },
+      "reference": "Sahih Bukhari: 1752",
+      "audio": ""
+    },
+    {
+      "id": "hajj_7",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "At Arafat",
+        "ml": "അറഫയിൽ വെച്ച്"
+      },
+      "arabic": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "La ilaha illallahu wahdahu la sharika lahu, lahul-mulku wa lahul-hamdu, wa Huwa 'ala kulli shay'in Qadir",
+      "translation": {
+        "en": "None has the right to be worshipped but Allah alone, Who has no partner. His is the command and His is the praise, and He is Able to do all things.",
+        "ml": "അല്ലാഹുവല്ലാതെ ആരാധനക്കർഹനില്ല. അവൻ ഏകനാണ്. അവന് പങ്കുകാരില്ല. ആധിപത്യവും സ്തുതിയും അവനാണ്. അവൻ എല്ലാ കാര്യങ്ങൾക്കും കഴിവുള്ളവനാണ്."
+      },
+      "reference": "At-Tirmidhi: 3585",
+      "audio": ""
+    },
+    {
+      "id": "hajj_8",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "When sacrificing an animal",
+        "ml": "ബലിയറുക്കുമ്പോൾ"
+      },
+      "arabic": "بِسْمِ اللَّهِ وَاللَّهُ أَكْبَرُ، اللَّهُمَّ هَذَا مِنْكَ وَلَكَ",
+      "transliteration": "Bismillahi wallahu Akbar, Allahumma hadha minka wa laka",
+      "translation": {
+        "en": "In the name of Allah, Allah is the Greatest. O Allah, this is from You and for You.",
+        "ml": "അല്ലാഹുവിന്റെ നാമത്തിൽ, അല്ലാഹു ഏറ്റവും വലിയവനാണ്. അല്ലാഹുവേ, ഇത് നിന്നിൽ നിന്നുള്ളതും നിനക്കുള്ളതുമാണ്."
+      },
+      "reference": "Abu Dawud: 2795",
+      "audio": ""
+    },
+    {
+      "id": "hajj_9",
+      "category": "occasional",
+      "subcategory": "hajj",
+      "title": {
+        "en": "While going to Mount Safa",
+        "ml": "സഫയിലേക്ക് പോകുമ്പോൾ"
+      },
+      "arabic": "إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ",
+      "transliteration": "Innas-Safa wal-Marwata min sha'airillahi",
+      "translation": {
+        "en": "Verily, Safa and Marwah are among the symbols of Allah.",
+        "ml": "തീർച്ചയായും സഫയും മർവയും അല്ലാഹുവിന്റെ അടയാളങ്ങളിൽ പെട്ടതാണ്."
+      },
+      "reference": "Sahih Muslim: 1218",
+      "audio": ""
+    },
+    {
+      "id": "ramadan_3",
+      "category": "occasional",
+      "subcategory": "ramadan",
+      "title": {
+        "en": "For someone who provides you with Iftar",
+        "ml": "നോമ്പ് തുറപ്പിച്ചവർക്ക് വേണ്ടി"
+      },
+      "arabic": "أَفْطَرَ عِنْدَكُمُ الصَّائِمُونَ، وَأَكَلَ طَعَامَكُمُ الأَبْرَارُ، وَصَلَّتْ عَلَيْكُمُ الْمَلائِكَةُ",
+      "transliteration": "Aftara 'indakumus-saimuna, wa akala ta'amakumul-abraru, wa sallat 'alaykumul-malaikatu",
+      "translation": {
+        "en": "May the fasting people break their fast with you, and may the righteous eat your food, and may the angels pray for you.",
+        "ml": "നോമ്പുകാർ നിങ്ങളുടെ അടുത്ത് നിന്ന് നോമ്പ് തുറക്കട്ടെ. പുണ്യവാന്മാർ നിങ്ങളുടെ ഭക്ഷണം കഴിക്കട്ടെ. മലക്കുകൾ നിങ്ങൾക്ക് വേണ്ടി പ്രാർത്ഥിക്കട്ടെ."
+      },
+      "reference": "Abu Dawud: 3854",
+      "audio": ""
+    },
+    {
+      "id": "ramadan_4",
+      "category": "occasional",
+      "subcategory": "ramadan",
+      "title": {
+        "en": "On the sighting of the crescent moon",
+        "ml": "മാസപ്പിറവി കാണുമ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ أَهِلَّهُ عَلَيْنَا بِالْأَمْنِ وَالْإِيمَانِ، وَالسَّلَامَةِ وَالْإِسْلَامِ، رَبِّي وَرَبُّكَ اللَّهُ",
+      "transliteration": "Allahumma ahillahu 'alayna bil-amni wal-iman, was-salamati wal-islam, Rabbi wa Rabbukallah",
+      "translation": {
+        "en": "O Allah, let this moon appear on us with security and faith, with safety and Islam. My Lord and your Lord is Allah.",
+        "ml": "അല്ലാഹുവേ, സമാധാനത്തിലും വിശ്വാസത്തിലും സുരക്ഷയിലും ഇസ്‌ലാമിലും ഈ മാസത്തെ ഞങ്ങൾക്ക് നീ ഉദിപ്പിക്കേണമേ. (മാസമേ,) എന്റെയും നിന്റെയും രക്ഷിതാവ് അല്ലാഹുവാകുന്നു."
+      },
+      "reference": "At-Tirmidhi: 3451",
+      "audio": ""
+    },
+    {
+      "id": "nature_4",
+      "category": "occasional",
+      "subcategory": "nature",
+      "title": {
+        "en": "For rain",
+        "ml": "മഴയ്ക്കായി"
+      },
+      "arabic": "اللَّهُمَّ أَسْقِنَا غَيْثًا مُغِيثًا مَرِيئًا مَرِيعًا، نَافِعًا غَيْرَ ضَارٍّ",
+      "transliteration": "Allahumma asqina ghaythan mughithan marian marian, nafi'an ghayra darr",
+      "translation": {
+        "en": "O Allah, bless us with a rain that is helping, pleasant, productive, beneficial and not harmful.",
+        "ml": "അല്ലാഹുവേ, ഉപകാരപ്രദമായതും ദോഷകരമല്ലാത്തതും സമൃദ്ധമായതുമായ മഴ നൽകി ഞങ്ങളെ നീ അനുഗ്രഹിക്കേണമേ."
+      },
+      "reference": "Abu Dawud: 1169",
+      "audio": ""
+    },
+    {
+      "id": "nature_5",
+      "category": "occasional",
+      "subcategory": "nature",
+      "title": {
+        "en": "After rainfall",
+        "ml": "മഴയ്ക്ക് ശേഷം"
+      },
+      "arabic": "مُطِرْنَا بِفَضْلِ اللَّهِ وَرَحْمَتِهِ",
+      "transliteration": "Mutirna bifadlillahi wa rahmatihi",
+      "translation": {
+        "en": "We have been given rain by the grace and mercy of Allah.",
+        "ml": "അല്ലാഹുവിന്റെ ഔദാര്യത്താലും കാരുണ്യത്താലും ഞങ്ങൾക്ക് മഴ ലഭിച്ചിരിക്കുന്നു."
+      },
+      "reference": "Sahih Bukhari: 846",
+      "audio": ""
+    },
+    {
+      "id": "nature_6",
+      "category": "occasional",
+      "subcategory": "nature",
+      "title": {
+        "en": "When there is excessive rain",
+        "ml": "അമിതമായ മഴ പെയ്യുമ്പോൾ"
+      },
+      "arabic": "اللَّهُمَّ حَوَالَيْنَا وَلاَ عَلَيْنَا",
+      "transliteration": "Allahumma hawalayna wa la 'alayna",
+      "translation": {
+        "en": "O Allah, let it rain around us and not upon us.",
+        "ml": "അല്ലാഹുവേ, ഞങ്ങളുടെ ചുറ്റിലും (മഴ പെയ്യിക്കേണമേ), ഞങ്ങളുടെ മേലല്ല."
+      },
+      "reference": "Sahih Bukhari: 1014",
+      "audio": ""
+    }
+  ]
+}
