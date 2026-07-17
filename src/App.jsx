@@ -25,6 +25,7 @@ import AppOnboarding from './components/onboarding/AppOnboarding';
 import UpdateManager from './components/update/UpdateManager';
 import RatingManager from './components/rating/RatingManager';
 import SettingsPage from './features/more/SettingsPage';
+import { apiUrl } from './config/api';
 
 // --- AUDIO SYSTEM HELPERS ---
 const getAudioUrl = (reciter, ayahNumber) => {
@@ -480,7 +481,7 @@ function UserDashboard() {
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             console.log('🔐 Verifying Google login with backend...');
-            const response = await fetch('http://localhost:8000/api/auth/google/', {
+            const response = await fetch(apiUrl('/api/auth/google/'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential }),
@@ -497,7 +498,8 @@ function UserDashboard() {
             const userData = { 
                 email: verifiedData.email, 
                 name: verifiedData.name, 
-                picture: verifiedData.picture 
+                picture: verifiedData.picture,
+                accessToken: verifiedData.accessToken,
             };
             
             setUser(userData);
@@ -804,7 +806,7 @@ function UserDashboard() {
         //   /api/calculate/    = stateless  (no memory, like a calculator app)
         //   /api/calculations/ = stateful   (saves history — this is the LEDGER!)
         // ─────────────────────────────────────────────────────────────────────
-        const DJANGO_SAVE_URL = 'http://localhost:8000/api/calculations/';
+        const DJANGO_SAVE_URL = apiUrl('/api/calculations/');
 
         const payload = {
             userEmail:         user?.email || 'anonymous@zakatledger.app',
@@ -826,7 +828,10 @@ function UserDashboard() {
 
             const response = await fetch(DJANGO_SAVE_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.accessToken || ''}`,
+                },
                 body: JSON.stringify(payload),
             });
 
@@ -852,7 +857,9 @@ function UserDashboard() {
         
         setIsLoadingHistory(true);
         try {
-            const response = await fetch(`http://localhost:8000/api/calculations/?email=${user.email}`);
+            const response = await fetch(apiUrl('/api/calculations/'), {
+                headers: { 'Authorization': `Bearer ${user.accessToken || ''}` },
+            });
             if (!response.ok) throw new Error('Could not fetch history');
             
             const data = await response.json();
@@ -868,8 +875,9 @@ function UserDashboard() {
         if (!window.confirm('Permanently delete this calculation from your ledger?')) return;
         
         try {
-            const response = await fetch(`http://localhost:8000/api/calculations/${id}/?email=${user?.email}`, {
+            const response = await fetch(apiUrl(`/api/calculations/${id}/`), {
                 method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${user?.accessToken || ''}` },
             });
             
             if (response.ok) {

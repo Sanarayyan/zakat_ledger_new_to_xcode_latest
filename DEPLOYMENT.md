@@ -1,0 +1,73 @@
+# Deployment readiness
+
+## Shared frontend and mobile build
+
+1. Copy `.env.example` to `.env.production`.
+2. Set `VITE_API_BASE_URL` to the public HTTPS backend URL.
+3. Set `VITE_GOOGLE_CLIENT_ID` to the production Google OAuth client ID.
+4. Run `npm ci` and `npm run mobile:sync` to build once and copy the same web application into iOS and Android.
+
+## iOS handoff
+
+1. Install the latest supported Xcode and select it with `xcode-select`.
+2. Run `npm run ios:open`.
+3. Configure the Apple developer team, bundle signing, capabilities, and App Store distribution profile.
+4. Confirm location and notification permission prompts on a real iPhone.
+5. Archive in Xcode, validate the archive, and upload it to App Store Connect/TestFlight.
+
+The iOS bundle ID is `com.muslimplus.app`.
+
+## Android handoff
+
+1. Install Android Studio, its bundled JDK, Android SDK 36, and the platform build tools.
+2. Run `npm run android:open` and allow Android Studio to complete Gradle sync.
+3. Confirm the package ID `com.muslimplus.app` is available in Google Play Console.
+4. Create or securely obtain the upload keystore. Do not commit keystore files or passwords.
+5. Configure release signing outside source control, then create a signed Android App Bundle (`.aab`).
+6. Test location, notification permissions, Qibla sensors, audio, Google login, Zakat history, and process restoration on real Android devices.
+7. Upload the `.aab` to an internal testing track before production rollout.
+
+Android supports API 24 and newer and targets API 36. Release builds reject cleartext HTTP traffic, so `VITE_API_BASE_URL` must use HTTPS.
+
+The frontend must be rebuilt after changing any `VITE_*` value. A physical phone cannot use `localhost` to reach the backend.
+
+## Django backend
+
+Use Python 3.11 or newer and install `backend/requirements.txt`. Configure these environment variables on the hosting platform:
+
+- `DJANGO_DEBUG=false`
+- `DJANGO_SECRET_KEY` with a long random value
+- `DJANGO_ALLOWED_HOSTS` with the backend host name
+- `DJANGO_CORS_ALLOWED_ORIGINS` with the deployed web origin, if a web build is hosted
+- `DJANGO_CSRF_TRUSTED_ORIGINS` with trusted HTTPS origins
+- `DJANGO_SECURE_SSL_REDIRECT=true` when the platform forwards HTTPS correctly
+- `DJANGO_SECURE_HSTS_SECONDS=31536000` only after HTTPS is confirmed across the deployment
+- `GOOGLE_CLIENT_ID` matching the frontend OAuth client
+
+Before starting the service, run:
+
+```sh
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py check --deploy
+```
+
+Start the WSGI service with:
+
+```sh
+gunicorn zakatledger.wsgi:application
+```
+
+SQLite is suitable for local testing only. Use a managed PostgreSQL database before a multi-instance or production backend deployment.
+
+## Release gate
+
+- Confirm all backend tests pass.
+- Confirm the production frontend build succeeds.
+- Test Google login, Zakat save/history/delete, location permission, notifications, audio, and offline/error states on a real iPhone.
+- Repeat the same acceptance test on at least one Android phone and one current emulator image.
+- Supply App Store privacy details for location, notifications, identifiers, and network services.
+- Complete Google Play Data Safety and content declarations.
+- Confirm expired or missing access tokens cannot read, save, or delete calculation history.
+
+Rating and application-version behavior are intentionally excluded from this checklist until separately approved.

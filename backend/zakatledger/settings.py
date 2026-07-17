@@ -2,15 +2,23 @@
 Django settings for ZakatLedger backend.
 """
 
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-x*f_u*6*bd-v7vb$%dd10a!_=q)(an1-)r#r2dgz9ey#j8jiha'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-development-only-key')
 
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
+
+if not DEBUG and SECRET_KEY == 'unsafe-development-only-key':
+    raise RuntimeError('DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=false')
 
 
 # ── APPS ──────────────────────────────────────────────────────────────────────
@@ -85,7 +93,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Django uses this to VERIFY the token Google sends — it checks:
 #   "Was this token really issued by Google for MY app?"
 # If the client ID doesn't match → token is rejected → security!
-GOOGLE_CLIENT_ID = '202849810199-h87ncfj5m3lsjun81hn1cil24gtocqb6.apps.googleusercontent.com'
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -99,12 +107,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allow React Vite dev server to call this API
 # In production replace this with your actual frontend domain
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:5174',
-    'http://127.0.0.1:5174',
+    origin.strip()
+    for origin in os.environ.get(
+        'DJANGO_CORS_ALLOWED_ORIGINS',
+        'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174',
+    ).split(',')
+    if origin.strip()
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'false').lower() == 'true'
+SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
+SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
 
 # ── DJANGO REST FRAMEWORK ──────────────────────────────────────────────────────
 REST_FRAMEWORK = {

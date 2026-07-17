@@ -6407,12 +6407,6 @@ body.light-mode .surah-detail-container {
     }
 }
 
-body
-
-body
-
-
-
 .segmented-btn:not(.active):hover {
     color: var(--text-main);
     background: rgba(197, 160, 89, 0.1);
@@ -6436,11 +6430,6 @@ body
     color: var(--primary);
     margin-bottom: 0.75rem;
 }
-
-/* Dark mode adjustments */
-body
-
-body
 
 @media (max-width: 768px) {
     .top-nav-refined {
@@ -6510,8 +6499,6 @@ body
 }
 
 
-
-body
 
 /* Mobile Adjustments for Detail Actions */
 @media (max-width: 768px) {

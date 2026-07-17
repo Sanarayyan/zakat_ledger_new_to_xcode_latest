@@ -572,11 +572,6 @@ body.dark-mode .search-wrapper:focus-within {
 
 
 
-  flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 6px 16px rgba(199, 154, 43, 0.12);
-}
-
 .mini-play-btn svg {
   width: 22px;
   height: 22px;
@@ -792,4 +787,3 @@ body.dark-mode .asma-detail-modal {
   margin: 0;
   line-height: 1.5;
 }
-

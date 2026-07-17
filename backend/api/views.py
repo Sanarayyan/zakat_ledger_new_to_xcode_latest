@@ -24,6 +24,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
 from django.conf import settings
+from django.core import signing
 
 # Google's official library to verify JWT tokens
 from google.oauth2 import id_token
@@ -45,6 +46,21 @@ ZAKAT_RATES = {
     'islamic':  Decimal('0.025'),
     'calendar': Decimal('0.02577'),
 }
+ACCESS_TOKEN_SALT = 'zakat-ledger-access'
+ACCESS_TOKEN_MAX_AGE = 60 * 60 * 24 * 30
+
+
+def get_authenticated_email(request):
+    authorization = request.headers.get('Authorization', '')
+    if not authorization.startswith('Bearer '):
+        return None
+
+    token = authorization.removeprefix('Bearer ').strip()
+    try:
+        payload = signing.loads(token, salt=ACCESS_TOKEN_SALT, max_age=ACCESS_TOKEN_MAX_AGE)
+        return payload.get('email')
+    except (signing.BadSignature, signing.SignatureExpired):
+        return None
 
 
 # ── CORE CALCULATION ENGINE ────────────────────────────────────────────────────
@@ -244,12 +260,14 @@ class GoogleVerifyView(APIView):
             verified_email   = google_info['email']
             verified_name    = google_info.get('name', '')
             verified_picture = google_info.get('picture', '')
+            access_token = signing.dumps({'email': verified_email}, salt=ACCESS_TOKEN_SALT)
 
             return Response({
                 'verified': True,
                 'email':    verified_email,
                 'name':     verified_name,
                 'picture':  verified_picture,
+                'accessToken': access_token,
                 # The email is now server-verified — safe to use in /api/calculations/
             })
 
@@ -282,11 +300,11 @@ class CalculationListCreateView(APIView):
     """
 
     def get(self, request):
-        email = request.query_params.get('email', '')
+        email = get_authenticated_email(request)
         if not email:
             return Response(
-                {'error': 'email query param required. Example: ?email=you@gmail.com'},
-                status=status.HTTP_400_BAD_REQUEST
+                {'error': 'Valid bearer token required'},
+                status=status.HTTP_401_UNAUTHORIZED
             )
 
         calculations = ZakatCalculation.objects.filter(user_email=email)
@@ -306,7 +324,9 @@ class CalculationListCreateView(APIView):
 
     def post(self, request):
         data       = request.data
-        user_email = data.get('userEmail', 'anonymous@zakatledger.app')
+        user_email = get_authenticated_email(request)
+        if not user_email:
+            return Response({'error': 'Valid bearer token required'}, status=status.HTTP_401_UNAUTHORIZED)
 
         result, error = run_zakat_calculation(data)
         if error:
@@ -344,26 +364,28 @@ class CalculationDetailView(APIView):
     DELETE /api/calculations/<id>/  → delete it
     """
 
-    def _get_object(self, pk):
+    def _get_object(self, pk, email):
         try:
-            return ZakatCalculation.objects.get(pk=pk)
+            return ZakatCalculation.objects.get(pk=pk, user_email=email)
         except ZakatCalculation.DoesNotExist:
             return None
 
     def get(self, request, pk):
-        calc = self._get_object(pk)
+        email = get_authenticated_email(request)
+        if not email:
+            return Response({'error': 'Valid bearer token required'}, status=status.HTTP_401_UNAUTHORIZED)
+        calc = self._get_object(pk, email)
         if not calc:
             return Response({'error': f'#{pk} not found'}, status=404)
         return Response(ZakatCalculationSerializer(calc).data)
 
     def delete(self, request, pk):
-        calc = self._get_object(pk)
+        email = get_authenticated_email(request)
+        if not email:
+            return Response({'error': 'Valid bearer token required'}, status=status.HTTP_401_UNAUTHORIZED)
+        calc = self._get_object(pk, email)
         if not calc:
             return Response({'error': f'#{pk} not found'}, status=404)
-
-        email = request.query_params.get('email', '')
-        if email and calc.user_email != email:
-            return Response({'error': 'Cannot delete another user\'s record'}, status=403)
 
         calc.delete()
         return Response({'deleted': True, 'id': pk})
