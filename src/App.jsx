@@ -22,7 +22,7 @@ import HajjGuide from './features/hajj/HajjGuide';
 import UmrahGuide from './features/umrah/UmrahGuide';
 import RatheebHaddad from './features/ratheeb/RatheebHaddad';
 import AppOnboarding from './components/onboarding/AppOnboarding';
-import UpdateManager from './components/update/UpdateManager';
+import VersionHubUpdatePopup from './components/VersionHubUpdatePopup';
 import RatingManager from './components/rating/RatingManager';
 import SettingsPage from './features/more/SettingsPage';
 import { apiUrl } from './config/api';
@@ -5507,7 +5507,7 @@ function App() {
                 <Route path="*" element={<Dashboard />} />
             </Routes>
             <GenderPrompt />
-            <UpdateManager />
+            <VersionHubUpdatePopup />
             <RatingManager />
         </>
     );

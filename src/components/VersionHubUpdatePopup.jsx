@@ -14,7 +14,7 @@ export default function VersionHubUpdatePopup() {
     useEffect(() => {
         let isMounted = true;
 
-        const checkUpdate = async () => {
+        const checkUpdate = async ({ force = false } = {}) => {
             // Get local version for display
             if (Capacitor.getPlatform() !== 'web') {
                 try {
@@ -27,35 +27,42 @@ export default function VersionHubUpdatePopup() {
                 }
             }
 
-            const data = await versionHubService.checkVersion();
+            const data = await versionHubService.checkVersion({ force });
             
             if (!isMounted) return;
 
-            if (data && data.update_available) {
+            if (data?.updateAvailable) {
                 setUpdateInfo(data);
                 setIsVisible(true);
             }
         };
 
         checkUpdate();
+        let appStateListener;
+        App.addListener('appStateChange', ({ isActive }) => {
+            if (isActive) checkUpdate({ force: true });
+        }).then((listener) => {
+            appStateListener = listener;
+        });
 
         return () => {
             isMounted = false;
+            appStateListener?.remove();
         };
     }, []);
 
     if (!isVisible || !updateInfo) return null;
 
-    const isMandatory = updateInfo.update_required === true || updateInfo.update_type === 'mandatory';
+    const isMandatory = updateInfo.action === 'mandatory' || updateInfo.canContinue === false;
 
     const handleUpdate = () => {
-        if (updateInfo.store_url) {
+        if (updateInfo.storeUrl) {
             if (Capacitor.getPlatform() !== 'web') {
                 // If native, open the external app URL
                 // The URL is handled by the OS to open the respective store
-                window.open(updateInfo.store_url, '_system');
+                window.open(updateInfo.storeUrl, '_system');
             } else {
-                window.open(updateInfo.store_url, '_blank');
+                window.open(updateInfo.storeUrl, '_blank');
             }
         }
     };
@@ -84,7 +91,7 @@ export default function VersionHubUpdatePopup() {
                 <div className="versionhub-badges">
                     <span className="versionhub-badge">v{currentVersion}</span>
                     <span className="versionhub-arrow">→</span>
-                    <span className="versionhub-badge">v{updateInfo.latest_version}</span>
+                    <span className="versionhub-badge">v{updateInfo.latestVersion}</span>
                 </div>
 
                 <p className="versionhub-description">

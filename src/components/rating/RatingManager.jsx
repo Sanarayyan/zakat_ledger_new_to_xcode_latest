@@ -1,12 +1,26 @@
 import React, { useEffect } from 'react';
 import { Preferences } from '@capacitor/preferences';
-import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { InAppReview } from '@capacitor-community/in-app-review';
+import {
+    InAppReviewService,
+    ReviewRequestResult,
+} from '../../services/inAppReviewService.mjs';
 
 const RATING_PREF_KEY = 'zakat_app_rating_data';
 
 export default function RatingManager() {
     useEffect(() => {
+        const reviewService = new InAppReviewService({
+            gateway: {
+                isAvailable: async () => Capacitor.isNativePlatform(),
+                requestReview: async () => InAppReview.requestReview(),
+            },
+            onError: (error) => {
+                console.error('Native in-app review request failed safely.', error);
+            },
+        });
+
         const handleCheckRating = async (event) => {
             const triggerSource = event.detail?.source;
             if (!triggerSource) return;
@@ -52,35 +66,31 @@ export default function RatingManager() {
                 }
 
                 if (shouldShow) {
-                    try {
-                        // Attempt native review dialog
-                        await InAppReview.requestReview();
-                        
-                        // If successful, flag as rated to prevent future prompts
-                        const newRatingData = {
-                            hasRated: true,
-                            ratedAt: new Date().toISOString()
-                        };
-                        await Preferences.set({ key: RATING_PREF_KEY, value: JSON.stringify(newRatingData) });
-                    } catch (reviewError) {
-                        console.error('Native AppReview failed or unavailable, using fallback', reviewError);
-                        
-                        // Fallback logic
-                        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                        if (/android/i.test(userAgent)) {
-                            window.open('market://details?id=com.zakatledger.app', '_system');
-                        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                            window.open('itms-apps://itunes.apple.com/app/id123456789', '_system'); // placeholder
-                        }
-                        
-                        // Put on cooldown since we triggered fallback
+                    const result = await reviewService.requestAfterSuccessfulAction();
+
+                    if (result === ReviewRequestResult.REQUESTED) {
+                        // Native APIs do not reveal whether a user completed a review.
+                        // Space out successful requests instead of incorrectly marking them rated.
+                        const nextEligibleDate = new Date();
+                        nextEligibleDate.setDate(nextEligibleDate.getDate() + 120);
+                        await Preferences.set({
+                            key: RATING_PREF_KEY,
+                            value: JSON.stringify({
+                                hasRated: false,
+                                lastRequestedAt: new Date().toISOString(),
+                                reminderDate: nextEligibleDate.toISOString(),
+                            }),
+                        });
+                    } else if (result === ReviewRequestResult.FAILED) {
                         const cooldownDate = new Date();
-                        cooldownDate.setDate(cooldownDate.getDate() + 30); // 30 days later
-                        const nextRatingData = {
-                            hasRated: false,
-                            reminderDate: cooldownDate.toISOString()
-                        };
-                        await Preferences.set({ key: RATING_PREF_KEY, value: JSON.stringify(nextRatingData) });
+                        cooldownDate.setDate(cooldownDate.getDate() + 30);
+                        await Preferences.set({
+                            key: RATING_PREF_KEY,
+                            value: JSON.stringify({
+                                hasRated: false,
+                                reminderDate: cooldownDate.toISOString(),
+                            }),
+                        });
                     }
                 }
             } catch (e) {

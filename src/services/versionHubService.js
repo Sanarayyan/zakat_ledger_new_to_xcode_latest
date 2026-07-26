@@ -3,65 +3,51 @@ import { Capacitor } from '@capacitor/core';
 
 let versionCheckPromise = null;
 
+const VERSION_HUB_URL =
+    import.meta.env.VITE_VERSIONHUB_URL ||
+    import.meta.env.VITE_PRODUCTION_VERSIONHUB_URL ||
+    import.meta.env.VITE_LOCAL_VERSIONHUB_URL;
+const VERSION_HUB_APP_KEY = import.meta.env.VITE_VERSIONHUB_APP_KEY;
+const APPLICATION_NAME = import.meta.env.VITE_VERSIONHUB_APPLICATION_NAME || 'muslim-plus';
+
 export const versionHubService = {
     /**
      * Checks the VersionHub API for updates.
      * Prevents duplicate requests per app launch by caching the promise.
      */
-    checkVersion: async () => {
-        if (versionCheckPromise) {
+    checkVersion: async ({ force = false } = {}) => {
+        if (!force && versionCheckPromise) {
             return versionCheckPromise;
         }
 
         versionCheckPromise = (async () => {
             try {
-                const detectedPlatform = Capacitor.getPlatform();
-                const platform =
-                    detectedPlatform === 'web'
-                    ? 'ios'
-                    : detectedPlatform;
-                console.log('VersionHub Platform:', platform);
-                
-                let current_version = '1.0.0';
-                let current_build_number = 1;
-
-                if (platform !== 'web') {
-                    try {
-                        const info = await App.getInfo();
-                        console.log('VersionHub App Info:', info);
-                        current_version = info.version || current_version;
-                        current_build_number = parseInt(info.build, 10) || current_build_number;
-                    } catch (e) {
-                        console.warn('Capacitor App plugin error, using default version.', e);
-                    }
-                }
-
-                console.log('VersionHub current_version:', current_version);
-                console.log('VersionHub current_build_number:', current_build_number);
-
-                const payload = {
-                    application_name: 'muslim-plus',
-                    platform: platform,
-                    current_version: current_version,
-                    current_build_number: current_build_number
-                };
-                
-                const url = import.meta.env.VITE_PRODUCTION_VERSIONHUB_URL || import.meta.env.VITE_LOCAL_VERSIONHUB_URL;
-                if (!url) {
-                    console.warn('VersionHub URL not configured.');
+                const platform = Capacitor.getPlatform();
+                if (platform !== 'ios' && platform !== 'android') {
                     return null;
                 }
 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds max
+                if (!VERSION_HUB_URL || !VERSION_HUB_APP_KEY) {
+                    console.warn('VersionHub URL or mobile app key is not configured.');
+                    return null;
+                }
 
-                const response = await fetch(url, {
+                const info = await App.getInfo();
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch(VERSION_HUB_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-App-Key': VERSION_HUB_APP_KEY,
                     },
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
+                    body: JSON.stringify({
+                        application_name: APPLICATION_NAME,
+                        platform,
+                        current_version: info.version || '1.0.0',
+                    }),
+                    signal: controller.signal,
                 });
 
                 clearTimeout(timeoutId);
@@ -70,12 +56,9 @@ export const versionHubService = {
                     throw new Error(`VersionHub API returned ${response.status}`);
                 }
 
-                const data = await response.json();
-                return data;
-
+                return response.json();
             } catch (error) {
-                console.error('VersionHub Check Failed:', error);
-                // Safe failure: return null to continue app launch, never crash
+                console.error('VersionHub check failed safely:', error);
                 return null;
             }
         })();

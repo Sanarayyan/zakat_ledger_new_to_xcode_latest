@@ -5,7 +5,11 @@
 1. Copy `.env.example` to `.env.production`.
 2. Set `VITE_API_BASE_URL` to the public HTTPS backend URL.
 3. Set `VITE_GOOGLE_CLIENT_ID` to the production Google OAuth client ID.
-4. Run `npm ci` and `npm run mobile:sync` to build once and copy the same web application into iOS and Android.
+4. Configure VersionHub:
+   - `VITE_VERSIONHUB_URL` is the public HTTPS `/api/v1/version-check` endpoint.
+   - `VITE_VERSIONHUB_APP_KEY` matches one configured `MOBILE_VERSION_API_KEYS` value.
+   - `VITE_VERSIONHUB_APPLICATION_NAME` matches the VersionHub release records (default `muslim-plus`).
+5. Run `npm ci`, `npm run test:rating`, and `npm run mobile:sync` to test, build once, and copy the same web application into iOS and Android.
 
 ## iOS handoff
 
@@ -69,5 +73,8 @@ SQLite is suitable for local testing only. Use a managed PostgreSQL database bef
 - Supply App Store privacy details for location, notifications, identifiers, and network services.
 - Complete Google Play Data Safety and content declarations.
 - Confirm expired or missing access tokens cannot read, save, or delete calculation history.
+- Confirm VersionHub returns `no_action`, `optional`, and `mandatory` correctly for both platforms.
+- Confirm optional updates can be dismissed and mandatory updates cannot be dismissed.
+- Test native rating prompts from TestFlight/App Store development and Google Play internal testing; sideloaded Android APKs are not reliable for this API.
 
-Rating and application-version behavior are intentionally excluded from this checklist until separately approved.
+Rating and application-version behavior use the translated reusable review service and VersionHub API.
