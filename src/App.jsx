@@ -3154,7 +3154,7 @@ function QuranPage() {
                 </div>
             )}
 
-            <main className="main-content-top fade-in quran-container qh-main">
+            <main className="main-content-top quran-container qh-main">
 
                 {/* ── Section Tabs ── */}
                 <div className="qh-tabs">
@@ -3705,7 +3705,8 @@ function SurahDetailPage() {
     const [surah, setSurah] = useState(null);
     const [loading, setLoading] = useState(true);
     const { lang, setLang, t } = useLanguage();
-    const [reciter, setReciter] = useState('ar.alafasy');
+    const [reciter, setReciter] = useState(() => localStorage.getItem('quran_reciter') || 'ar.alafasy');
+    const reciterRef = useRef(reciter);
     const [viewMode, setViewMode] = useState('ayah'); // 'ayah' or 'page'
     const [playingAyah, setPlayingAyah] = useState(null);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -3868,6 +3869,8 @@ function SurahDetailPage() {
     const audioRef = useRef(null);
 
     useEffect(() => {
+        reciterRef.current = reciter;
+        localStorage.setItem('quran_reciter', reciter);
         console.log(`[DEBUG] Reciter selected: ${reciter}`);
         if (playingAyah !== null && audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
@@ -4054,7 +4057,7 @@ function SurahDetailPage() {
                     // Ayah tracking is handled automatically
 
                     audio.pause();
-                    audio.src = getAudioUrl(reciter, nextAyah.number);
+                    audio.src = getAudioUrl(reciterRef.current, nextAyah.number);
                     audio.load();
                     audio.playbackRate = playbackRateRef.current;
                     audio.play().catch(err => {
@@ -4656,7 +4659,8 @@ const JuzDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [viewMode, setViewMode] = useState('ayah');
-    const [reciter, setReciter] = useState('ar.alafasy');
+    const [reciter, setReciter] = useState(() => localStorage.getItem('quran_reciter') || 'ar.alafasy');
+    const reciterRef = useRef(reciter);
     const [playingAyah, setPlayingAyah] = useState(null);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1);
@@ -4806,6 +4810,8 @@ const JuzDetailPage = () => {
     const audioRef = useRef(null);
 
     useEffect(() => {
+        reciterRef.current = reciter;
+        localStorage.setItem('quran_reciter', reciter);
         console.log(`[DEBUG] Juz Reciter selected: ${reciter}`);
         if (playingAyah !== null && audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
@@ -4966,7 +4972,7 @@ const JuzDetailPage = () => {
                     const currentAyahData = juzData.ayahs.find(a => a.number === currentPlayingNum);
                     if (currentAyahData) markSessionComplete(currentAyahData);
                     
-                    handlePlayAudio(nextAyah.number, getAudioUrl(reciter, nextAyah.number));
+                    handlePlayAudio(nextAyah.number, getAudioUrl(reciterRef.current, nextAyah.number));
                 } else {
                     setPlayingAyah(null);
                 }

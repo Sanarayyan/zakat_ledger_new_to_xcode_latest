@@ -23,8 +23,11 @@ export default function QiblaFinder() {
     const lastRawHeadingRef = useRef(null);
     const watcherIdRef = useRef(null);
     const frameRef = useRef(null);
+    const fallbackTimerRef = useRef(null);
     const successTriggeredRef = useRef(false);
     const hasAbsoluteRef = useRef(false);
+    const hasWebkitHeadingRef = useRef(false);
+    const orientationStartedRef = useRef(false);
     
     // Smoothing
     const LPF_ALPHA = 0.08; 
@@ -48,6 +51,11 @@ export default function QiblaFinder() {
             if (frameRef.current !== null) {
                 cancelAnimationFrame(frameRef.current);
             }
+            if (fallbackTimerRef.current !== null) {
+                clearTimeout(fallbackTimerRef.current);
+            }
+            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.removeEventListener('deviceorientation', handleOrientation, true);
         };
     }, []);
 
@@ -123,14 +131,25 @@ export default function QiblaFinder() {
     const handleOrientation = (e) => {
         let heading = null;
 
-        if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
+        if (
+            Number.isFinite(e.webkitCompassHeading) &&
+            e.webkitCompassHeading >= 0
+        ) {
+            // iOS supplies its calibrated magnetic heading here. Once this
+            // source is available, ignore alpha-based events so two competing
+            // coordinate systems cannot move the compass.
+            hasWebkitHeadingRef.current = true;
             heading = e.webkitCompassHeading;
+        } else if (hasWebkitHeadingRef.current) {
+            return;
         } else if (e.absolute === true || e.type === 'deviceorientationabsolute') {
             hasAbsoluteRef.current = true;
-            heading = 360 - e.alpha; 
+            const screenAngle = window.screen?.orientation?.angle ?? window.orientation ?? 0;
+            heading = (360 - e.alpha + screenAngle + 360) % 360;
         } else if (e.alpha !== null) {
             if (hasAbsoluteRef.current) return; // Prevent jitter if absolute is supported
-            heading = 360 - e.alpha; 
+            const screenAngle = window.screen?.orientation?.angle ?? window.orientation ?? 0;
+            heading = (360 - e.alpha + screenAngle + 360) % 360;
         } else {
             return;
         }
@@ -148,7 +167,8 @@ export default function QiblaFinder() {
                 // Normalize diff to -180 to 180
                 diff = ((diff + 540) % 360) - 180;
                 
-                continuousHeadingRef.current += diff * LPF_ALPHA;
+                const smoothing = hasWebkitHeadingRef.current ? 0.2 : LPF_ALPHA;
+                continuousHeadingRef.current += diff * smoothing;
                 lastRawHeadingRef.current = heading;
             }
         }
@@ -162,12 +182,15 @@ export default function QiblaFinder() {
     };
 
     const startOrientation = () => {
+        if (orientationStartedRef.current) return;
+        orientationStartedRef.current = true;
+
         window.addEventListener('deviceorientationabsolute', handleOrientation, true);
         window.addEventListener('deviceorientation', handleOrientation, true);
         
         frameRef.current = requestAnimationFrame(animationLoop);
         
-        setTimeout(() => {
+        fallbackTimerRef.current = setTimeout(() => {
             if (lastRawHeadingRef.current === null) {
                 setIsFallback(true);
             }
