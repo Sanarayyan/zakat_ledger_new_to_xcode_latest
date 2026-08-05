@@ -34,6 +34,11 @@ export default function VersionHubUpdatePopup() {
             if (data?.updateAvailable) {
                 setUpdateInfo(data);
                 setIsVisible(true);
+            } else if (data) {
+                // Remove an old popup when VersionHub changes the rule to
+                // no_action or the installed version is no longer outdated.
+                setUpdateInfo(null);
+                setIsVisible(false);
             }
         };
 

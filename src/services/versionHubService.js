@@ -8,7 +8,9 @@ const VERSION_HUB_URL =
     import.meta.env.VITE_PRODUCTION_VERSIONHUB_URL ||
     import.meta.env.VITE_LOCAL_VERSIONHUB_URL;
 const VERSION_HUB_APP_KEY = import.meta.env.VITE_VERSIONHUB_APP_KEY;
-const APPLICATION_NAME = import.meta.env.VITE_VERSIONHUB_APPLICATION_NAME || 'muslim-plus';
+// The latest VersionHub backend uses its configured default application
+// (currently `mobile_app`) when this value is not supplied.
+const APPLICATION_NAME = import.meta.env.VITE_VERSIONHUB_APPLICATION_NAME?.trim();
 
 export const versionHubService = {
     /**
@@ -36,17 +38,24 @@ export const versionHubService = {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+                const requestBody = {
+                    platform,
+                    version: info.version || '1.0.0',
+                };
+
+                // Only override VersionHub's default when this installation is
+                // explicitly configured for a different application.
+                if (APPLICATION_NAME) {
+                    requestBody.application_name = APPLICATION_NAME;
+                }
+
                 const response = await fetch(VERSION_HUB_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-App-Key': VERSION_HUB_APP_KEY,
                     },
-                    body: JSON.stringify({
-                        application_name: APPLICATION_NAME,
-                        platform,
-                        current_version: info.version || '1.0.0',
-                    }),
+                    body: JSON.stringify(requestBody),
                     signal: controller.signal,
                 });
 
