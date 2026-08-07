@@ -1,5 +1,10 @@
 {
   "appId": "com.muslimplus.app",
   "appName": "Muslim Plus",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
 }

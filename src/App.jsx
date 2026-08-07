@@ -25,7 +25,6 @@ import AppOnboarding from './components/onboarding/AppOnboarding';
 import VersionHubUpdatePopup from './components/VersionHubUpdatePopup';
 import RatingManager from './components/rating/RatingManager';
 import SettingsPage from './features/more/SettingsPage';
-import { apiUrl } from './config/api';
 
 // --- AUDIO SYSTEM HELPERS ---
 const getAudioUrl = (reciter, ayahNumber) => {
@@ -481,7 +480,7 @@ function UserDashboard() {
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             console.log('🔐 Verifying Google login with backend...');
-            const response = await fetch(apiUrl('/api/auth/google/'), {
+            const response = await fetch('http://localhost:8000/api/auth/google/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential }),
@@ -493,15 +492,14 @@ function UserDashboard() {
             }
 
             const verifiedData = await response.json();
-            
+
             // Now we use the data VERIFIED by the server
-            const userData = { 
-                email: verifiedData.email, 
-                name: verifiedData.name, 
-                picture: verifiedData.picture,
-                accessToken: verifiedData.accessToken,
+            const userData = {
+                email: verifiedData.email,
+                name: verifiedData.name,
+                picture: verifiedData.picture
             };
-            
+
             setUser(userData);
             localStorage.setItem('zakat_user', JSON.stringify(userData));
             setAuthError('');
@@ -806,7 +804,7 @@ function UserDashboard() {
         //   /api/calculate/    = stateless  (no memory, like a calculator app)
         //   /api/calculations/ = stateful   (saves history — this is the LEDGER!)
         // ─────────────────────────────────────────────────────────────────────
-        const DJANGO_SAVE_URL = apiUrl('/api/calculations/');
+        const DJANGO_SAVE_URL = 'http://localhost:8000/api/calculations/';
 
         const payload = {
             userEmail:         user?.email || 'anonymous@zakatledger.app',
@@ -828,10 +826,7 @@ function UserDashboard() {
 
             const response = await fetch(DJANGO_SAVE_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user?.accessToken || ''}`,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
 
@@ -857,9 +852,7 @@ function UserDashboard() {
         
         setIsLoadingHistory(true);
         try {
-            const response = await fetch(apiUrl('/api/calculations/'), {
-                headers: { 'Authorization': `Bearer ${user.accessToken || ''}` },
-            });
+            const response = await fetch(`http://localhost:8000/api/calculations/?email=${user.email}`);
             if (!response.ok) throw new Error('Could not fetch history');
             
             const data = await response.json();
@@ -875,9 +868,8 @@ function UserDashboard() {
         if (!window.confirm('Permanently delete this calculation from your ledger?')) return;
         
         try {
-            const response = await fetch(apiUrl(`/api/calculations/${id}/`), {
+            const response = await fetch(`http://localhost:8000/api/calculations/${id}/?email=${user?.email}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${user?.accessToken || ''}` },
             });
             
             if (response.ok) {
@@ -3154,7 +3146,7 @@ function QuranPage() {
                 </div>
             )}
 
-            <main className="main-content-top quran-container qh-main">
+            <main className="main-content-top fade-in quran-container qh-main">
 
                 {/* ── Section Tabs ── */}
                 <div className="qh-tabs">
@@ -3705,8 +3697,7 @@ function SurahDetailPage() {
     const [surah, setSurah] = useState(null);
     const [loading, setLoading] = useState(true);
     const { lang, setLang, t } = useLanguage();
-    const [reciter, setReciter] = useState(() => localStorage.getItem('quran_reciter') || 'ar.alafasy');
-    const reciterRef = useRef(reciter);
+    const [reciter, setReciter] = useState('ar.alafasy');
     const [viewMode, setViewMode] = useState('ayah'); // 'ayah' or 'page'
     const [playingAyah, setPlayingAyah] = useState(null);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -3869,8 +3860,6 @@ function SurahDetailPage() {
     const audioRef = useRef(null);
 
     useEffect(() => {
-        reciterRef.current = reciter;
-        localStorage.setItem('quran_reciter', reciter);
         console.log(`[DEBUG] Reciter selected: ${reciter}`);
         if (playingAyah !== null && audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
@@ -4057,7 +4046,7 @@ function SurahDetailPage() {
                     // Ayah tracking is handled automatically
 
                     audio.pause();
-                    audio.src = getAudioUrl(reciterRef.current, nextAyah.number);
+                    audio.src = getAudioUrl(reciter, nextAyah.number);
                     audio.load();
                     audio.playbackRate = playbackRateRef.current;
                     audio.play().catch(err => {
@@ -4659,8 +4648,7 @@ const JuzDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [viewMode, setViewMode] = useState('ayah');
-    const [reciter, setReciter] = useState(() => localStorage.getItem('quran_reciter') || 'ar.alafasy');
-    const reciterRef = useRef(reciter);
+    const [reciter, setReciter] = useState('ar.alafasy');
     const [playingAyah, setPlayingAyah] = useState(null);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1);
@@ -4810,8 +4798,6 @@ const JuzDetailPage = () => {
     const audioRef = useRef(null);
 
     useEffect(() => {
-        reciterRef.current = reciter;
-        localStorage.setItem('quran_reciter', reciter);
         console.log(`[DEBUG] Juz Reciter selected: ${reciter}`);
         if (playingAyah !== null && audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
@@ -4972,7 +4958,7 @@ const JuzDetailPage = () => {
                     const currentAyahData = juzData.ayahs.find(a => a.number === currentPlayingNum);
                     if (currentAyahData) markSessionComplete(currentAyahData);
                     
-                    handlePlayAudio(nextAyah.number, getAudioUrl(reciterRef.current, nextAyah.number));
+                    handlePlayAudio(nextAyah.number, getAudioUrl(reciter, nextAyah.number));
                 } else {
                     setPlayingAyah(null);
                 }
@@ -5474,16 +5460,24 @@ function App() {
 
     if (showSplash) {
         return (
-            <div className="premium-splash-screen fade-in">
-                <div className="splash-logo-container">
-                    <img src="/muslim-plus-logo.png" alt="Muslim Plus Logo" className="splash-logo" />
+            <>
+                <div className="premium-splash-screen fade-in">
+                    <div className="splash-logo-container">
+                        <img src="/muslim-plus-logo.png" alt="Muslim Plus Logo" className="splash-logo" />
+                    </div>
                 </div>
-            </div>
+                <VersionHubUpdatePopup />
+            </>
         );
     }
 
     if (!hasCompletedOnboarding) {
-        return <AppOnboarding onComplete={() => setHasCompletedOnboarding(true)} />;
+        return (
+            <>
+                <AppOnboarding onComplete={() => setHasCompletedOnboarding(true)} />
+                <VersionHubUpdatePopup />
+            </>
+        );
     }
 
     return (

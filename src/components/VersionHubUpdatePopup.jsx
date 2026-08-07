@@ -14,7 +14,7 @@ export default function VersionHubUpdatePopup() {
     useEffect(() => {
         let isMounted = true;
 
-        const checkUpdate = async ({ force = false } = {}) => {
+        const checkUpdate = async () => {
             // Get local version for display
             if (Capacitor.getPlatform() !== 'web') {
                 try {
@@ -27,47 +27,39 @@ export default function VersionHubUpdatePopup() {
                 }
             }
 
-            const data = await versionHubService.checkVersion({ force });
-            
+            const data = await versionHubService.checkVersion();
+
             if (!isMounted) return;
 
-            if (data?.updateAvailable) {
+            const isAvailable = data && (data.updateAvailable === true || data.update_available === true || data.action === 'optional' || data.action === 'mandatory');
+
+            if (isAvailable) {
                 setUpdateInfo(data);
                 setIsVisible(true);
-            } else if (data) {
-                // Remove an old popup when VersionHub changes the rule to
-                // no_action or the installed version is no longer outdated.
-                setUpdateInfo(null);
-                setIsVisible(false);
             }
         };
 
         checkUpdate();
-        let appStateListener;
-        App.addListener('appStateChange', ({ isActive }) => {
-            if (isActive) checkUpdate({ force: true });
-        }).then((listener) => {
-            appStateListener = listener;
-        });
 
         return () => {
             isMounted = false;
-            appStateListener?.remove();
         };
     }, []);
 
     if (!isVisible || !updateInfo) return null;
 
-    const isMandatory = updateInfo.action === 'mandatory' || updateInfo.canContinue === false;
+    const isMandatory = updateInfo.action === 'mandatory' || updateInfo.update_required === true || updateInfo.update_type === 'mandatory' || updateInfo.canContinue === false;
+    const latestVersion = updateInfo.latestVersion || updateInfo.latest_version;
+    const storeUrl = updateInfo.storeUrl || updateInfo.store_url;
 
     const handleUpdate = () => {
-        if (updateInfo.storeUrl) {
+        if (storeUrl) {
             if (Capacitor.getPlatform() !== 'web') {
                 // If native, open the external app URL
                 // The URL is handled by the OS to open the respective store
-                window.open(updateInfo.storeUrl, '_system');
+                window.open(storeUrl, '_system');
             } else {
-                window.open(updateInfo.storeUrl, '_blank');
+                window.open(storeUrl, '_blank');
             }
         }
     };
@@ -96,7 +88,7 @@ export default function VersionHubUpdatePopup() {
                 <div className="versionhub-badges">
                     <span className="versionhub-badge">v{currentVersion}</span>
                     <span className="versionhub-arrow">→</span>
-                    <span className="versionhub-badge">v{updateInfo.latestVersion}</span>
+                    <span className="versionhub-badge">v{latestVersion}</span>
                 </div>
 
                 <p className="versionhub-description">
