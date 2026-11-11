@@ -19,7 +19,7 @@ For full details, see [DEPLOYMENT.md](DEPLOYMENT.md) and [FINAL_RELEASE_ACCEPTAN
 | Backend tests (`manage.py test`, Python 3.12) | 28 pass, 1 skipped (PostgreSQL-only test) |
 | Android debug APK build | Pass |
 | iOS build (Simulator, unsigned) | Pass |
-| Phone testing of this build | See `PHONE_TEST_CHECKLIST.md` — owner is testing |
+| Phone testing of this build (test build, iPhone via Xcode + Android APK) | **Pass** — owner reported on 11 Nov 2026 that both phones work properly; no failures reported. Checklist: `PHONE_TEST_CHECKLIST.md` |
 
 ## 3. Tools needed
 

@@ -1,5 +1,7 @@
 # Phone test checklist — Muslim Plus (11 Nov 2026)
 
+> **Result (11 Nov 2026):** the owner tested this build on an iPhone (Xcode) and an Android phone (APK) and reported that it works properly, with no failures. Real store builds (signed, with production settings) must be checked again by the deploy team.
+
 Use this to test the latest code on a real iPhone and a real Android phone.
 Mark each line **Pass**, **Fail** or **Skip**. If something fails, take a screenshot and write one line about what you saw.
 
