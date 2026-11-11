@@ -49,6 +49,21 @@ export default function SettingsPage() {
         } finally { setDeletingData(false); }
     };
     const [notificationError, setNotificationError] = useState('');
+    // Android only: show the Alarms & reminders button just while that permission is missing.
+    // Users stop a playing Adhan from its notification, so Settings has no Stop button.
+    const [exactAllowed, setExactAllowed] = useState(true);
+    useEffect(() => {
+        if (!nativeAdhanEnabled) return;
+        const check = () => Adhan.status().then(status => setExactAllowed(!!status.exactAllowed)).catch(() => {});
+        check();
+        const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+        document.addEventListener('visibilitychange', onVisible);
+        return () => document.removeEventListener('visibilitychange', onVisible);
+    }, []);
+    const alarmsMissing = nativeAdhanEnabled && !exactAllowed && !!settings?.notificationsEnabled;
+    const errorText = notificationError || scheduleError || '';
+    const alertText = errorText.startsWith('Allow Alarms & reminders') ? (alarmsMissing ? t('allow_alarms_note') : '')
+        : errorText === 'Allow app notifications in phone settings.' ? t('allow_notifications_note') : errorText;
     const [isNotificationsExpanded, setIsNotificationsExpanded] = useState(false);
 
     const [isGenderModalOpen, setIsGenderModalOpen] = useState(false);
@@ -103,14 +118,12 @@ export default function SettingsPage() {
 
             <div className="settings-content">
                 {import.meta.env.MODE === 'device-test' && <p className="test-build-note">{t('device_test_banner')}</p>}
-                {(scheduleError || notificationError) && <p role="alert">{notificationError || scheduleError}</p>}
-                {nativeAdhanEnabled && <section className="settings-card" style={{ padding: 16 }}>
-                    <h2>{t('adhan_card_title')}</h2>
-                    <p>{t('adhan_card_desc')}</p>
-                    <button onClick={() => Adhan.requestExactPermission().catch(error => setNotificationError(error.message))}>{t('allow_alarms_reminders')}</button>
-                    <button onClick={() => stopAdhan().catch(error => setNotificationError(error.message))}>{t('stop_current_adhan')}</button>
-                    {import.meta.env.MODE === 'device-test' && <button onClick={triggerTestNotification}>Test Adhan notification in 10 seconds</button>}
+                {(alertText || alarmsMissing) && <section className="settings-card settings-alert-card">
+                    {alertText && <p role="alert">{alertText}</p>}
+                    {alarmsMissing && <button className="settings-alarm-btn" onClick={() => Adhan.requestExactPermission().catch(error => setNotificationError(error.message))}>{t('allow_alarms_reminders')}</button>}
                 </section>}
+                {import.meta.env.MODE === 'device-test' && nativeAdhanEnabled &&
+                    <button onClick={triggerTestNotification}>Test Adhan notification in 10 seconds</button>}
                 {import.meta.env.MODE === 'device-test' && Capacitor.getPlatform() === 'ios' &&
                     <button onClick={triggerTestNotification}>Test iOS Adhan sound and prayer action</button>}
                 {import.meta.env.MODE === 'device-test' && (import.meta.env.VITE_VERSIONHUB_LIVE_TEST === 'true'

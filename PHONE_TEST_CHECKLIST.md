@@ -12,7 +12,7 @@ Users can't reach anything that needs the real server today: Zakath is "Coming S
 
 **Install**
 - **Android:** copy `build/store-test/Muslim-Plus-store-test.apk` to the phone and install it over the old test app.
-  (SHA-256 `3f242c00cfaabc01f1135c29ad2970880acd62b6ad06ead446d55b6e492cd60d`, release build, versionName 1.0.3 / versionCode 4)
+  (SHA-256 `155c8afe857d3abb1d391b0ce03c88b9c8819536a4c6a9c00dff5e190daaa196`, release build, versionName 1.0.3 / versionCode 4)
 - **iPhone:** open `ios/App/App.xcodeproj`. Go to **Product → Scheme → Edit Scheme… → Run** and set **Build Configuration** to **Release**. Pick your iPhone and press **Run**. Set it back to Debug afterwards.
 
 | # | What to do | What should happen | iPhone | Android |
@@ -23,6 +23,9 @@ Users can't reach anything that needs the real server today: Zakath is "Coming S
 | P4 | Settings → turn on prayer notifications and Adhan sound | Permission is asked; the next prayer notification arrives on time with sound | | |
 | P5 | More → Zakath | Shows "Coming Soon" | | |
 | P6 | Close and reopen the app | No update popup appears (the update server is a placeholder in this build) | | |
+| P7 | Android: Settings | **No** Stop Adhan button or Adhan text. Only if "Alarms & reminders" is off: one short message and an **Allow Alarms & reminders** button (it disappears once allowed) | — | |
+| P8 | Android: when the Adhan plays | Tap **Stop Adhan** on the notification → sound stops; the next prayer still rings | — | |
+| P9 | iPhone: when the Adhan notification plays | Press the **side button or a volume button** → sound stops. Or long-press the notification → **Stop Adhan** and **Open prayer times** buttons (in Malayalam too) | | — |
 
 The Android "Test Adhan in 10 seconds" button doesn't exist in this build. Use a real prayer time (P4) instead.
 
@@ -53,7 +56,7 @@ If you change the web code later, run `npm run mobile:sync:device-test` with Nod
 
 ### Android (APK file)
 1. Copy this file to the phone: `android/app/build/outputs/apk/debug/app-debug.apk`
-   (SHA-256 `34fbf98f097e0146676721c1b1136ac7134f455e573ce2d35fdc028e5cf474c9`, Settings cleanup build)
+   (SHA-256 `e99cf5d3ff9f741d4ae0f4eaead84d83434734eb4e1fc31d73fbf1ce6bbb1986`, Settings cleanup build)
 2. On the phone, open the file and tap **Install**. Allow "install unknown apps" if asked.
 3. Install it **over** the old test app. Don't uninstall first, so you can check that your data is kept.
 

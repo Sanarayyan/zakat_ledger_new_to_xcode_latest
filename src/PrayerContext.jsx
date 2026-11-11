@@ -7,6 +7,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { App } from '@capacitor/app';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext';
 import { Capacitor } from '@capacitor/core';
 import { Adhan, nativeAdhanEnabled, scheduleIOSPrayerAlerts } from './services/adhanService';
 import { shouldKeepExistingPrayerAlarms } from './services/prayerNotificationPolicy.mjs';
@@ -18,6 +19,7 @@ const PrayerContext = createContext();
 
 export const PrayerProvider = ({ children }) => {
     const navigate = useNavigate();
+    const { t: translate, lang } = useLanguage();
     const [settings, setSettings] = useState(() => {
         const parsed = readStoredJSON(appStorage, 'prayer_settings', {});
         if (parsed.location?.city?.includes('(Fallback)')) delete parsed.location;
@@ -250,13 +252,18 @@ export const PrayerProvider = ({ children }) => {
                 if (!disposed && actionId === 'OPEN_PRAYER') navigate('/prayer');
             });
             if (disposed) { await listener.remove(); return; }
+            // iOS plays the Adhan as the notification sound. "Stop Adhan" dismisses the alert without
+            // opening the app, matching the Stop button on Android notifications.
             await LocalNotifications.registerActionTypes({
-                types: [{ id: 'PRAYER_ALERT', actions: [{ id: 'OPEN_PRAYER', title: 'Open prayer times', foreground: true }] }],
+                types: [{ id: 'PRAYER_ALERT', actions: [
+                    { id: 'STOP_ADHAN', title: translate('stop_adhan'), destructive: true },
+                    { id: 'OPEN_PRAYER', title: translate('open_prayer_times'), foreground: true },
+                ] }],
             });
         }
         register().catch(console.warn);
         return () => { disposed = true; listener?.remove(); };
-    }, [navigate]);
+    }, [navigate, lang]);
 
     // Developer Test Functions
     const triggerTestNotification = async () => {

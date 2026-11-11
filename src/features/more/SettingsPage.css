@@ -436,3 +436,20 @@ input:checked + .toggle-slider:before {
 .accordion-card .accordion-body:not(.expanded) {
     padding-bottom: 0;
 }
+
+/* Notification problems (and the Android alarm-permission button) shown on a readable card. */
+.settings-alert-card {
+    padding: 16px 20px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings-alarm-btn {
+    align-self: flex-start;
+    background: var(--primary, #c5a059);
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 600;
+}
