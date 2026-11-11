@@ -1,16 +1,19 @@
 # Evidence Index
 
-Generated: 2026-11-11T12:46:33.650167+05:30
+Generated: 2026-11-11T12:54:47.974747+05:30
 
 | File | Size (bytes) |
 |---|---:|
 | `execution/evidence/UI-A11Y-002_20261111_home_after_dhuhr.jpg` | 23262 |
+| `execution/evidence/UI-A11Y-002_RUN4_20261111_focus_ring_zakath_toast.jpg` | 28099 |
 | `execution/evidence/UI-CAL-001_20261111_today_highlight.jpg` | 22476 |
+| `execution/evidence/UI-DASH-002_RUN4_20261111_home_unchanged.jpg` | 23469 |
 | `execution/evidence/UI-I18N-001_20261111_more_untranslated.png` | 22974 |
 | `execution/evidence/UI-I18N-001_RUN2_20261111_malayalam_nav.jpg` | 24935 |
 | `execution/evidence/UI-ONB-003_20261111_dots_overlap_results.jpg` | 25201 |
 | `execution/evidence/UI-ONB-003_RUN3_20261111_dots_below_results.jpg` | 10860 |
 | `execution/evidence/UI-ONB-004_20261111_hanafi_selected.jpg` | 12347 |
+| `execution/evidence/UI-ONB-004_RUN4_20261111_keyboard_radio.jpg` | 12381 |
 | `execution/evidence/UI-ONB-005_20261111_dashboard_kochi.jpg` | 24769 |
 | `execution/evidence/UI-PRAY-001_20261111_dhuhr_row_blank.jpg` | 19915 |
 | `execution/evidence/UI-PRAY-001_20261111_dhuhr_row_zoom.png` | 12101 |
@@ -34,3 +37,4 @@ Generated: 2026-11-11T12:46:33.650167+05:30
 | `execution/evidence/UNIT_20261111_npm_test.log` | 34311 |
 | `execution/evidence/UNIT_RUN2_20261111_npm_test.log` | 34305 |
 | `execution/evidence/UNIT_RUN3_20261111_npm_test.log` | 34285 |
+| `execution/evidence/UNIT_RUN4_20261111_npm_test.log` | 34295 |

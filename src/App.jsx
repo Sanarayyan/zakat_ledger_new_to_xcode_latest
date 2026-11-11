@@ -872,6 +872,7 @@ function UserDashboard() {
             <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
                     className="back-btn" 
+                    aria-label="Back"
                     onClick={() => {
                         if (currentView === 'home') {
                             navigate('/home');
@@ -2853,6 +2854,7 @@ function QuranPage() {
             <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button
                     className="back-btn"
+                    aria-label={t('back')}
                     onClick={() => navigate('/')}
                 >
                     {BACK_ICON}
@@ -4063,6 +4065,7 @@ function SurahDetailPage() {
                                                     <div className="ayah-info">
                                                         <button 
                                                             className="btn-audio-play" 
+                                                            aria-label={`Play ayah ${ayah.numberInSurah}`}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number));
@@ -4764,7 +4767,7 @@ const JuzDetailPage = () => {
                                     )}
                                     <div className="ayah-top">
                                         <div className="ayah-info">
-                                            <button className="btn-audio-play" onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number))}>
+                                            <button className="btn-audio-play" aria-label={`Play ayah ${ayah.numberInSurah}`} onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number))}>
                                                 {playingAyah === ayah.number && isAudioPlaying ? PAUSE_ICON : PLAY_ICON}
                                             </button>
                                             <span className="ayah-index-arabic">{ayah.numberInSurah}</span>

@@ -3,6 +3,7 @@ import { appStorage } from '../../services/appStorage';
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../LanguageContext';
+import { pressable } from '../../utils/pressable';
 import { usePrayer } from '../../PrayerContext';
 import './MorePage.css';
 
@@ -119,9 +120,9 @@ export default function MorePage() {
         <div className="more-root">
             {/* Header */}
             <header className="header">
-                <button className="back-btn" onClick={() => navigate('/')}>{BACK_ICON}</button>
+                <button className="back-btn" aria-label={t('back')} onClick={() => navigate('/')}>{BACK_ICON}</button>
                 <h1 className="header-title">{t('more_features')}</h1>
-                <button className="settings-btn" onClick={() => navigate('/settings')}>
+                <button className="settings-btn" aria-label={t('settings')} onClick={() => navigate('/settings')}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -164,29 +165,29 @@ export default function MorePage() {
                 {/* Features Grid */}
                 <h3 className="section-subtitle" style={{marginTop: '32px', marginLeft: '16px'}}>{t('tools')}</h3>
                 <div className="features-grid">
-                    <div className="feature-card" onClick={() => navigate('/asma')}>
+                    <div className="feature-card" {...pressable(() => navigate('/asma'), { role: 'link' })}>
                         <div className="feature-icon">{ASMA_ICON}</div>
                         <span className="feature-label">{t('asmaul_husna')}</span>
                     </div>
-                    <div className="feature-card upcoming-feature" onClick={() => setShowToast(true)}>
+                    <div className="feature-card upcoming-feature" {...pressable(() => setShowToast(true))}>
                         <div className="coming-soon-badge">{t('coming_soon')}</div>
                         <span className="feature-label" style={{ height: 'auto', marginTop: '6px' }}>{t('zakat_ledger')}</span>
                     </div>
                     {!isMale && (
-                        <div className="feature-card" onClick={() => navigate('/womens-guidance')}>
+                        <div className="feature-card" {...pressable(() => navigate('/womens-guidance'), { role: 'link' })}>
                             <div className="feature-icon">{WOMENS_ICON}</div>
                             <span className="feature-label">{t('womens_guidance_title')}</span>
                         </div>
                     )}
-                    <div className="feature-card" onClick={() => navigate('/hajj')}>
+                    <div className="feature-card" {...pressable(() => navigate('/hajj'), { role: 'link' })}>
                         <div className="feature-icon">{KAABA_ICON}</div>
                         <span className="feature-label">{t('hajj_guide')}</span>
                     </div>
-                    <div className="feature-card" onClick={() => navigate('/umrah')}>
+                    <div className="feature-card" {...pressable(() => navigate('/umrah'), { role: 'link' })}>
                         <div className="feature-icon">{MOON_ICON}</div>
                         <span className="feature-label">{t('umrah_guide')}</span>
                     </div>
-                    <div className="feature-card" onClick={() => navigate('/ratheeb')}>
+                    <div className="feature-card" {...pressable(() => navigate('/ratheeb'), { role: 'link' })}>
                         <div className="feature-icon">{TASBIH_ICON}</div>
                         <span className="feature-label">{lang === 'ml' ? 'റാത്തീബുൽ ഹദ്ദാദ്' : 'Ratheeb al-Haddad'}</span>
                     </div>

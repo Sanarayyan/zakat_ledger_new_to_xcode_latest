@@ -13,7 +13,7 @@
   },
   "UI-ONB-004": {
     "status": "PASS",
-    "from_run": "RUN-2026-11-11-03-REGRESSION"
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
   },
   "UI-ONB-005": {
     "status": "PASS",
@@ -29,11 +29,11 @@
   },
   "UI-DASH-002": {
     "status": "PASS",
-    "from_run": "RUN-2026-11-11-01"
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
   },
   "UI-NAV-001": {
     "status": "PASS",
-    "from_run": "RUN-2026-11-11-03-REGRESSION"
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
   },
   "UI-NAV-002": {
     "status": "PASS",
@@ -93,7 +93,7 @@
   },
   "UI-ZAKAT-001": {
     "status": "PASS",
-    "from_run": "RUN-2026-11-11-01"
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
   },
   "UI-WOMEN-001": {
     "status": "PASS",
@@ -132,11 +132,11 @@
     "from_run": "RUN-2026-11-11-02-REGRESSION"
   },
   "UI-A11Y-001": {
-    "status": "FAIL",
-    "from_run": "RUN-2026-11-11-01"
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
   },
   "UI-A11Y-002": {
-    "status": "FAIL",
-    "from_run": "RUN-2026-11-11-01"
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
   }
 }

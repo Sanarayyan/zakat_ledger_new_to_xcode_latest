@@ -95,7 +95,7 @@ export default function SettingsPage() {
     return (
         <div className="settings-root">
             <header className="header">
-                <button className="back-btn" onClick={() => navigate(-1)}>{BACK_ICON}</button>
+                <button className="back-btn" aria-label={t('back')} onClick={() => navigate(-1)}>{BACK_ICON}</button>
                 <h1 className="header-title">{t('settings_title') || 'Settings'}</h1>
             </header>
 

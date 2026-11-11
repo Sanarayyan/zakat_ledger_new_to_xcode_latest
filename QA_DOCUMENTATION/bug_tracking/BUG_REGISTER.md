@@ -11,7 +11,8 @@
 | BUG-006 | **FIXED, regression PASS** (`.tracker-header`/`.subview-header` get a card surface) | UI-WOMEN-001/002 (RUN-2026-11-11-03) |
 | BUG-007 | **FIXED, regression PASS** (dots in flow inside the scrolling onboarding viewport) | UI-ONB-001..005 |
 | BUG-008 | **FIXED, regression PASS** (phones: icon-only trigger docked left; `aria-label="Read mode"`) | UI-QURAN-002/004 |
-| BUG-009, BUG-010 | **OPEN** (accessibility, not yet approved) | UI-A11Y-001/002 still FAIL |
+| BUG-009 | **FIXED, regression PASS** (aria-labels on Back/Settings/Close/ayah Play buttons) | UI-A11Y-001 (RUN-2026-11-11-04) |
+| BUG-010 | **FIXED, regression PASS** (`src/utils/pressable.js`: role, tabindex, Enter/Space on nav, tiles and onboarding radios; focus-visible outline in `index.css`) | UI-A11Y-002, UI-DASH-002, UI-NAV-001, UI-ZAKAT-001, UI-ONB-004 |
 | BUG-011 | **FIXED, regression PASS** (`.premium-settings-menu` background `var(--bg-card)`, `App.css`) | UI-QURAN-003 |
 
 The original proposals for each bug are kept below.

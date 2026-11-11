@@ -160,6 +160,14 @@ button {
   background-image: none;
 }
 
+/* Visible keyboard focus for div-based controls made operable via pressable() (BUG-010). */
+#root [role="link"][tabindex]:focus-visible,
+#root [role="button"][tabindex]:focus-visible,
+#root [role="radio"][tabindex]:focus-visible {
+  outline: 2px solid var(--primary, #c5a059);
+  outline-offset: 2px;
+}
+
 /* Keep the highlighted next-prayer row; the rule above would turn it white under white text. */
 #root .prayer-row.active {
   background: var(--p-accent);

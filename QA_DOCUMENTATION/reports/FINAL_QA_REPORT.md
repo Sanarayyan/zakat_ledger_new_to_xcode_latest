@@ -60,3 +60,9 @@ Fixed:
 
 RUN-2026-11-11-03 re-ran 11 cases: all PASS. `npm test` shows 156 pass, 0 fail, and the device-test build succeeds.
 **Latest status:** 33 of 35 PASS. Still failing: UI-A11Y-001 and UI-A11Y-002 (BUG-009/010).
+
+## Update 3: accessibility fixes (2026-11-11)
+- BUG-009: aria-labels were added to the 14 icon-only buttons (Back, Settings, Close, ayah Play).
+- BUG-010: a new helper, `src/utils/pressable.js`, gives the bottom nav, Home tiles, More tiles and onboarding options a role, keyboard focus and Enter/Space activation, without changing their look. A focus-visible outline was added in `index.css`. The streak capsule was left alone so interactive roles aren't nested.
+
+RUN-2026-11-11-04 re-ran 6 cases: all PASS. Latest status for suite v1.0.0 is **35 of 35 PASS**. The cycle is closed for the web layer. The remaining risks are listed in CURRENT_RUN_SUMMARY.md.

@@ -3,6 +3,7 @@ import { appStorage } from '../../services/appStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { getDeviceLocation, locationErrorMessage } from '../../services/locationService.mjs';
 import { usePrayer } from '../../PrayerContext';
+import { pressable } from '../../utils/pressable';
 import './AppOnboarding.css';
 
 // SVG Icons to avoid emojis and maintain a premium look
@@ -250,12 +251,12 @@ export default function AppOnboarding({ onComplete }) {
                             Madhab selection helps provide accurate prayer time calculations and Islamic guidance preferences.
                         </p>
 
-                        <div className="selection-grid">
+                        <div className="selection-grid" role="radiogroup">
                             {['shafi', 'hanafi', 'maliki', 'hanbali'].map(m => (
                                 <div 
                                     key={m}
                                     className={`selection-card ${form.madhab === m ? 'active' : ''}`}
-                                    onClick={() => setForm({...form, madhab: m})}
+                                    {...pressable(() => setForm({...form, madhab: m}), { role: 'radio', 'aria-checked': form.madhab === m })}
                                 >
                                     <span className="card-title">{m.charAt(0).toUpperCase() + m.slice(1)}</span>
                                     <div className="card-indicator"></div>
@@ -282,12 +283,12 @@ export default function AppOnboarding({ onComplete }) {
                             We ask this to personalize certain Islamic guidance and features respectfully, including additional information relevant for women.
                         </p>
 
-                        <div className="selection-grid">
+                        <div className="selection-grid" role="radiogroup">
                             {['Female', 'Male'].map(g => (
                                 <div 
                                     key={g}
                                     className={`selection-card ${form.gender === g ? 'active' : ''}`}
-                                    onClick={() => setForm({...form, gender: g})}
+                                    {...pressable(() => setForm({...form, gender: g}), { role: 'radio', 'aria-checked': form.gender === g })}
                                 >
                                     <span className="card-title">{g}</span>
                                     <div className="card-indicator"></div>
