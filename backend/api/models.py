@@ -19,6 +19,8 @@ import uuid
 class AccountDeletionReceipt(models.Model):
     id = models.UUIDField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # sha256 of the Google subject that deleted; blank on receipts made before this field existed.
+    account_hash = models.CharField(max_length=64, blank=True, default='')
 
 
 class LoginChallenge(models.Model):

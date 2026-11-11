@@ -52,6 +52,28 @@ class DeletionRecoveryTests(TestCase):
         self.assertEqual(client.delete('/api/account/data/', {'deletionId': operation}, format='json').status_code, 200)
         self.assertTrue(AccessSession.objects.filter(pk=new_session.pk).exists())
 
+    def test_receipt_never_answers_for_a_different_signed_in_account(self):
+        client = APIClient()
+        token, _ = issue_session('first@example.test', 'first-subject')
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        operation = str(uuid4())
+        self.assertEqual(client.delete('/api/account/data/', {'deletionId': operation}, format='json').status_code, 200)
+        other_token, other_session = issue_session('second@example.test', 'second-subject')
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {other_token}')
+        response = client.delete('/api/account/data/', {'deletionId': operation}, format='json')
+        self.assertEqual(response.status_code, 409)
+        self.assertNotIn('deleted', response.data)
+        self.assertTrue(AccessSession.objects.filter(pk=other_session.pk).exists())
+        client.credentials()
+        self.assertEqual(client.delete('/api/account/data/', {'deletionId': operation}, format='json').status_code, 200)
+
+    def test_receipt_made_before_owner_tracking_still_confirms(self):
+        legacy = AccountDeletionReceipt.objects.create(id=uuid4())
+        client = APIClient()
+        token, _ = issue_session('legacy@example.test', 'legacy-subject')
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(client.delete('/api/account/data/', {'deletionId': str(legacy.pk)}, format='json').status_code, 200)
+
     def test_invalid_or_unauthorized_operation_cannot_create_receipt(self):
         client = APIClient()
         self.assertEqual(client.delete('/api/account/data/', {'deletionId': 'invalid'}, format='json').status_code, 400)
@@ -318,6 +340,37 @@ class CalculationApiTests(TestCase):
 
 
 class AuthenticationSecurityTests(TestCase):
+    def test_logout_all_devices_revokes_every_session_of_that_account_only(self):
+        first, _ = issue_session('many@example.test', 'many-subject')
+        _, second = issue_session('many@example.test', 'many-subject')
+        _, other = issue_session('someone@example.test', 'someone-subject')
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {first}')
+        self.assertEqual(client.post('/api/auth/logout/', {'allDevices': True}, format='json').status_code, 200)
+        self.assertFalse(AccessSession.objects.filter(user_email='many@example.test').exists())
+        self.assertTrue(AccessSession.objects.filter(pk=other.pk).exists())
+
+    def test_plain_logout_revokes_only_the_current_session(self):
+        first, _ = issue_session('pair@example.test', 'pair-subject')
+        _, second = issue_session('pair@example.test', 'pair-subject')
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {first}')
+        for body in ({}, {'allDevices': 'true'}):
+            self.assertEqual(client.post('/api/auth/logout/', body, format='json').status_code, 200)
+        self.assertEqual(list(AccessSession.objects.values_list('pk', flat=True)), [second.pk])
+
+    @override_settings(GOOGLE_CLIENT_IDS=['configured.apps.googleusercontent.com'])
+    def test_flooding_login_challenge_does_not_lock_out_google_sign_in(self):
+        from django.core.cache import cache
+        cache.clear()
+        client = APIClient()
+        codes = [client.post('/api/auth/challenge/').status_code for _ in range(31)]
+        self.assertEqual(codes[:30], [200] * 30)
+        self.assertEqual(codes[30], 429)
+        # Separate bucket: sign-in still reaches validation instead of 429.
+        self.assertEqual(client.post('/api/auth/google/', {}, format='json').status_code, 400)
+        cache.clear()
+
     def test_challenge_is_one_time_and_binds_nonce(self):
         from .authentication import new_login_challenge, exchange_google_identity
         challenge, nonce = new_login_challenge()

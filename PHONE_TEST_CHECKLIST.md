@@ -2,6 +2,39 @@
 
 > **Result (11 Nov 2026):** the owner tested this build on an iPhone (Xcode) and an Android phone (APK) and reported that it works properly, with no failures. Real store builds (signed, with production settings) must be checked again by the deploy team.
 
+## Store-mode test (owner, before handover)
+
+> **Result (11 Nov 2026): all passed.** The owner tested on an iPhone and an Android phone: store-mode checks P1–P7, plus the Adhan stop checks P8–P9 with the test build. This includes P9b: tapping Stop Adhan on the iPhone notification stops the sound.
+
+This build is made exactly the way the deploy team will make the store app, except:
+- placeholder server and Google settings (the deploy team has the real ones), and
+- Android is signed with a test key, not the store key.
+
+Users can't reach anything that needs the real server today: Zakath is "Coming Soon" and there's no Google sign-in in normal use.
+
+**Install**
+- **Android:** copy `build/store-test/Muslim-Plus-store-test.apk` to the phone and install it over the old test app.
+  (SHA-256 `155c8afe857d3abb1d391b0ce03c88b9c8819536a4c6a9c00dff5e190daaa196`, release build, versionName 1.0.3 / versionCode 4)
+- **iPhone:** open `ios/App/App.xcodeproj`. Go to **Product → Scheme → Edit Scheme… → Run** and set **Build Configuration** to **Release**. Pick your iPhone and press **Run**. Set it back to Debug afterwards.
+
+| # | What to do | What should happen | iPhone | Android |
+|---|---|---|---|---|
+| P1 | Open Settings | **No** "DEVICE TEST BUILD", no test Adhan buttons, no VersionHub note | | |
+| P2 | Fresh start: Settings → "Delete my app data" (test phone only), or a clean install | Onboarding starts like a new user | | |
+| P3 | Go through Home, Quran (open a Surah, play a verse), Prayer, Qibla, Tasbih, More | Everything works like before; no error popups | | |
+| P4 | Settings → turn on prayer notifications and Adhan sound | Permission is asked; the next prayer notification arrives on time with sound | | |
+| P5 | More → Zakath | Shows "Coming Soon" | | |
+| P6 | Close and reopen the app | No update popup appears (the update server is a placeholder in this build) | | |
+| P7 | Android: Settings | **No** Stop Adhan button or Adhan text. Only if "Alarms & reminders" is off: one short message and an **Allow Alarms & reminders** button (it disappears once allowed) | — | |
+| P8 | Android: when the Adhan plays | Tap **Stop Adhan** on the notification → sound stops; the next prayer still rings | — | |
+| P9 | iPhone: when the Adhan notification plays | Press the **side button or a volume button** → sound stops. Or long-press the notification → **Stop Adhan** and **Open prayer times** buttons (in Malayalam too) | | — |
+
+The Android "Test Adhan in 10 seconds" button doesn't exist in this build. Use a real prayer time (P4) instead.
+
+**Last step:** when P1–P6 pass, run `npm run mobile:sync:device-test` with Node 22 to put your phone projects back to the test build.
+
+---
+
 Use this to test the latest code on a real iPhone and a real Android phone.
 Mark each line **Pass**, **Fail** or **Skip**. If something fails, take a screenshot and write one line about what you saw.
 
@@ -25,11 +58,22 @@ If you change the web code later, run `npm run mobile:sync:device-test` with Nod
 
 ### Android (APK file)
 1. Copy this file to the phone: `android/app/build/outputs/apk/debug/app-debug.apk`
-   (SHA-256 `d22d85c3e766798a912a083c05d4b6a88ef2133174c02e93b701209d310bdd69`)
+   (SHA-256 `e99cf5d3ff9f741d4ae0f4eaead84d83434734eb4e1fc31d73fbf1ce6bbb1986`, Settings cleanup build)
 2. On the phone, open the file and tap **Install**. Allow "install unknown apps" if asked.
 3. Install it **over** the old test app. Don't uninstall first, so you can check that your data is kept.
 
 ---
+
+## Settings cleanup retest (11 Nov 2026, quick)
+
+| # | What to do | What should happen | iPhone | Android |
+|---|---|---|---|---|
+| S1 | Open Settings | No long technical text at the top. "Personal Preferences" heading is easy to read | | |
+| S2 | Open Notifications | Last line: "To keep reminders working, open the app with internet at least once a week." | | |
+| S3 | Scroll to the bottom | "Your data" card with one short sentence and a red "Delete my app data" | | |
+| S4 | Tap "Delete my app data", then **Cancel** | One short question appears; Cancel keeps everything | | |
+| S5 | Android: Adhan card in Malayalam | Card text and buttons are in Malayalam | — | |
+| S6 | Dark theme and Malayalam | All of the above is readable | | |
 
 ## Part B — Basic checks (both phones)
 

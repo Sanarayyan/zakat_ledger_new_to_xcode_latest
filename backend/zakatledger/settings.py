@@ -126,9 +126,11 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'false' if DEBUG else 'true').lower() == 'true'
-SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
-SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
+# HSTS is on (1 year) whenever HTTPS redirect is on; set DJANGO_SECURE_HSTS_SECONDS=0 to turn it off.
+SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '31536000' if SECURE_SSL_REDIRECT else '0'))
+# Opt-in only: both are hard to undo once browsers have cached them.
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0 and os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', 'false').lower() == 'true'
+SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0 and os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', 'false').lower() == 'true'
 
 # ── DJANGO REST FRAMEWORK ──────────────────────────────────────────────────────
 REST_FRAMEWORK = {
@@ -139,7 +141,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     # Always return JSON — never HTML error pages
-    'DEFAULT_THROTTLE_RATES': {'anon': '30/min'},
+    'DEFAULT_THROTTLE_RATES': {'anon': '30/min', 'login_challenge': '30/min', 'login_google': '30/min'},
     # Trust forwarding headers only when a deployment names its trusted proxy count.
     'NUM_PROXIES': int(os.environ.get('DJANGO_NUM_PROXIES', '0')),
     'DEFAULT_RENDERER_CLASSES': [

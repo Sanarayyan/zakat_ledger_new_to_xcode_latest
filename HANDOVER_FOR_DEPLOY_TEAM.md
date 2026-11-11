@@ -16,10 +16,12 @@ For full details, see [DEPLOYMENT.md](DEPLOYMENT.md) and [FINAL_RELEASE_ACCEPTAN
 | Check | Result |
 |---|---|
 | App unit tests (`npm test`) | 156 pass, 0 fail, 4 skipped |
-| Backend tests (`manage.py test`, Python 3.12) | 28 pass, 1 skipped (PostgreSQL-only test) |
+| Backend tests (`manage.py test`, Python 3.12) | 34 pass, 1 skipped (PostgreSQL-only test, which also passes on PostgreSQL) |
+| Local security scan (Shannon) | No injection, XSS or SSRF found. Fixed: separate login rate limits, HSTS on by default, deletion receipts tied to their account, "log out everywhere" option |
 | Android debug APK build | Pass |
 | iOS build (Simulator, unsigned) | Pass |
 | Phone testing of this build (test build, iPhone via Xcode + Android APK) | **Pass** — owner reported on 11 Nov 2026 that both phones work properly; no failures reported. Checklist: `PHONE_TEST_CHECKLIST.md` |
+| Store-mode build on phones (placeholder settings, Android release APK, iPhone Release) + Adhan stop from notification | **Pass** — owner, 11 Nov 2026 (checks P1–P9) |
 
 ## 3. Tools needed
 
@@ -40,6 +42,12 @@ npm run android:open         # build a signed .aab from Android Studio
 
 `npm run mobile:sync:device-test` makes the **test build** used for phone testing. Never upload the test build to a store.
 
+**Store build vs test build (important):**
+- Git contains **no built app files**. Xcode and Android Studio get the app only when you run a sync command.
+- Always run `npm run mobile:sync` (with `.env.production`) right before archiving or building the `.aab`.
+- The store build removes all test items automatically: the "DEVICE TEST BUILD — local testing only" note, the test Adhan buttons, the VersionHub test note and the local tester account. This was checked on 11 Nov 2026 with a production build that used placeholder settings.
+- **Quick check before upload:** open Settings in the store build. If you see "DEVICE TEST BUILD", it is the wrong build. Run `npm run mobile:sync` again.
+
 ## 5. What your team must supply (app can't go live without these)
 
 **App settings (`.env.production`, see `.env.example`)**
@@ -53,6 +61,9 @@ npm run android:open         # build a signed .aab from Android Studio
 - PostgreSQL (`DJANGO_DB_ENGINE=postgresql` + `POSTGRES_*`) and Redis (`DJANGO_CACHE_LOCATION`) for production
 - Before starting the server, run `migrate`, `collectstatic`, `check --deploy`. Start it with `gunicorn zakatledger.wsgi:application`
 - Don't use or migrate the local `backend/db.sqlite3` in production.
+- **Behind a proxy or load balancer:** set `DJANGO_NUM_PROXIES` to the number of proxies, and make the proxy overwrite `X-Forwarded-For`. Without this, all users share one login rate limit (30 per minute).
+- **HSTS** is on for one year by default once the HTTPS redirect is on. Set `DJANGO_SECURE_HSTS_SECONDS=0` until HTTPS works everywhere.
+- Migration `0005` adds an owner column to deletion receipts. It is covered by the `migrate` step above.
 
 **Signing and stores**
 - Android upload keystore (kept outside git) and Play Console app

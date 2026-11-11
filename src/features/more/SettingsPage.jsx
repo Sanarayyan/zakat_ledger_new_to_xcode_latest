@@ -33,8 +33,10 @@ export default function SettingsPage() {
             const pending = await accountDataDeletion.pending();
             const session = restoreSession();
             if (!pending) {
-                if (!window.confirm('Delete all app data for every profile on this device, including financial records, reading progress and period data? If signed in, your cloud calculation history and all app sessions will also be deleted. Your Google account is not deleted. This cannot be undone.')) return;
-                if (!session && !window.confirm('You are not currently signed in. This will delete device data only. Cloud history will remain. To delete cloud history, cancel and sign in first. Continue with device-only deletion?')) return;
+                const message = session
+                    ? 'Delete all app data on this phone, and your saved calculation history? Your Google account is not deleted. This cannot be undone.'
+                    : t('delete_app_data_confirm');
+                if (!window.confirm(message)) return;
             }
             setDeletingData(true);
             await stopAdhan();
@@ -47,6 +49,21 @@ export default function SettingsPage() {
         } finally { setDeletingData(false); }
     };
     const [notificationError, setNotificationError] = useState('');
+    // Android only: show the Alarms & reminders button just while that permission is missing.
+    // Users stop a playing Adhan from its notification, so Settings has no Stop button.
+    const [exactAllowed, setExactAllowed] = useState(true);
+    useEffect(() => {
+        if (!nativeAdhanEnabled) return;
+        const check = () => Adhan.status().then(status => setExactAllowed(!!status.exactAllowed)).catch(() => {});
+        check();
+        const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+        document.addEventListener('visibilitychange', onVisible);
+        return () => document.removeEventListener('visibilitychange', onVisible);
+    }, []);
+    const alarmsMissing = nativeAdhanEnabled && !exactAllowed && !!settings?.notificationsEnabled;
+    const errorText = notificationError || scheduleError || '';
+    const alertText = errorText.startsWith('Allow Alarms & reminders') ? (alarmsMissing ? t('allow_alarms_note') : '')
+        : errorText === 'Allow app notifications in phone settings.' ? t('allow_notifications_note') : errorText;
     const [isNotificationsExpanded, setIsNotificationsExpanded] = useState(false);
 
     const [isGenderModalOpen, setIsGenderModalOpen] = useState(false);
@@ -101,30 +118,17 @@ export default function SettingsPage() {
 
             <div className="settings-content">
                 {import.meta.env.MODE === 'device-test' && <p className="test-build-note">{t('device_test_banner')}</p>}
-                {(scheduleError || notificationError) && <p role="alert">{notificationError || scheduleError}</p>}
-                {nativeAdhanEnabled && <section className="settings-card" style={{ padding: 16 }}>
-                    <h2>Adhan notification</h2>
-                    <p>Stop the current Adhan from its notification. Future reminders stay enabled. Your media volume controls Adhan loudness.</p>
-                    <button onClick={() => Adhan.requestExactPermission().catch(error => setNotificationError(error.message))}>Allow Alarms &amp; reminders</button>
-                    <button onClick={() => stopAdhan().catch(error => setNotificationError(error.message))}>Stop current Adhan</button>
-                    {import.meta.env.MODE === 'device-test' && <button onClick={triggerTestNotification}>Test Adhan notification in 10 seconds</button>}
+                {(alertText || alarmsMissing) && <section className="settings-card settings-alert-card">
+                    {alertText && <p role="alert">{alertText}</p>}
+                    {alarmsMissing && <button className="settings-alarm-btn" onClick={() => Adhan.requestExactPermission().catch(error => setNotificationError(error.message))}>{t('allow_alarms_reminders')}</button>}
                 </section>}
+                {import.meta.env.MODE === 'device-test' && nativeAdhanEnabled &&
+                    <button onClick={triggerTestNotification}>Test Adhan notification in 10 seconds</button>}
                 {import.meta.env.MODE === 'device-test' && Capacitor.getPlatform() === 'ios' &&
                     <button onClick={triggerTestNotification}>Test iOS Adhan sound and prayer action</button>}
                 {import.meta.env.MODE === 'device-test' && (import.meta.env.VITE_VERSIONHUB_LIVE_TEST === 'true'
                     ? <p className="test-build-note">Update checks use the real VersionHub server. Close and reopen the app after changing versions.json.</p>
                     : <ReleaseTestControls />)}
-                <section className="settings-card" style={{ padding: 16 }}>
-                    <h2>{t('privacy_personal_data')}</h2>
-                    <p>{t('privacy_device_description')}</p>
-                    <p>{t('privacy_browser_description')}</p>
-                    <button disabled={deletingData} onClick={deletePersonalData}>{deletingData ? t('deleting_app_data') : pendingDeletion ? t('resume_app_data_deletion') : t('delete_app_data')}</button>
-                    {pendingDeletion && <p role="status">{t('pending_app_data_deletion')}</p>}
-                    {privacyError && <p role="alert">{privacyError}</p>}
-                </section>
-                <section className="settings-card" style={{ padding: 16 }}>
-                    <p>{t('notification_schedule_note')}</p>
-                </section>
                 {/* Personal Preferences Section */}
                 <div className="settings-section-wrapper">
                     <h2 className="settings-section-title">{t('personal_preferences') || 'Personal Preferences'}</h2>
@@ -241,9 +245,19 @@ export default function SettingsPage() {
                                     <span className="toggle-slider"></span>
                                 </label>
                             </div>
+                            <p className="settings-item-desc settings-note">{t('notification_schedule_note')}</p>
                         </div>
                     </section>
                 </div>
+
+                {/* Your data (kept so users can delete their data, as the stores expect) */}
+                <section className="settings-card settings-data-card">
+                    <h2 className="settings-section-title no-margin">{t('privacy_personal_data')}</h2>
+                    <p className="settings-item-desc">{t('privacy_device_description')}</p>
+                    <button className="settings-delete-btn" disabled={deletingData} onClick={deletePersonalData}>{deletingData ? t('deleting_app_data') : pendingDeletion ? t('resume_app_data_deletion') : t('delete_app_data')}</button>
+                    {pendingDeletion && <p role="status">{t('pending_app_data_deletion')}</p>}
+                    {privacyError && <p role="alert">{privacyError}</p>}
+                </section>
             </div>
 
             {/* Gender Selection Bottom Sheet */}
