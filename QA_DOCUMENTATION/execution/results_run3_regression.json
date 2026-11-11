@@ -1,0 +1,303 @@
+{
+  "suite_version": "1.0.0",
+  "suite_sha256": "8e40ba1551913bcf7d99e6726b0d8a123499d04bdab85bf9853f90a638372c5d",
+  "run_id": "RUN-2026-11-11-03-REGRESSION",
+  "environment": {
+    "app_build": "branch qa/ui-fixes-cycle1 (7c82fc8) + fixes BUG-006/007/008/011",
+    "platform": "web (hybrid Capacitor app, web layer only)",
+    "browser_device": "Claude desktop built-in Chromium pane, mobile emulation",
+    "viewport": "375x812",
+    "started_at": "2026-11-11 (IST)"
+  },
+  "results": [
+    {
+      "test_id": "UI-ONB-001",
+      "status": "PASS",
+      "actual_result": "Fresh data: 'STEP 1 OF 3' and the three location options shown.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-002",
+      "status": "PASS",
+      "actual_result": "'Kochi' returned 12 results incl. Ernakulam District, Kerala, India; selected.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-003",
+      "status": "PASS",
+      "actual_result": "Step dots are position:static at top 1436px, below the last result card (bottom 1373px); 0 overlaps with the 12 result cards.",
+      "evidence": [
+        "execution/evidence/UI-ONB-003_RUN3_20261111_dots_below_results.jpg"
+      ],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-004",
+      "status": "PASS",
+      "actual_result": "Hanafi selected and Continue advanced; dots also static on step 2.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-005",
+      "status": "PASS",
+      "actual_result": "Female + Complete Setup -> Home with KOCHI.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-006",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-DASH-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-DASH-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-NAV-001",
+      "status": "PASS",
+      "actual_result": "Onboarding completion routed to Home; reader and Women's Guidance reachable; no console errors in a fresh tab.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-NAV-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-PRAY-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-PRAY-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-002",
+      "status": "PASS",
+      "actual_result": "Reading view shows ayahs and translations; Page View shows JUZ 1 / PAGE 1.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-003",
+      "status": "PASS",
+      "actual_result": "Menu background rgb(255,255,255) (opaque); labels 'Text Size', 'Default', 'Reciter'; nothing shows through.",
+      "evidence": [
+        "execution/evidence/UI-QURAN-003_RUN3_20261111_menu_opaque.jpg"
+      ],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-004",
+      "status": "PASS",
+      "actual_result": "On phones the trigger is icon-only (54x44) at left 16px; ayah 2 Arabic fully visible in Reading view and Page View text unobstructed in the first viewport. aria-label 'Read mode'.",
+      "evidence": [
+        "execution/evidence/UI-QURAN-004_RUN3_20261111_readmode_left_icon.jpg",
+        "execution/evidence/UI-QURAN-004_RUN3_20261111_pageview.jpg"
+      ],
+      "notes": "A fixed button can still overlap text while scrolling; the case only asserts the initial viewport.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-TASBIH-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-TASBIH-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QIBLA-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-SET-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-SET-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-SET-003",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ASMA-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ZAKAT-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-WOMEN-001",
+      "status": "PASS",
+      "actual_result": "Cycle length min 20, max 45, restored to 28.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-WOMEN-002",
+      "status": "PASS",
+      "actual_result": "Tracker header and Gentle Q&A header now on rgb(255,255,255) cards; text readable.",
+      "evidence": [
+        "execution/evidence/UI-WOMEN-002_RUN3_20261111_header_cards.jpg"
+      ],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-HAJJ-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-UMRAH-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-RATHEEB-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-DUAS-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-CAL-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-I18N-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-THEME-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-A11Y-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-A11Y-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see RUN-2026-11-11-01/02.",
+      "executed_at": "2026-11-11"
+    }
+  ]
+}

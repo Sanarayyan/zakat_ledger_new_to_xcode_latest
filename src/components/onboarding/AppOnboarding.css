@@ -361,4 +361,6 @@
     padding: calc(4.5rem + env(safe-area-inset-top)) 0 max(1rem, env(safe-area-inset-bottom));
 }
 .app-onboarding-container { margin-block: auto; flex-shrink: 0; }
+/* Keep the step dots in flow so they never float over scrolled content (BUG-007). */
+.app-onboarding-viewport .onboarding-progress { position: static; flex-shrink: 0; margin: 24px auto 16px; }
 .app-onboarding-viewport .onboarding-header { top: calc(.75rem + env(safe-area-inset-top)); }

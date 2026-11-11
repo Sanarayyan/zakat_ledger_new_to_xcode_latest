@@ -8996,7 +8996,8 @@ body.dark-mode .view-mode-quick-toggle .toggle-btn.active {
     top: calc(100% + 12px);
     right: 16px;
     width: 280px;
-    background: var(--bg-glass);
+    /* Opaque so the page title never shows through the menu (BUG-011). */
+    background: var(--bg-card);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border);

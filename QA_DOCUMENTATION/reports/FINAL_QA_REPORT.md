@@ -50,3 +50,13 @@ Caveats:
 - The Malayalam strings need review by a native speaker.
 - Hot reload caused console errors in the long-lived tab. A fresh tab showed none.
 - **Still open:** BUG-006 to BUG-010 (not approved) and BUG-011 (new).
+
+## Update 2: step-2 fixes (2026-11-11)
+Fixed:
+- BUG-011: the reader menu is opaque (`src/App.css`)
+- BUG-006: Women's Guidance section headers sit on cards (`WomensGuidance.css`)
+- BUG-007: onboarding dots are in the page flow (`AppOnboarding.css`)
+- BUG-008: on phones, Read Mode is a left-docked icon with an aria-label (`AutoScrollControl.css/.jsx`)
+
+RUN-2026-11-11-03 re-ran 11 cases: all PASS. `npm test` shows 156 pass, 0 fail, and the device-test build succeeds.
+**Latest status:** 33 of 35 PASS. Still failing: UI-A11Y-001 and UI-A11Y-002 (BUG-009/010).

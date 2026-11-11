@@ -8,8 +8,11 @@
 | BUG-003 | **FIXED, regression PASS**; Malayalam strings need native review | UI-I18N-001 PASS; UI-QURAN-003 labels fixed, but that case still FAILs because of BUG-011 |
 | BUG-004 | **FIXED, regression PASS**; text moved to key `notification_schedule_note` (en + ml) | UI-SET-001/002/003 |
 | BUG-005 | **FIXED, regression PASS** (computed-style evidence; pane was hidden) | UI-RATHEEB-001 |
-| BUG-006 to BUG-010 | **OPEN, not approved** (deferred) | — |
-| BUG-011 | **NEW, OPEN** (LOW) | UI-QURAN-003: the reader options menu panel is translucent, so the surah title shows through. `.premium-menu` styling in App.css / the reader menu; needs an opaque background |
+| BUG-006 | **FIXED, regression PASS** (`.tracker-header`/`.subview-header` get a card surface) | UI-WOMEN-001/002 (RUN-2026-11-11-03) |
+| BUG-007 | **FIXED, regression PASS** (dots in flow inside the scrolling onboarding viewport) | UI-ONB-001..005 |
+| BUG-008 | **FIXED, regression PASS** (phones: icon-only trigger docked left; `aria-label="Read mode"`) | UI-QURAN-002/004 |
+| BUG-009, BUG-010 | **OPEN** (accessibility, not yet approved) | UI-A11Y-001/002 still FAIL |
+| BUG-011 | **FIXED, regression PASS** (`.premium-settings-menu` background `var(--bg-card)`, `App.css`) | UI-QURAN-003 |
 
 The original proposals for each bug are kept below.
 
