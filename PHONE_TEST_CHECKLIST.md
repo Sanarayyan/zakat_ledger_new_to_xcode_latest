@@ -2,6 +2,34 @@
 
 > **Result (11 Nov 2026):** the owner tested this build on an iPhone (Xcode) and an Android phone (APK) and reported that it works properly, with no failures. Real store builds (signed, with production settings) must be checked again by the deploy team.
 
+## Store-mode test (owner, before handover)
+
+This build is made exactly the way the deploy team will make the store app, except:
+- placeholder server and Google settings (the deploy team has the real ones), and
+- Android is signed with a test key, not the store key.
+
+Users can't reach anything that needs the real server today: Zakath is "Coming Soon" and there's no Google sign-in in normal use.
+
+**Install**
+- **Android:** copy `build/store-test/Muslim-Plus-store-test.apk` to the phone and install it over the old test app.
+  (SHA-256 `3f242c00cfaabc01f1135c29ad2970880acd62b6ad06ead446d55b6e492cd60d`, release build, versionName 1.0.3 / versionCode 4)
+- **iPhone:** open `ios/App/App.xcodeproj`. Go to **Product → Scheme → Edit Scheme… → Run** and set **Build Configuration** to **Release**. Pick your iPhone and press **Run**. Set it back to Debug afterwards.
+
+| # | What to do | What should happen | iPhone | Android |
+|---|---|---|---|---|
+| P1 | Open Settings | **No** "DEVICE TEST BUILD", no test Adhan buttons, no VersionHub note | | |
+| P2 | Fresh start: Settings → "Delete my app data" (test phone only), or a clean install | Onboarding starts like a new user | | |
+| P3 | Go through Home, Quran (open a Surah, play a verse), Prayer, Qibla, Tasbih, More | Everything works like before; no error popups | | |
+| P4 | Settings → turn on prayer notifications and Adhan sound | Permission is asked; the next prayer notification arrives on time with sound | | |
+| P5 | More → Zakath | Shows "Coming Soon" | | |
+| P6 | Close and reopen the app | No update popup appears (the update server is a placeholder in this build) | | |
+
+The Android "Test Adhan in 10 seconds" button doesn't exist in this build. Use a real prayer time (P4) instead.
+
+**Last step:** when P1–P6 pass, run `npm run mobile:sync:device-test` with Node 22 to put your phone projects back to the test build.
+
+---
+
 Use this to test the latest code on a real iPhone and a real Android phone.
 Mark each line **Pass**, **Fail** or **Skip**. If something fails, take a screenshot and write one line about what you saw.
 
