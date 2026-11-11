@@ -4,6 +4,8 @@
 
 ## Store-mode test (owner, before handover)
 
+> **Result (11 Nov 2026): all passed.** The owner tested on an iPhone and an Android phone: store-mode checks P1–P7, plus the Adhan stop checks P8–P9 with the test build. This includes P9b: tapping Stop Adhan on the iPhone notification stops the sound.
+
 This build is made exactly the way the deploy team will make the store app, except:
 - placeholder server and Google settings (the deploy team has the real ones), and
 - Android is signed with a test key, not the store key.

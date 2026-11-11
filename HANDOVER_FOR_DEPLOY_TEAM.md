@@ -20,6 +20,7 @@ For full details, see [DEPLOYMENT.md](DEPLOYMENT.md) and [FINAL_RELEASE_ACCEPTAN
 | Android debug APK build | Pass |
 | iOS build (Simulator, unsigned) | Pass |
 | Phone testing of this build (test build, iPhone via Xcode + Android APK) | **Pass** — owner reported on 11 Nov 2026 that both phones work properly; no failures reported. Checklist: `PHONE_TEST_CHECKLIST.md` |
+| Store-mode build on phones (placeholder settings, Android release APK, iPhone Release) + Adhan stop from notification | **Pass** — owner, 11 Nov 2026 (checks P1–P9) |
 
 ## 3. Tools needed
 
