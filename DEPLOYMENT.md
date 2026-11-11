@@ -45,7 +45,8 @@ Use Python 3.11 or newer and install `backend/requirements.txt`. Configure these
 - `DJANGO_CORS_ALLOWED_ORIGINS` with the deployed web origin, if a web build is hosted
 - `DJANGO_CSRF_TRUSTED_ORIGINS` with trusted HTTPS origins
 - `DJANGO_SECURE_SSL_REDIRECT=true` when the platform forwards HTTPS correctly
-- `DJANGO_SECURE_HSTS_SECONDS=31536000` only after HTTPS is confirmed across the deployment
+- HSTS is on for one year by default whenever the HTTPS redirect is on. Set `DJANGO_SECURE_HSTS_SECONDS=0` until HTTPS is confirmed across the deployment
+- `DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=true` and `DJANGO_SECURE_HSTS_PRELOAD=true` are opt-in; only set them when every subdomain serves HTTPS
 - `GOOGLE_CLIENT_ID` matching the frontend OAuth client
 
 Before starting the service, run:

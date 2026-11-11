@@ -318,6 +318,18 @@ class CalculationApiTests(TestCase):
 
 
 class AuthenticationSecurityTests(TestCase):
+    @override_settings(GOOGLE_CLIENT_IDS=['configured.apps.googleusercontent.com'])
+    def test_flooding_login_challenge_does_not_lock_out_google_sign_in(self):
+        from django.core.cache import cache
+        cache.clear()
+        client = APIClient()
+        codes = [client.post('/api/auth/challenge/').status_code for _ in range(31)]
+        self.assertEqual(codes[:30], [200] * 30)
+        self.assertEqual(codes[30], 429)
+        # Separate bucket: sign-in still reaches validation instead of 429.
+        self.assertEqual(client.post('/api/auth/google/', {}, format='json').status_code, 400)
+        cache.clear()
+
     def test_challenge_is_one_time_and_binds_nonce(self):
         from .authentication import new_login_challenge, exchange_google_identity
         challenge, nonce = new_login_challenge()

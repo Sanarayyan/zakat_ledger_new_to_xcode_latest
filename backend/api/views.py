@@ -27,7 +27,7 @@ from functools import partial
 from requests.exceptions import RequestException
 from .authentication import authenticated_session, new_login_challenge, exchange_google_identity, lock_account_for_write
 from .calculations import calculate
-from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import ScopedRateThrottle
 
 # Google's official library to verify JWT tokens
 from google.oauth2 import id_token
@@ -93,7 +93,9 @@ def health_check(request):
 
 class GoogleVerifyView(APIView):
     """Verify Google's signature/audience, bind a one-time nonce, and issue an opaque session."""
-    throttle_classes = [AnonRateThrottle]
+    # Own bucket: flooding the challenge endpoint must not lock out sign-in.
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login_google'
 
     def post(self, request):
         if not settings.GOOGLE_CLIENT_IDS:
@@ -131,7 +133,8 @@ class LogoutView(APIView):
 
 
 class LoginChallengeView(APIView):
-    throttle_classes = [AnonRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login_challenge'
 
     def post(self, request):
         if not settings.GOOGLE_CLIENT_IDS:
