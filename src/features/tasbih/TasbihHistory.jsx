@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../LanguageContext';
@@ -13,11 +15,11 @@ export default function TasbihHistory() {
     const [sessionToDelete, setSessionToDelete] = useState(null);
 
     useEffect(() => {
-        const storedSessions = JSON.parse(localStorage.getItem('tasbih_sessions') || '[]');
+        const storedSessions = readStoredJSON(appStorage, 'tasbih_sessions', []);
         storedSessions.sort((a, b) => new Date(b.lastActive) - new Date(a.lastActive));
         setSessions(storedSessions);
 
-        const storedAnalytics = JSON.parse(localStorage.getItem('tasbih_analytics') || '{}');
+        const storedAnalytics = readStoredJSON(appStorage, 'tasbih_analytics', {});
         setAnalytics({
             currentStreak: storedAnalytics.currentStreak || 0,
             lifetimeTotal: storedAnalytics.lifetimeTotal || 0,
@@ -42,7 +44,7 @@ export default function TasbihHistory() {
         if (sessionToDelete) {
             const updated = sessions.filter(s => s.id !== sessionToDelete);
             setSessions(updated);
-            localStorage.setItem('tasbih_sessions', JSON.stringify(updated));
+            appStorage.setItem('tasbih_sessions', JSON.stringify(updated));
             setSessionToDelete(null);
         }
     };

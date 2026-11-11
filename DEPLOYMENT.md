@@ -78,3 +78,13 @@ SQLite is suitable for local testing only. Use a managed PostgreSQL database bef
 - Test native rating prompts from TestFlight/App Store development and Google Play internal testing; sideloaded Android APKs are not reliable for this API.
 
 Rating and application-version behavior use the translated reusable review service and VersionHub API.
+
+## Stage 3.1 production service configuration
+
+Install `backend/requirements-production.txt` to add the reviewed PostgreSQL and Redis drivers. Set `DJANGO_DB_ENGINE=postgresql` and `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, optionally `POSTGRES_PORT` (5432) and `POSTGRES_SSLMODE` (verify-full). Provide the managed provider's CA/trust setup for hostname verification; do not disable TLS to pass a check. SQLite stays the local default. `DJANGO_SQLITE_PATH` can point to a disposable test database. Never run production migrations against the original local database.
+
+Set `DJANGO_CACHE_LOCATION` to the managed Redis URL (`rediss://` for TLS) for shared DRF throttle state across workers. Unset means Django's local development cache remains in use. DRF throttles are approximate application controls, not a denial-of-service boundary: configure proxy per-IP rate/connection limits, total header limits and a request body limit of 64 KiB. Application middleware rejects API bodies above 64 KiB and Accept headers above 4 KiB before DRF parsing/negotiation.
+
+Real PostgreSQL migration/rollback/concurrency and shared Redis tests still need disposable service access. These configuration paths do not imply deployment acceptance. Do not expire deletion receipts until an approved recovery/retention policy defines how delayed deletion retries remain safe.
+
+By default, DRF throttling uses the socket peer address and ignores client-supplied forwarding headers. Behind a trusted proxy chain, set `DJANGO_NUM_PROXIES` to its exact hop count, configure the ingress to strip or overwrite inbound `X-Forwarded-For`, and prevent direct public access to Gunicorn. Otherwise clients behind the same proxy can share a limit.

@@ -1,0 +1,300 @@
+{
+  "suite_version": "1.0.0",
+  "suite_sha256": "8e40ba1551913bcf7d99e6726b0d8a123499d04bdab85bf9853f90a638372c5d",
+  "run_id": "RUN-2026-11-11-04-REGRESSION",
+  "environment": {
+    "app_build": "branch qa/ui-fixes-cycle1 (627c9c1) + fixes BUG-009/010",
+    "platform": "web (hybrid Capacitor app, web layer only)",
+    "browser_device": "Claude desktop built-in Chromium pane, mobile emulation",
+    "viewport": "375x812",
+    "started_at": "2026-11-11 (IST)"
+  },
+  "results": [
+    {
+      "test_id": "UI-ONB-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-003",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-004",
+      "status": "PASS",
+      "actual_result": "Madhab options are role=radio in a radiogroup; keyboard Space on Hanafi sets aria-checked=true, shows the filled indicator and enables Continue.",
+      "evidence": [
+        "execution/evidence/UI-ONB-004_RUN4_20261111_keyboard_radio.jpg"
+      ],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-005",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ONB-006",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-DASH-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-DASH-002",
+      "status": "PASS",
+      "actual_result": "Mouse clicks: Quran, Prayer, Qibla, Tasbih, Duas, Calendar tiles route correctly; Home visuals unchanged.",
+      "evidence": [
+        "execution/evidence/UI-DASH-002_RUN4_20261111_home_unchanged.jpg"
+      ],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-NAV-001",
+      "status": "PASS",
+      "actual_result": "Bottom nav Quran/Tasbih/Qibla/More route correctly by click and keyboard; no console errors in a fresh tab.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-NAV-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-PRAY-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-PRAY-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-003",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QURAN-004",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-TASBIH-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-TASBIH-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-QIBLA-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-SET-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-SET-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-SET-003",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ASMA-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-ZAKAT-001",
+      "status": "PASS",
+      "actual_result": "Click and Space both show 'Coming Soon, In Sha Allah'; stays on /more.",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-WOMEN-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-WOMEN-002",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-HAJJ-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-UMRAH-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-RATHEEB-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-DUAS-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-CAL-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-I18N-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-THEME-001",
+      "status": "NOT_RUN",
+      "actual_result": "",
+      "evidence": [],
+      "notes": "Outside the scope of this regression; see earlier runs.",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-A11Y-001",
+      "status": "PASS",
+      "actual_result": "0 visible buttons/links/radios without an accessible name on /, /prayer (incl. Prayer Settings sheet), /qibla, /more, /settings, /quran, /quran/1 (was 13).",
+      "evidence": [],
+      "notes": "",
+      "executed_at": "2026-11-11"
+    },
+    {
+      "test_id": "UI-A11Y-002",
+      "status": "PASS",
+      "actual_result": "Home keyboard order now includes Quran/Prayer Times/Qibla/Tasbih/Duas/Calendar tiles and Quran/Tasbih/Qibla/More nav (role=link, tabindex 0); Enter on Prayer Times -> /prayer, Enter on More -> /more; Tab shows a 2px focus outline; Space on Zakath Ledger shows the toast without scrolling. More tiles: 5 links + 1 button.",
+      "evidence": [
+        "execution/evidence/UI-A11Y-002_RUN4_20261111_focus_ring_zakath_toast.jpg"
+      ],
+      "notes": "Home nav item is aria-current=page and not focusable (current page). Streak capsule left as-is to avoid nesting interactive roles.",
+      "executed_at": "2026-11-11"
+    }
+  ]
+}

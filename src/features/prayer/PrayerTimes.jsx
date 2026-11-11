@@ -1,9 +1,10 @@
+import CitySearch from '../../components/CitySearch';
+import { locationDisplayName } from '../../services/locationService.mjs';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../LanguageContext';
 import { usePrayer } from '../../PrayerContext';
-import { Geolocation } from '@capacitor/geolocation';
 import { getFormattedHijriDate } from '../../utils/hijri';
 import './PrayerTimes.css';
 
@@ -11,10 +12,11 @@ const PRAYERS_LIST = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
 export default function PrayerTimes() {
     const navigate = useNavigate();
+    const chooseCity = useLocation().state?.chooseCity === true;
     const { t, lang } = useLanguage();
-    const { settings, updateSettings, timings, nextPrayer, countdown, loading, error, refresh, formatTime, triggerTestNotification, triggerTestAdhan } = usePrayer();
+    const { settings, updateSettings, timings, nextPrayer, countdown, loading, error, refresh, formatTime, triggerTestNotification, triggerTestAdhan, detectLocation, locating: isDetecting, locError } = usePrayer();
 
-    const [showSetup, setShowSetup] = useState(!settings);
+    const [showSetup, setShowSetup] = useState(!settings?.location && !chooseCity);
     
     const [isDark, setIsDark] = useState(document.body.classList.contains('dark-mode'));
 
@@ -28,51 +30,16 @@ export default function PrayerTimes() {
 
     const fetchPrayerTimes = () => refresh();
 
-    const [showLocEdit, setShowLocEdit] = useState(false);
+    const [showLocEdit, setShowLocEdit] = useState(chooseCity);
     const [showMadhabEdit, setShowMadhabEdit] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [isDetecting, setIsDetecting] = useState(false);
-    const [locError, setLocError] = useState('');
-    
-    useEffect(() => {
-        const timeoutId = setTimeout(async () => {
-            if (searchQuery.trim().length > 2) {
-                setIsSearching(true);
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=5`);
-                    const data = await res.json();
-                    setSearchResults(data);
-                } catch (e) {
-                    console.error("Geocoding failed", e);
-                }
-                setIsSearching(false);
-            } else {
-                setSearchResults([]);
-            }
-        }, 500);
-        return () => clearTimeout(timeoutId);
-    }, [searchQuery]);
-
-    const handleSelectCity = (result) => {
-        const cityName = result.name || result.display_name.split(',')[0];
-        updateSettings({
-            ...settings,
-            location: {
-                lat: parseFloat(result.lat),
-                lng: parseFloat(result.lon),
-                city: cityName
-            }
-        });
+    const handleSelectCity = location => {
+        updateSettings({ location });
         setShowLocEdit(false);
-        setSearchQuery('');
-        setSearchResults([]);
+        setShowSetup(false);
     };
 
     const handleSelectMadhab = (madhabValue) => {
         updateSettings({
-            ...(settings || { location: { lat: 0, lng: 0, city: 'Unknown' }, method: 1 }),
             madhab: madhabValue,
             school: madhabValue === 'hanafi' ? 1 : 0
         });
@@ -80,51 +47,8 @@ export default function PrayerTimes() {
     };
 
     const handleAutoDetect = async () => {
-        setIsDetecting(true);
-        setLocError('');
-        try {
-            let permission = await Geolocation.checkPermissions();
-            
-            if (permission.location !== 'granted') {
-                permission = await Geolocation.requestPermissions();
-            }
-
-            if (permission.location !== 'granted' && permission.location !== 'prompt-with-rationale') {
-                setLocError('Location permission denied. Please enable it in your device settings.');
-                setIsDetecting(false);
-                return;
-            }
-
-            // Enforce a strict 15s timeout because Android Geolocation can hang indefinitely
-            const positionPromise = Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Location request timed out')), 15000));
-            
-            const position = await Promise.race([positionPromise, timeoutPromise]);
-            const { latitude, longitude } = position.coords;
-            let finalCity = 'Current Location';
-            try {
-                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-                const data = await res.json();
-                if (data.city || data.locality) {
-                    finalCity = data.city || data.locality;
-                }
-            } catch (err) {
-                console.error("Geocoding error:", err);
-            }
-            updateSettings({
-                ...(settings || { madhab: 'shafi', school: 0, method: 1 }),
-                location: {
-                    lat: latitude,
-                    lng: longitude,
-                    city: finalCity
-                }
-            });
-        } catch (error) {
-            console.error("Location error:", error);
-            setLocError('Unable to retrieve your location. Please check your GPS connection or enter city manually.');
-        } finally {
-            setIsDetecting(false);
-        }
+        const location = await detectLocation();
+        if (location) { setShowLocEdit(false); setShowSetup(false); }
     };
 
     const getAtmosphere = (prayerName) => {
@@ -179,7 +103,8 @@ export default function PrayerTimes() {
                     <div className="modal-header-elegant" style={{ position: 'relative' }}>
                         <h2>{t('prayer_settings') || 'Prayer Settings'}</h2>
                         {settings?.location?.city && (
-                            <button 
+                            <button
+                                aria-label="Close"
                                 onClick={() => setShowSetup(false)}
                                 style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '1.5rem', color: 'var(--c-text-muted)', cursor: 'pointer', padding: '8px' }}
                             >
@@ -200,7 +125,7 @@ export default function PrayerTimes() {
                             <div className="prayer-location-card">
                                 <div className="loc-left">
                                     <span className="loc-icon"><Icons.LocationIcon /></span>
-                                    <span className="detected-city">{settings.location.city}</span>
+                                    <span className="detected-city">{locationDisplayName(settings.location, lang) || t('choose_location')}</span>
                                 </div>
                                 <button className="prayer-btn-change" onClick={() => { setShowSetup(false); setShowLocEdit(true); }}>{t('change') || 'Change'}</button>
                             </div>
@@ -216,20 +141,18 @@ export default function PrayerTimes() {
                     </div>
 
                     <div className="prayer-form-section">
+                        <button className="prayer-btn-use-location" onClick={() => { setShowSetup(false); setShowLocEdit(true); }}>{t('choose_city_manually')}</button>
                         <label className="section-label">{t('madhab_school') || 'Madhab'}</label>
-                        <div className="segmented-control">
-                            <button 
-                                className={`segment-btn ${(settings?.madhab || 'shafi') === 'shafi' ? 'active' : ''}`}
-                                onClick={() => handleSelectMadhab('shafi')}
-                            >
-                                {t('shafi_maliki_hanbali') || 'Shafi / Maliki'}
-                            </button>
-                            <button 
-                                className={`segment-btn ${(settings?.madhab || 'shafi') === 'hanafi' ? 'active' : ''}`}
-                                onClick={() => handleSelectMadhab('hanafi')}
-                            >
-                                {t('hanafi') || 'Hanafi'}
-                            </button>
+                        <div className="segmented-control madhab-control">
+                            {['shafi', 'hanafi', 'maliki', 'hanbali'].map(madhab => (
+                                <button
+                                    key={madhab}
+                                    className={`segment-btn ${(settings?.madhab || 'shafi') === madhab ? 'active' : ''}`}
+                                    onClick={() => handleSelectMadhab(madhab)}
+                                >
+                                    {t(madhab)}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -247,27 +170,37 @@ export default function PrayerTimes() {
             
             <div className="prayer-container">
             <header className="prayer-header">
-                <button className="prayer-back-btn" onClick={() => navigate(-1)}>
+                <button className="prayer-back-btn" aria-label={t('back')} onClick={() => navigate(-1)}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </button>
                 <h1>{t('prayer_times') || 'Prayer Times'}</h1>
-                <button className="prayer-settings-btn" onClick={() => setShowSetup(true)}>
+                <button className="prayer-settings-btn" aria-label={t('settings')} onClick={() => setShowSetup(true)}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 </button>
             </header>
 
-            {loading || !timings ? (
+            {!settings?.location ? (
+                <div className="prayer-loading">
+                    <p>{t('choose_location')}</p>
+                    <button className="prayer-btn-use-location" onClick={handleAutoDetect} disabled={isDetecting}>{isDetecting ? t('detecting_location') : t('use_current_location')}</button>
+                    <button className="prayer-btn-use-location" onClick={() => setShowLocEdit(true)}>{t('choose_city_manually')}</button>
+                    {locError && <p role="alert">{locError}</p>}
+                </div>
+            ) : loading && !timings ? (
                 <div className="prayer-loading">
                     <div className="prayer-spinner"></div>
                     <p>{t('loading') || 'Loading...'}</p>
                 </div>
-            ) : error ? (
+            ) : !timings ? (
                 <div className="prayer-loading" style={{color: 'red'}}>
                     <p>{error}</p>
                     <button onClick={fetchPrayerTimes} className="prayer-btn-save" style={{marginTop: '16px', width: 'auto', padding: '8px 16px'}}>Retry</button>
                 </div>
             ) : (
                 <>
+                    {error && <div role="status" className="inline-error-message">
+                        {error} <button onClick={fetchPrayerTimes}>{t('retry')}</button>
+                    </div>}
                     {/* Glassmorphic Hero Card */}
                     <div className="prayer-hero-card">
                         <div className="hero-particles">
@@ -297,10 +230,10 @@ export default function PrayerTimes() {
                             <div className="hero-footer-row">
                                 <button className="quick-edit-btn" onClick={() => setShowLocEdit(true)}>
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                    <span className="truncate-text">{settings.location.city}</span>
+                                    <span className="truncate-text">{locationDisplayName(settings.location, lang) || t('choose_location')}</span>
                                 </button>
                                 <button className="quick-edit-btn" onClick={() => setShowMadhabEdit(true)}>
-                                    {settings.madhab === 'hanafi' ? (t('hanafi') || 'Hanafi') : (t('shafi_maliki_hanbali') ? t('shafi_maliki_hanbali').split(' / ')[0] : 'Shafi')}
+                                    {t(settings.madhab || 'shafi')}
                                 </button>
                             </div>
                         </div>
@@ -331,17 +264,7 @@ export default function PrayerTimes() {
                     <div className="prayer-modal-sheet quick-edit-sheet">
                         <div className="modal-drag-handle"></div>
                         <h3 className="quick-edit-title">Change Location</h3>
-                        <div className="search-input-wrapper">
-                            <input 
-                                type="text" 
-                                className="premium-search-input"
-                                placeholder="Search city..." 
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                autoFocus
-                            />
-                            {isSearching && <div className="mini-spinner"></div>}
-                        </div>
+                        <CitySearch onSelect={handleSelectCity} disabled={isDetecting} />
                         <button className="prayer-btn-use-location mini-loc-btn" onClick={() => {
                             if (!isDetecting) handleAutoDetect();
                         }} disabled={isDetecting}>
@@ -352,16 +275,7 @@ export default function PrayerTimes() {
                             )}
                         </button>
                         {locError && <div className="inline-error-message mt-2">{locError}</div>}
-                        {searchResults.length > 0 && (
-                            <div className="search-results-list">
-                                {searchResults.map((res, i) => (
-                                    <button key={i} className="search-result-item" onClick={() => handleSelectCity(res)}>
-                                        <div className="res-title">{res.name}</div>
-                                        <div className="res-subtitle">{res.display_name}</div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+
                     </div>
                 </div>
             )}
@@ -384,7 +298,7 @@ export default function PrayerTimes() {
                                     className={`quick-madhab-item ${settings.madhab === m.id ? 'active' : ''}`}
                                     onClick={() => handleSelectMadhab(m.id)}
                                 >
-                                    <span>{m.label}</span>
+                                    <span>{t(m.id)}</span>
                                     {settings.madhab === m.id && <span className="active-check"><Icons.CheckIcon /></span>}
                                 </button>
                             ))}

@@ -10,9 +10,23 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'com.google.gms:google-services:4.4.4'
 
+        // Keep security overrides on the build tooling classpath.
+        classpath platform('io.netty:netty-bom:4.1.140.Final')
+        constraints {
+            classpath 'org.jdom:jdom2:2.0.6.1'
+            classpath 'org.bouncycastle:bcprov-jdk18on:1.85'
+            classpath 'org.bouncycastle:bcpkix-jdk18on:1.85'
+            classpath 'org.bouncycastle:bcutil-jdk18on:1.85'
+        }
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+}
+
+// Jetifier's XML consumer still expands external entities with patched JDOM.
+if (providers.gradleProperty('android.enableJetifier').map { it.toBoolean() }.getOrElse(false)) {
+    throw new GradleException('Jetifier is disabled for this release because its XML parser permits external entities.')
 }
 
 apply from: "variables.gradle"

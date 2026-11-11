@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +40,6 @@ const ML = {
   bookmarksOnly: 'ബുക്ക്‌മാർക്കുകൾ മാത്രം',
   noBookmarks: 'ബുക്ക്‌മാർക്കുകൾ ഒന്നും ലഭ്യമല്ല',
   noResults: 'ഫലങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല',
-  playing: 'പ്ലേ ചെയ്യുന്നു...',
   audioError: 'ഓഡിയോ ഈ ഉപകരണത്തിൽ ലഭ്യമല്ല',
   checklistCats: {
     'Documents': 'രേഖകൾ', 
@@ -89,40 +90,24 @@ export default function UmrahGuide() {
 
   // Persistence States
   const [completedSteps, setCompletedSteps] = useState(() => {
-    const s = localStorage.getItem('umrah_steps_done');
-    return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'umrah_steps_done', []);
   });
   const [checklist, setChecklist] = useState(() => {
-    const s = localStorage.getItem('umrah_checklist');
-    return s ? JSON.parse(s) : {};
+    return readStoredJSON(appStorage, 'umrah_checklist', {});
   });
   const [bookmarks, setBookmarks] = useState(() => {
-    const s = localStorage.getItem('umrah_bookmarks');
-    return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'umrah_bookmarks', []);
   });
   const [recentlyViewed, setRecentlyViewed] = useState(() => {
-    const s = localStorage.getItem('umrah_recent_views');
-    return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'umrah_recent_views', []);
   });
 
-  // Audio Playback State
-  const [playingId, setPlayingId] = useState(null);
-  const audioRef = React.useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-      }
-    };
-  }, []);
   useEffect(() => {
     // Add section to recently viewed
     setRecentlyViewed(prev => {
       const filtered = prev.filter(x => x !== section);
       const next = [section, ...filtered].slice(0, 5);
-      localStorage.setItem('umrah_recent_views', JSON.stringify(next));
+      appStorage.setItem('umrah_recent_views', JSON.stringify(next));
       return next;
     });
   }, [section]);
@@ -130,7 +115,7 @@ export default function UmrahGuide() {
   const toggleStep = (id) => {
     setCompletedSteps(prev => {
       const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-      localStorage.setItem('umrah_steps_done', JSON.stringify(next));
+      appStorage.setItem('umrah_steps_done', JSON.stringify(next));
       return next;
     });
   };
@@ -138,7 +123,7 @@ export default function UmrahGuide() {
   const toggleChecklist = (key) => {
     setChecklist(prev => {
       const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem('umrah_checklist', JSON.stringify(next));
+      appStorage.setItem('umrah_checklist', JSON.stringify(next));
       return next;
     });
   };
@@ -147,55 +132,31 @@ export default function UmrahGuide() {
     setBookmarks(prev => {
       const key = `${type}::${id}`;
       const next = prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key];
-      localStorage.setItem('umrah_bookmarks', JSON.stringify(next));
+      appStorage.setItem('umrah_bookmarks', JSON.stringify(next));
       return next;
     });
   };
 
   const isBookmarked = (id, type) => bookmarks.includes(`${type}::${id}`);
 
-  // Play Dua Audio from local files
-  const playAudio = (id, text, translation) => {
-    if (playingId === id) {
-      if (audioRef.current) audioRef.current.pause();
-      setPlayingId(null);
-      return;
+  // Search titles and body text (both languages), skipping icons/React elements.
+  const query = search.trim().toLowerCase();
+  const textOf = (v) => {
+    if (typeof v === 'string') return v;
+    if (Array.isArray(v)) return v.map(textOf).join(' ');
+    if (v && typeof v === 'object' && !v.$$typeof) {
+      return Object.entries(v).filter(([k]) => k !== 'icon').map(([, x]) => textOf(x)).join(' ');
     }
-
-    if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-    }
-    
-    setPlayingId(id);
-    
-    try {
-        const audioUrl = new URL(`../../assets/audio/umrah/${id}.mp3`, import.meta.url).href;
-        const audio = new Audio(audioUrl);
-        audioRef.current = audio;
-        
-        audio.oncanplaythrough = () => {
-            audio.play().catch(e => {
-                console.error("Audio playback error:", e);
-                setPlayingId(null);
-                alert(isMl ? ML.audioError : "Audio file not found or failed to play.");
-            });
-        };
-        
-        audio.onerror = () => {
-            setPlayingId(null);
-            alert(isMl ? ML.audioError : "Audio file not available.");
-        };
-        
-        audio.onended = () => {
-            setPlayingId(null);
-        };
-        
-        audio.load();
-    } catch(e) {
-        setPlayingId(null);
-    }
+    return '';
   };
+  const matches = (item) => !query || textOf(item).toLowerCase().includes(query);
+  const SEARCHABLE = {
+    intro: [UMRAH_INTRO.whatIsUmrah, UMRAH_INTRO.importance, UMRAH_INTRO.difference, UMRAH_INTRO.conditions],
+    journey: UMRAH_STEPS, duas: UMRAH_DUAS, ihram: IHRAM_GUIDE, women: WOMENS_GUIDANCE,
+    health: HEALTH_SAFETY, mistakes: COMMON_MISTAKES, spiritual: SPIRITUAL_PREP,
+    miqats: MIQAT_LOCATIONS, ziyarah: ZIYARAH_GUIDE.flatMap(c => c.sites),
+  };
+  const noResults = Boolean(query && SEARCHABLE[section] && !SEARCHABLE[section].some(matches));
 
   const copyToClipboard = (dua) => {
     const text = `${dua.arabic}\n${dua.transliteration}\n${isMl && dua.meaning_ml ? dua.meaning_ml : dua.meaning}`;
@@ -267,13 +228,18 @@ export default function UmrahGuide() {
 
       {/* Main Content Render */}
       <div className="ug-content">
-        
+        {noResults && (
+          <div className="ug-card" role="status">
+            <p className="ug-card-content-desc">{isMl ? 'ഫലങ്ങളൊന്നും കണ്ടെത്തിയില്ല' : 'No results found in this section'}</p>
+          </div>
+        )}
+
         {/* SECTION 1: Introduction */}
         {section === 'intro' && (
           <div className="ug-section animate-fade">
             {[UMRAH_INTRO.whatIsUmrah, UMRAH_INTRO.importance, UMRAH_INTRO.difference, UMRAH_INTRO.conditions].map((item, idx) => {
               if (showBookmarksOnly && !isBookmarked(`intro_${idx}`, 'intro')) return null;
-              if (search && !item.title.toLowerCase().includes(search.toLowerCase()) && !item.title_ml.toLowerCase().includes(search.toLowerCase())) return null;
+              if (!matches(item)) return null;
               
               return (
                 <div key={idx} className="ug-card introduction-card">
@@ -297,7 +263,7 @@ export default function UmrahGuide() {
               <p>{isMl ? ML.journeyIntro : 'Follow each step in exact sequence. Tap cards to see essential rules, sunnahs, and common errors.'}</p>
             </div>
             {UMRAH_STEPS.map((step) => {
-              const matchedSearch = !search || step.title.toLowerCase().includes(search.toLowerCase()) || step.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(step);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(step.id, 'step');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -321,7 +287,7 @@ export default function UmrahGuide() {
         {section === 'duas' && (
           <div className="ug-section animate-fade">
             {UMRAH_DUAS.map((dua) => {
-              const matchedSearch = !search || dua.title.toLowerCase().includes(search.toLowerCase()) || dua.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(dua);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(dua.id, 'dua');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -334,9 +300,7 @@ export default function UmrahGuide() {
                         {isBookmarked(dua.id, 'dua') ? STAR_FILLED : STAR_EMPTY}
                       </button>
                       <button className="ug-dua-action-icon" onClick={() => copyToClipboard(dua)}><Icons.CopyIcon /></button>
-                      <button className={`ug-dua-action-icon ${playingId === dua.id ? 'pulse-green' : ''}`} onClick={() => playAudio(dua.id, dua.arabic, dua.meaning)}>
-                        {playingId === dua.id ? <Icons.PauseIcon /> : <Icons.SpeakerIcon />}
-                      </button>
+                      <span>{isMl ? ML.audioError : 'Recording unavailable'}</span>
                     </div>
                   </div>
                   <h4 className="ug-dua-title">{isMl ? dua.title_ml : dua.title}</h4>
@@ -353,7 +317,7 @@ export default function UmrahGuide() {
         {section === 'ihram' && (
           <div className="ug-section animate-fade">
             {IHRAM_GUIDE.map((item, idx) => {
-              const matchedSearch = !search || item.title.toLowerCase().includes(search.toLowerCase()) || item.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(item);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(`ihram_${idx}`, 'ihram');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -376,7 +340,7 @@ export default function UmrahGuide() {
         {section === 'women' && (
           <div className="ug-section animate-fade">
             {WOMENS_GUIDANCE.map((item, idx) => {
-              const matchedSearch = !search || item.title.toLowerCase().includes(search.toLowerCase()) || item.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(item);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(`women_${idx}`, 'women');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -444,7 +408,7 @@ export default function UmrahGuide() {
         {section === 'health' && (
           <div className="ug-section animate-fade">
             {HEALTH_SAFETY.map((item, idx) => {
-              const matchedSearch = !search || item.title.toLowerCase().includes(search.toLowerCase()) || item.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(item);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(`health_${idx}`, 'health');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -467,7 +431,7 @@ export default function UmrahGuide() {
         {section === 'mistakes' && (
           <div className="ug-section animate-fade">
             {COMMON_MISTAKES.map((item, idx) => {
-              const matchedSearch = !search || item.title.toLowerCase().includes(search.toLowerCase()) || item.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(item);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(`mistakes_${idx}`, 'mistakes');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -491,7 +455,7 @@ export default function UmrahGuide() {
         {section === 'spiritual' && (
           <div className="ug-section animate-fade">
             {SPIRITUAL_PREP.map((item, idx) => {
-              const matchedSearch = !search || item.title.toLowerCase().includes(search.toLowerCase()) || item.title_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(item);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(`spiritual_${idx}`, 'spiritual');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -514,7 +478,7 @@ export default function UmrahGuide() {
         {section === 'miqats' && (
           <div className="ug-section animate-fade">
             {MIQAT_LOCATIONS.map((item, idx) => {
-              const matchedSearch = !search || item.name.toLowerCase().includes(search.toLowerCase()) || item.name_ml.toLowerCase().includes(search.toLowerCase());
+              const matchedSearch = matches(item);
               const matchedBookmark = !showBookmarksOnly || isBookmarked(`miqats_${idx}`, 'miqats');
               if (!matchedSearch || !matchedBookmark) return null;
 
@@ -543,7 +507,7 @@ export default function UmrahGuide() {
               <div key={idx} className="ug-ziyarah-group">
                 <h3 className="ug-ziyarah-group-title">{isMl ? cat.category_ml : cat.category}</h3>
                 {cat.sites.map((site, sIdx) => {
-                  const matchedSearch = !search || site.title.toLowerCase().includes(search.toLowerCase()) || site.title_ml.toLowerCase().includes(search.toLowerCase());
+                  const matchedSearch = matches(site);
                   const matchedBookmark = !showBookmarksOnly || isBookmarked(`ziyarah_${idx}_${sIdx}`, 'ziyarah');
                   if (!matchedSearch || !matchedBookmark) return null;
 

@@ -1,17 +1,26 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { Geolocation } from '@capacitor/geolocation';
+import { calendarDay, nextCalendarPrayer, localDateKey, prayerContextKey, prayerDateInZone } from './services/prayerCalendar.mjs';
+import { readStoredJSON } from './services/storedJson.mjs';
+import { appStorage } from './services/appStorage';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import { getDeviceLocation, locationErrorMessage } from './services/locationService.mjs';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { App } from '@capacitor/app';
+import { useNavigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
+import { Adhan, nativeAdhanEnabled, scheduleIOSPrayerAlerts } from './services/adhanService';
+import { shouldKeepExistingPrayerAlarms } from './services/prayerNotificationPolicy.mjs';
+import { syncPrayerAlarms } from './services/prayerAlarmSync.mjs';
+import { notificationWrites } from './services/notificationScheduler.mjs';
+import { createPrayerTimesService } from './services/prayerTimesService.mjs';
 
 const PrayerContext = createContext();
 
-const PRAYERS_LIST = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-
 export const PrayerProvider = ({ children }) => {
+    const navigate = useNavigate();
     const [settings, setSettings] = useState(() => {
-        const saved = localStorage.getItem('prayer_settings');
-        const parsed = saved ? JSON.parse(saved) : {};
+        const parsed = readStoredJSON(appStorage, 'prayer_settings', {});
+        if (parsed.location?.city?.includes('(Fallback)')) delete parsed.location;
         return {
             notificationsEnabled: false,
             adhanEnabled: false,
@@ -20,8 +29,13 @@ export const PrayerProvider = ({ children }) => {
         };
     });
 
-    const [timings, setTimings] = useState(null);
-    const [calendar, setCalendar] = useState(null);
+    const [initialCalendar] = useState(() => {
+        const cache = readStoredJSON(appStorage, 'prayer_calendar_cache_v1', {});
+        return cache.context === prayerContextKey(settings) && Array.isArray(cache.calendar) ? cache.calendar : null;
+    });
+    const [calendar, setCalendar] = useState(initialCalendar);
+    const timings = calendarDay(calendar, prayerDateInZone(calendar))?.timings || null;
+    const [prayerContextChanged, setPrayerContextChanged] = useState(false);
     const [nextPrayer, setNextPrayer] = useState(null);
     const [nextPrayerTime, setNextPrayerTime] = useState('');
     const [countdown, setCountdown] = useState('');
@@ -30,119 +44,105 @@ export const PrayerProvider = ({ children }) => {
     const [locating, setLocating] = useState(false);
     const [locError, setLocError] = useState('');
     const [lastTriggeredPrayer, setLastTriggeredPrayer] = useState('');
-    const [audio] = useState(new Audio('https://www.islamcan.com/audio/adhan/azan1.mp3'));
+    const [scheduleError, setScheduleError] = useState('');
+    const [resumeCount, setResumeCount] = useState(0);
+    const scheduleQueue = useRef(Promise.resolve());
+    const prayerRequests = useRef(null);
+    const locationRequest = useRef(0);
+    if (!prayerRequests.current) prayerRequests.current = createPrayerTimesService();
+    const [audio] = useState(() => new Audio('https://www.islamcan.com/audio/adhan/azan1.mp3'));
+
+    useEffect(() => () => { audio.pause(); }, [audio]);
 
     const fetchPrayerTimes = async (currentSettings) => {
         if (!currentSettings || !currentSettings.location) return;
         
         setLoading(true);
         setError('');
+        let current = false;
         try {
-            const { lat, lng } = currentSettings.location;
-            const school = currentSettings.school || 0;
-            const now = new Date();
-            const month = now.getMonth() + 1;
-            const year = now.getFullYear();
-            
-            // Fetch the whole month for today/tomorrow/etc.
-            const res = await fetch(`https://api.aladhan.com/v1/calendar?latitude=${lat}&longitude=${lng}&school=${school}&month=${month}&year=${year}&method=1`);
-            const data = await res.json();
-            
-            if (data.code === 200) {
-                setCalendar(data.data);
-                // Set today's timings specifically for backward compatibility
-                const today = now.getDate();
-                setTimings(data.data[today - 1].timings);
-            } else {
-                setError('Failed to fetch prayer times.');
-            }
+            const result = await prayerRequests.current.load(currentSettings);
+            if (!result) return;
+            current = true;
+            const context = prayerContextKey(currentSettings);
+            const previous = readStoredJSON(appStorage, 'prayer_calendar_cache_v1', {});
+            const fetched = result.value.calendar;
+            const lastDate = fetched.at(-1).date.gregorian;
+            const lastMonth = Number(lastDate.year) * 12 + Number(lastDate.month.number);
+            const retained = result.value.warning && previous.context === context
+                ? previous.calendar?.filter(day => {
+                    const date = day.date.gregorian;
+                    return Number(date.year) * 12 + Number(date.month?.number) === lastMonth + 1;
+                }) || [] : [];
+            const updated = fetched.concat(retained);
+            appStorage.setItem('prayer_calendar_cache_v1', JSON.stringify({ context, calendar: updated }));
+            setCalendar(updated);
+            setPrayerContextChanged(false);
+            if (result.value.warning) setError(result.value.warning);
         } catch (err) {
-            setError('Error connecting to prayer times service.');
+            current = true;
+            setError(err.message || 'Error connecting to prayer times service.');
         } finally {
-            setLoading(false);
+            if (current) setLoading(false);
         }
     };
 
     const updateSettings = (newSettings) => {
-        setSettings(newSettings);
-        localStorage.setItem('prayer_settings', JSON.stringify(newSettings));
+        if ('location' in newSettings) {
+            locationRequest.current++;
+            setLocError('');
+            setLocating(false);
+        }
+        prayerRequests.current.cancel();
+        const location = 'location' in newSettings ? newSettings.location : settings.location;
+        const school = newSettings.school ?? settings.school;
+        if (location?.lat !== settings.location?.lat || location?.lng !== settings.location?.lng || school !== settings.school) {
+            setPrayerContextChanged(true);
+            setCalendar(null);
+            setNextPrayer(null);
+            setNextPrayerTime('');
+            setCountdown('');
+        }
+        setSettings(previous => ({ ...previous, ...newSettings }));
     };
 
-    const autoFetchLocation = async (currentSettings) => {
+    const detectLocation = async () => {
+        const request = ++locationRequest.current;
         setLocating(true);
         setLocError('');
         try {
-            let permission = await Geolocation.checkPermissions();
-            if (permission.location !== 'granted') {
-                permission = await Geolocation.requestPermissions();
-            }
-
-            if (permission.location !== 'granted' && permission.location !== 'prompt-with-rationale') {
-                throw new Error('Permission denied or disabled');
-            }
-
-            const positionPromise = Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Location timeout')), 15000));
-            
-            const position = await Promise.race([positionPromise, timeoutPromise]);
-            const { latitude, longitude } = position.coords;
-            
-            let city = 'Current Location';
-            try {
-                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-                const data = await res.json();
-                city = data.city || data.locality || city;
-            } catch(e) {}
-
-            updateSettings({ ...currentSettings, location: { lat: latitude, lng: longitude, city } });
+            const location = await getDeviceLocation();
+            if (request !== locationRequest.current) return null;
+            updateSettings({ location });
+            return location;
         } catch (error) {
-            console.error("Auto fetch location failed", error);
-            setLocError('Location failed. Using fallback city (Makkah).');
-            updateSettings({ ...currentSettings, location: { lat: 21.4225, lng: 39.8262, city: 'Makkah (Fallback)' } });
+            if (request === locationRequest.current) setLocError(locationErrorMessage(error, appStorage.getItem('zakat_lang')));
+            return null;
         } finally {
-            setLocating(false);
+            if (request === locationRequest.current) setLocating(false);
         }
     };
 
     useEffect(() => {
-        if (settings) {
-            if (!settings.location || (settings.location.lat === 0 && settings.location.lng === 0)) {
-                autoFetchLocation(settings);
-            } else {
-                fetchPrayerTimes(settings);
-            }
+        appStorage.setItem('prayer_settings', JSON.stringify(settings));
+        if (settings.location) {
+            fetchPrayerTimes(settings);
+        } else {
+            prayerRequests.current.cancel();
+            setLoading(false);
+            setCalendar(null);
+            setNextPrayer(null);
+            setCountdown('');
         }
-    }, [settings]);
+        return () => prayerRequests.current.cancel();
+    }, [settings, resumeCount]);
 
     useEffect(() => {
-        if (!timings) return;
+        if (!calendar) return;
         
         const updateCountdown = () => {
             const now = new Date();
-            const currentTime = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-            
-            let next = null;
-            let minDiff = Infinity;
-
-            for (let prayer of PRAYERS_LIST) {
-                if (prayer === 'Sunrise') continue;
-                
-                const timeStrRaw = timings[prayer];
-                if (!timeStrRaw) continue;
-
-                const timeStr = timeStrRaw.split(' ')[0];
-                const [hours, mins] = timeStr.split(':').map(Number);
-                const prayerTime = hours * 60 + mins;
-
-                let diff = prayerTime - currentTime;
-                if (diff < 0) diff += 24 * 60; // Next day
-
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    next = { name: prayer, diff, time: timeStr };
-                }
-            }
-
+            const next = nextCalendarPrayer(calendar, now);
             if (next) {
                 setNextPrayer(next.name);
                 setNextPrayerTime(next.time);
@@ -154,17 +154,17 @@ export const PrayerProvider = ({ children }) => {
                 setCountdown(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
 
                 // Notification Trigger Logic (Foreground Web Fallback)
-                if (settings?.notificationsEnabled && next.diff <= 0.02 && next.name !== lastTriggeredPrayer) {
+                if (!Capacitor.isNativePlatform() && settings?.notificationsEnabled && next.diff <= 0.02 && next.name !== lastTriggeredPrayer) {
                     setLastTriggeredPrayer(next.name);
                     triggerAction(next.name);
                 }
-            }
+            } else { setNextPrayer(null); setNextPrayerTime(''); setCountdown(''); }
         };
 
         updateCountdown();
         const interval = setInterval(updateCountdown, 1000);
         return () => clearInterval(interval);
-    }, [timings, settings, lastTriggeredPrayer, audio]);
+    }, [calendar, settings, lastTriggeredPrayer, audio]);
 
     // Unified Action Trigger (Adhan & Vibration)
     const triggerAction = async (prayerName) => {
@@ -186,142 +186,122 @@ export const PrayerProvider = ({ children }) => {
         }
     };
 
-    // Robust Background Scheduling using Capacitor
+    const stopAdhan = async () => {
+        audio.pause();
+        audio.currentTime = 0;
+        if (nativeAdhanEnabled) await Adhan.stop();
+    };
+
     useEffect(() => {
-        if (!calendar || !settings?.notificationsEnabled) return;
+        if (!settings.adhanEnabled || !settings.notificationsEnabled) stopAdhan().catch(console.error);
+        if (nativeAdhanEnabled) notificationWrites.run(() => Adhan.configure({
+            sound: !!settings.adhanEnabled && !!settings.notificationsEnabled,
+            vibrate: !!settings.vibrationEnabled,
+        })).catch(console.error);
+    }, [settings.adhanEnabled, settings.notificationsEnabled, settings.vibrationEnabled]);
 
-        const schedulePrayerNotifications = async () => {
-            try {
-                let permStatus = await LocalNotifications.checkPermissions();
-                if (permStatus.display !== 'granted') {
-                    permStatus = await LocalNotifications.requestPermissions();
-                    if (permStatus.display !== 'granted') return;
-                }
-
-                // Clear previous prayer alarms
-                const pending = await LocalNotifications.getPending();
-                const prayerIds = pending.notifications
-                    .filter(n => n.id >= 100 && n.id <= 500)
-                    .map(n => ({ id: n.id }));
-                if (prayerIds.length > 0) {
-                    await LocalNotifications.cancel({ notifications: prayerIds });
-                }
-
-                const now = new Date();
-                const scheduled = [];
-                let idCounter = 100;
-                
-                const todayDate = now.getDate();
-                const monthDays = calendar.slice(todayDate - 1); // From today to end of month
-                
-                // Limit to next 7 days to avoid OS scheduling limits (iOS limits to 64 local notifications).
-                // 7 days * 5 prayers = 35 notifications. This is very safe!
-                const lookaheadDays = monthDays.slice(0, 7);
-
-                lookaheadDays.forEach((dayData) => {
-                    const dayTimings = dayData.timings;
-                    if (!dayTimings) return;
-                    
-                    const gDay = parseInt(dayData.date.gregorian.day, 10);
-                    const gMonth = dayData.date.gregorian.month.number - 1; // JS months are 0-indexed
-                    const gYear = parseInt(dayData.date.gregorian.year, 10);
-
-                    PRAYERS_LIST.forEach((p) => {
-                        if (p === 'Sunrise') return;
-                        
-                        const rawTime = dayTimings[p];
-                        if (!rawTime) return;
-
-                        const cleanTime = rawTime.split(' ')[0];
-                        const [hours, minutes] = cleanTime.split(':').map(Number);
-                        
-                        const prayerTime = new Date(gYear, gMonth, gDay, hours, minutes, 0, 0);
-
-                        if (prayerTime > now) {
-                            scheduled.push({
-                                title: `🕌 Time for ${p} Prayer`,
-                                body: `The time for ${p} has begun.`,
-                                id: idCounter++,
-                                schedule: { at: prayerTime, allowWhileIdle: true }, // Wake device
-                                sound: 'adhan.mp3',
-                                actionTypeId: 'PRAYER_ALERT',
-                                extra: { prayer: p }
-                            });
-                        }
-                    });
-                });
-
-                if (scheduled.length > 0) {
-                    await LocalNotifications.schedule({ notifications: scheduled });
-                }
-            } catch (e) {
-                console.log('Background scheduling not supported in browser environment', e);
-            }
-        };
-
-        schedulePrayerNotifications();
-    }, [calendar, settings?.notificationsEnabled]);
-
-    // Setup global foreground/action listeners
     useEffect(() => {
-        let actionListener = null;
-        let receivedListener = null;
+        let listener;
+        let disposed = false;
+        App.addListener('appStateChange', state => {
+            if (state.isActive) setResumeCount(value => value + 1);
+        }).then(handle => { if (disposed) handle.remove(); else listener = handle; });
+        const refresh = () => setResumeCount(value => value + 1);
+        const visible = () => { if (document.visibilityState === 'visible') refresh(); };
+        window.addEventListener('online', refresh);
+        document.addEventListener('visibilitychange', visible);
+        let day = `${localDateKey()}-${new Date().getTimezoneOffset()}`;
+        const timer = setInterval(() => {
+            const next = `${localDateKey()}-${new Date().getTimezoneOffset()}`;
+            if (next !== day) { day = next; refresh(); }
+        }, 30000);
+        return () => { disposed = true; if (listener) listener.remove(); clearInterval(timer); window.removeEventListener('online', refresh); document.removeEventListener('visibilitychange', visible); };
+    }, []);
 
-        const setupListeners = async () => {
+    useEffect(() => {
+        let stale = false;
+        scheduleQueue.current = scheduleQueue.current.catch(() => {}).then(async () => {
+            if (stale) return;
+            if (!Capacitor.isNativePlatform()) return;
+            // Preserve saved alarms during an ordinary offline restart, but clear a superseded location's alarms.
+            if (shouldKeepExistingPrayerAlarms(settings.notificationsEnabled, calendar, prayerContextChanged)) return;
+            setScheduleError('');
             try {
-                actionListener = await LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
-                    const prayer = notification.notification.extra?.prayer;
-                    if (prayer) {
-                        triggerAction(prayer);
-                    }
+                await syncPrayerAlarms({
+                    localNotifications: LocalNotifications, adhan: nativeAdhanEnabled ? Adhan : null,
+                    settings, calendar, isStale: () => stale, setScheduleError,
+                    stopTitle: appStorage.getItem('zakat_lang') === 'ml' ? 'ബാങ്ക് നിർത്തുക' : 'Stop Adhan',
+                    writeNotification: notificationWrites.run,
+                    schedulePrimary: Capacitor.getPlatform() === 'ios' ? scheduleIOSPrayerAlerts : undefined,
                 });
-
-                receivedListener = await LocalNotifications.addListener('localNotificationReceived', (notification) => {
-                    const prayer = notification.extra?.prayer;
-                    if (prayer && prayer !== lastTriggeredPrayer) {
-                        setLastTriggeredPrayer(prayer);
-                        triggerAction(prayer);
-                    }
-                });
-            } catch (e) {
-                console.log('Local notifications listeners failed', e);
+            } catch (error) {
+                if (!stale) setScheduleError(error.message || 'Prayer reminders could not be scheduled.');
             }
-        };
+        });
+        return () => { stale = true; };
+    }, [calendar, prayerContextChanged, settings.notificationsEnabled, settings.adhanEnabled, settings.vibrationEnabled, resumeCount]);
 
-        setupListeners();
-
-        return () => {
-            if (actionListener) actionListener.remove();
-            if (receivedListener) receivedListener.remove();
-        };
-    }, [settings, lastTriggeredPrayer]);
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform() || nativeAdhanEnabled) return;
+        let disposed = false;
+        let listener;
+        async function register() {
+            listener = await LocalNotifications.addListener('localNotificationActionPerformed', ({ actionId }) => {
+                if (!disposed && actionId === 'OPEN_PRAYER') navigate('/prayer');
+            });
+            if (disposed) { await listener.remove(); return; }
+            await LocalNotifications.registerActionTypes({
+                types: [{ id: 'PRAYER_ALERT', actions: [{ id: 'OPEN_PRAYER', title: 'Open prayer times', foreground: true }] }],
+            });
+        }
+        register().catch(console.warn);
+        return () => { disposed = true; listener?.remove(); };
+    }, [navigate]);
 
     // Developer Test Functions
     const triggerTestNotification = async () => {
         try {
+            if (nativeAdhanEnabled) {
+                const status = await Adhan.status();
+                if (!status.notificationsAllowed) {
+                    const permission = await LocalNotifications.requestPermissions();
+                    if (permission.display !== 'granted') throw new Error('Allow notifications first.');
+                }
+                if (!status.exactAllowed) {
+                    await Adhan.requestExactPermission();
+                    alert('Allow Alarms & reminders, return here, then press Test notification again.');
+                    return;
+                }
+                await notificationWrites.run(() => Adhan.test({
+                    stopTitle: appStorage.getItem('zakat_lang') === 'ml' ? 'ബാങ്ക് നിർത്തുക' : 'Stop Adhan',
+                }));
+                alert('Test Adhan will play in 10 seconds. Lock the phone, expand the notification, and tap Stop Adhan.');
+                return;
+            }
             let permStatus = await LocalNotifications.checkPermissions();
             if (permStatus.display !== 'granted') {
                 permStatus = await LocalNotifications.requestPermissions();
             }
             if (permStatus.display === 'granted') {
-                const now = new Date();
-                now.setSeconds(now.getSeconds() + 3);
-                await LocalNotifications.schedule({
-                    notifications: [{
-                        title: `🕌 Test Prayer Notification`,
-                        body: `This is a test notification for Adhan.`,
-                        id: 999,
-                        schedule: { at: now },
-                        extra: { prayer: 'Test' }
-                    }]
-                });
-                alert('Test notification scheduled in 3 seconds. Please minimize the app to verify background delivery.');
+                const ios = Capacitor.getPlatform() === 'ios';
+                const at = new Date(Math.ceil(Date.now() / 1000) * 1000 + 3000);
+                const notifications = [{
+                    title: '🕌 Test Prayer Notification',
+                    body: 'This is a test notification for Adhan.',
+                    id: 999,
+                    schedule: { at },
+                    ...(ios ? { sound: 'adhan.caf' } : {}),
+                    extra: { prayer: 'Test' },
+                }];
+                await notificationWrites.run(() => ios ? scheduleIOSPrayerAlerts(notifications)
+                    : LocalNotifications.schedule({ notifications }));
+                alert('Test notification scheduled in a few seconds. Minimize the app to verify background delivery.');
             } else {
                 alert('Notification permission denied by OS.');
             }
         } catch (e) {
             console.log('Local Notifications failed', e);
-            alert('Notifications not supported on this platform/browser.');
+            alert(e.message || 'Notifications not supported on this platform/browser.');
         }
     };
 
@@ -330,22 +310,9 @@ export const PrayerProvider = ({ children }) => {
             alert('Adhan and Vibration are both muted in settings. Toggle them ON to test.');
             return;
         }
-        triggerAction('Test');
+        if (nativeAdhanEnabled) triggerTestNotification();
+        else triggerAction('Test');
     };
-
-    // Refresh at midnight
-    useEffect(() => {
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setHours(24, 0, 0, 0);
-        const timeUntilMidnight = midnight.getTime() - now.getTime();
-
-        const timeout = setTimeout(() => {
-            if (settings) fetchPrayerTimes(settings);
-        }, timeUntilMidnight);
-
-        return () => clearTimeout(timeout);
-    }, [timings, settings]);
 
     const formatTime = (timeStr) => {
         if (!timeStr) return '';
@@ -374,9 +341,13 @@ export const PrayerProvider = ({ children }) => {
             error,
             locating,
             locError,
+            detectLocation,
             formatTime,
             triggerTestNotification,
             triggerTestAdhan,
+            stopAdhan,
+            scheduleError,
+            resumeCount,
             refresh: () => settings && fetchPrayerTimes(settings)
         }}>
             {children}

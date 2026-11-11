@@ -1,3 +1,4 @@
+import { appStorage } from '../services/appStorage';
 import { useState, useEffect } from 'react';
 
 const TOTAL_AYAHS = 6236;
@@ -21,7 +22,7 @@ function computeAyahNumber(dateKey) {
 
 function loadCache() {
     try {
-        const raw = localStorage.getItem(CACHE_KEY);
+        const raw = appStorage.getItem(CACHE_KEY);
         return raw ? JSON.parse(raw) : null;
     } catch {
         return null;
@@ -30,14 +31,14 @@ function loadCache() {
 
 function saveCache(dateKey, ayahData) {
     try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ date: dateKey, ayah: ayahData }));
+        appStorage.setItem(CACHE_KEY, JSON.stringify({ date: dateKey, ayah: ayahData }));
     } catch { /* storage full – ignore */ }
 }
 
 /**
  * useDailyAyah
  * Returns { arabic, translation, surahEnglish, surahArabic, ayahNum, surahNum, loading, error }
- * - Fetches once per day, persists in localStorage
+ * - Fetches once per day, persists in appStorage
  * - No API call on refresh if cache is fresh
  */
 export function useDailyAyah(lang = 'en') {

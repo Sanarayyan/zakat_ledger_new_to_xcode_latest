@@ -1,4 +1,6 @@
 :root {
+  --app-night-wallpaper: url('./assets/serene_bg.png');
+  --app-day-wallpaper: url('./assets/daytime_bg.png');
   --primary: #c5a059;
   /* Gold/Bronze */
   --primary-glow: rgba(197, 160, 89, 0.4);
@@ -38,9 +40,7 @@ body.light-mode {
 
 body {
   font-family: var(--font-family);
-  background: 
-    linear-gradient(rgba(7, 11, 20, 0.4), rgba(7, 11, 20, 0.8)),
-    url('./assets/serene_bg.png') no-repeat center center fixed;
+  background: var(--app-night-wallpaper) no-repeat center center fixed;
   background-size: cover;
   transition: background 0.5s ease, color 0.3s ease;
   color: var(--text-main);
@@ -59,9 +59,7 @@ body {
 }
 
 body.light-mode {
-  background: 
-    linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.6)),
-    url('./assets/daytime_bg.png') no-repeat center center fixed;
+  background: var(--app-day-wallpaper) no-repeat center center fixed;
   background-size: cover;
 }
 
@@ -139,6 +137,63 @@ button {
 
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* One wallpaper and consistent, plain panels across the main screens. */
+#root :is(.zakat-page-wrapper, .more-root, .settings-root, .calendar-page,
+  .duas-page-refined, .womens-guidance-root, .hg-root, .ug-root, .asma-root,
+  .ratheeb-root, .home-selection-container) {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+#root .atmosphere-overlay {
+  display: none;
+}
+
+#root :is(.dash-date-card, .dash-daily-ayah, .dash-nudge-banner,
+  .dash-prayer-info, .dash-streak-capsule, .dash-feature-quran,
+  .dash-feature-prayer, .dash-feature-qibla, .shortcut-card,
+  .prayer-hero-card, .prayer-row, .prayer-modal-sheet, .prayer-location-card,
+  .hijri-card, .event-detail-card, .upcoming-feature, .settings-card) {
+  background: var(--bg-card);
+  background-image: none;
+}
+
+/* Visible keyboard focus for div-based controls made operable via pressable() (BUG-010). */
+#root [role="link"][tabindex]:focus-visible,
+#root [role="button"][tabindex]:focus-visible,
+#root [role="radio"][tabindex]:focus-visible {
+  outline: 2px solid var(--primary, #c5a059);
+  outline-offset: 2px;
+}
+
+/* Keep the highlighted next-prayer row; the rule above would turn it white under white text. */
+#root .prayer-row.active {
+  background: var(--p-accent);
+}
+
+.dash-location-button {
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+.dash-location-error, .qibla-location-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.qibla-bearing, .qibla-location-note {
+  text-align: center;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: 12px;
+}
+.test-build-note {
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 /* Safe Area Insets for iOS */
 :root {

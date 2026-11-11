@@ -1,0 +1,868 @@
+{
+  "suite_version": "1.0.0",
+  "app": {
+    "name": "Muslim Plus",
+    "build": "git 7a771a1 + uncommitted working tree (vite dev, web)",
+    "platforms": [
+      "web-mobile-375x812"
+    ]
+  },
+  "cases": [
+    {
+      "id": "UI-ONB-001",
+      "title": "Location step offers three setup options",
+      "feature_id": "FEAT-ONB-001",
+      "priority": "P1",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Fresh browser profile / app data cleared"
+      ],
+      "steps": [
+        "Open the app root URL",
+        "Wait for the splash screen to finish"
+      ],
+      "expected_result": [
+        "Step indicator 'STEP 1 OF 3' is shown",
+        "Buttons 'Use phone location', 'Skip for now' and 'Select city manually' are visible"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-ONB-002",
+      "title": "Manual city search returns selectable results",
+      "feature_id": "FEAT-ONB-001",
+      "priority": "P0",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Fresh browser profile / app data cleared",
+        "Network access to the city-search service"
+      ],
+      "steps": [
+        "On Location Setup tap 'Select city manually'",
+        "Type 'Kochi' into the city field",
+        "Wait up to 6 s",
+        "Tap the result 'Kochi – Ernakulam District, Kerala, India'"
+      ],
+      "expected_result": [
+        "A 'Searching...' state is shown while loading",
+        "A result list containing 'Ernakulam District, Kerala, India' appears",
+        "After selection a card shows 'Kochi' with a 'Change' action and a 'Continue' button"
+      ],
+      "test_data": [
+        "City: Kochi"
+      ],
+      "tags": [
+        "network"
+      ]
+    },
+    {
+      "id": "UI-ONB-003",
+      "title": "City result list is not overlapped by the step dots",
+      "feature_id": "FEAT-ONB-001",
+      "priority": "P2",
+      "type": "visual",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Fresh browser profile / app data cleared"
+      ],
+      "steps": [
+        "Perform UI-ONB-002 steps 1-3",
+        "Inspect the result cards near the step-indicator dots"
+      ],
+      "expected_result": [
+        "No result card text is covered by the pagination/step dots"
+      ],
+      "test_data": [
+        "City: Kochi"
+      ],
+      "tags": [
+        "layout"
+      ]
+    },
+    {
+      "id": "UI-ONB-004",
+      "title": "Madhab step requires a selection and marks it",
+      "feature_id": "FEAT-ONB-001",
+      "priority": "P1",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Fresh browser profile / app data cleared",
+        "Location step completed"
+      ],
+      "steps": [
+        "Observe the Continue button before selecting",
+        "Tap 'Hanafi'",
+        "Observe options and Continue button"
+      ],
+      "expected_result": [
+        "Continue appears disabled before a selection",
+        "After tapping, Hanafi shows a filled radio indicator",
+        "Continue becomes enabled"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-ONB-005",
+      "title": "Completing setup lands on the dashboard with chosen city",
+      "feature_id": "FEAT-ONB-001",
+      "priority": "P0",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Fresh browser profile / app data cleared",
+        "Location and madhab steps completed"
+      ],
+      "steps": [
+        "On 'Personalize Experience' tap 'Female'",
+        "Tap 'Complete Setup'"
+      ],
+      "expected_result": [
+        "The Home dashboard is displayed",
+        "Header reads 'TODAY'S DATE • KOCHI'"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-ONB-006",
+      "title": "Onboarding is not repeated after reload",
+      "feature_id": "FEAT-ONB-001",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Reload the root URL",
+        "Wait for splash to finish"
+      ],
+      "expected_result": [
+        "The Home dashboard is shown, not Location Setup"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-DASH-001",
+      "title": "Dashboard shows dates and next prayer countdown",
+      "feature_id": "FEAT-DASH-001",
+      "priority": "P0",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Home",
+        "Read the date card",
+        "Wait 3 seconds and re-read the countdown"
+      ],
+      "expected_result": [
+        "Gregorian date matching the device date is shown",
+        "A Hijri date with 'AH' is shown",
+        "Next prayer name and time are shown",
+        "Countdown value decreases over time"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-DASH-002",
+      "title": "Dashboard tiles open their features",
+      "feature_id": "FEAT-DASH-001",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Tap each tile in turn (Quran, Prayer Times, Qibla Finder, Tasbih, Duas, Calendar), returning Home after each"
+      ],
+      "expected_result": [
+        "Each tile opens the matching screen (/quran, /prayer, /qibla, /tasbih, /duas, /calendar)"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-NAV-001",
+      "title": "Bottom navigation routes to each tab",
+      "feature_id": "FEAT-NAV-001",
+      "priority": "P0",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Tap Home, Quran, Tasbih, Qibla, more in the bottom bar (back to Home between full-screen tabs)"
+      ],
+      "expected_result": [
+        "Each tab opens its screen without errors in the console"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-NAV-002",
+      "title": "Unknown route does not crash the app",
+      "feature_id": "FEAT-NAV-001",
+      "priority": "P3",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open /this-route-does-not-exist"
+      ],
+      "expected_result": [
+        "A usable screen (Home or a not-found page) renders; no blank page or error boundary"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-PRAY-001",
+      "title": "All prayer rows are legible, including the next prayer",
+      "feature_id": "FEAT-PRAY-001",
+      "priority": "P1",
+      "type": "visual",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Light mode",
+        "Time is before Isha so one row is 'next'"
+      ],
+      "steps": [
+        "Open Prayer Times",
+        "Inspect each of the six rows"
+      ],
+      "expected_result": [
+        "Rows Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha each show a readable name and time",
+        "The next-prayer row is visually highlighted but its text is readable"
+      ],
+      "test_data": [],
+      "tags": [
+        "contrast"
+      ]
+    },
+    {
+      "id": "UI-PRAY-002",
+      "title": "Changing madhab updates Asr and persists",
+      "feature_id": "FEAT-PRAY-002",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Prayer Times > settings (gear)",
+        "Select 'Shafi', close the sheet, note Asr",
+        "Re-open, select 'Hanafi', close, note Asr",
+        "Reload the page"
+      ],
+      "expected_result": [
+        "Asr time for Hanafi is later than for Shafi",
+        "Summary chip shows the selected madhab",
+        "Selection survives reload"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-QURAN-001",
+      "title": "Sura list shows all 114 suras",
+      "feature_id": "FEAT-QURAN-001",
+      "priority": "P1",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Quran tab",
+        "Scroll to the end of the list"
+      ],
+      "expected_result": [
+        "First item is 1 Al-Faatiha (7 Ayah)",
+        "Last item is 114 An-Naas",
+        "Each item shows English meaning, ayah count and Arabic name"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-QURAN-002",
+      "title": "Opening a surah shows ayahs and both view modes work",
+      "feature_id": "FEAT-QURAN-002",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Tap Al-Faatiha",
+        "Observe Reading view",
+        "Tap 'Page View'"
+      ],
+      "expected_result": [
+        "Reading view shows 7 ayahs with translations",
+        "Page View shows continuous Arabic text with Juz/Page markers"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-QURAN-003",
+      "title": "Reader options menu uses readable labels",
+      "feature_id": "FEAT-QURAN-002",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "A surah is open"
+      ],
+      "steps": [
+        "Tap the ⋮ menu in the reader header"
+      ],
+      "expected_result": [
+        "Section headings are human-readable text (no raw translation keys such as TEXT_SIZE)",
+        "Menu content is legible over the page behind it"
+      ],
+      "test_data": [],
+      "tags": [
+        "i18n"
+      ]
+    },
+    {
+      "id": "UI-QURAN-004",
+      "title": "Floating Read Mode button does not hide verse text",
+      "feature_id": "FEAT-QURAN-002",
+      "priority": "P3",
+      "type": "visual",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Al-Faatiha open in Reading view at top"
+      ],
+      "steps": [
+        "Observe the floating 'READ MODE' button position relative to ayah text"
+      ],
+      "expected_result": [
+        "The floating button does not cover Arabic verse text in the initial viewport"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-TASBIH-001",
+      "title": "Tapping increments and Reset clears the counter",
+      "feature_id": "FEAT-TASBIH-001",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Tasbih (choose 'Start New Dhikr' if prompted)",
+        "Tap the bead ring 3 times",
+        "Tap Reset (confirm if asked)"
+      ],
+      "expected_result": [
+        "Counter shows 3 after three taps",
+        "Counter returns to 0 after Reset"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-TASBIH-002",
+      "title": "Counter persists and resume prompt appears",
+      "feature_id": "FEAT-TASBIH-001",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Tasbih, start new, tap 3 times",
+        "Reload and open Tasbih again",
+        "Tap 'Resume'"
+      ],
+      "expected_result": [
+        "Dialog 'Continue Previous Dhikr?' shows SubhanAllah with count 3",
+        "After Resume the counter shows 3"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-QIBLA-001",
+      "title": "Missing compass shows a clear recoverable message",
+      "feature_id": "FEAT-QIBLA-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Desktop browser without orientation sensor"
+      ],
+      "steps": [
+        "Open Qibla",
+        "Tap 'Enable Compass'"
+      ],
+      "expected_result": [
+        "A message explains compass access is unavailable/denied",
+        "A 'Try Again' action is offered"
+      ],
+      "test_data": [],
+      "tags": [
+        "web-only"
+      ]
+    },
+    {
+      "id": "UI-SET-001",
+      "title": "Settings text is legible",
+      "feature_id": "FEAT-SET-001",
+      "priority": "P2",
+      "type": "visual",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Light mode"
+      ],
+      "steps": [
+        "Open more > Settings (gear)",
+        "Read the notification-scheduling paragraph below the privacy card"
+      ],
+      "expected_result": [
+        "All paragraph text sits on a surface with readable contrast (not directly over the photo background)"
+      ],
+      "test_data": [],
+      "tags": [
+        "contrast"
+      ]
+    },
+    {
+      "id": "UI-SET-002",
+      "title": "Gender preference can be changed and persists",
+      "feature_id": "FEAT-SET-001",
+      "priority": "P2",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Settings, tap Gender",
+        "Choose 'Male'",
+        "Reload Settings",
+        "Change back to 'Female'"
+      ],
+      "expected_result": [
+        "Gender row shows 'Male' after selection and after reload"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-SET-003",
+      "title": "Delete my app data resets the app after confirmation",
+      "feature_id": "FEAT-SET-001",
+      "priority": "P1",
+      "type": "e2e",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Run last – destroys local test data"
+      ],
+      "steps": [
+        "Open Settings",
+        "Tap 'Delete my app data'",
+        "Confirm"
+      ],
+      "expected_result": [
+        "A confirmation is requested before deletion",
+        "After confirming, local data is cleared and onboarding (Location Setup) is shown"
+      ],
+      "test_data": [],
+      "tags": [
+        "destructive-local"
+      ]
+    },
+    {
+      "id": "UI-ASMA-001",
+      "title": "99 Names lists 99 entries and search filters",
+      "feature_id": "FEAT-ASMA-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open more > 99 Names of Allah",
+        "Count cards",
+        "Search 'Rahman'",
+        "Search 'zzqx'"
+      ],
+      "expected_result": [
+        "99 names are listed",
+        "'Rahman' shows Ar-Rahman",
+        "'zzqx' shows 'No results found'"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-ZAKAT-001",
+      "title": "Zakath Ledger tile shows coming-soon feedback",
+      "feature_id": "FEAT-ZAKAT-001",
+      "priority": "P3",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open more",
+        "Tap 'Zakath Ledger'"
+      ],
+      "expected_result": [
+        "A 'Coming Soon' message is shown and no broken screen opens"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-WOMEN-001",
+      "title": "Cycle length is clamped to a sane range",
+      "feature_id": "FEAT-WOMEN-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Women's Guidance > Tracker",
+        "Press '-' repeatedly",
+        "Press '+' repeatedly",
+        "Restore to 28"
+      ],
+      "expected_result": [
+        "Value stops at a minimum (observed 20)",
+        "Value stops at a maximum (observed 45)"
+      ],
+      "test_data": [],
+      "tags": [
+        "boundary"
+      ]
+    },
+    {
+      "id": "UI-WOMEN-002",
+      "title": "Women's Guidance tracker text is legible",
+      "feature_id": "FEAT-WOMEN-001",
+      "priority": "P3",
+      "type": "visual",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Light mode"
+      ],
+      "steps": [
+        "Open Women's Guidance",
+        "Read 'Spiritually Supported Period Tracker' heading and description"
+      ],
+      "expected_result": [
+        "Heading and description have readable contrast against their background"
+      ],
+      "test_data": [],
+      "tags": [
+        "contrast"
+      ]
+    },
+    {
+      "id": "UI-HAJJ-001",
+      "title": "Hajj guide shows steps and expands a card",
+      "feature_id": "FEAT-HAJJ-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open more > Hajj Guide",
+        "Tap 'Spiritual Preparation'"
+      ],
+      "expected_result": [
+        "'0 / 13 steps completed' shown",
+        "Card expands to show details"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-UMRAH-001",
+      "title": "Umrah guide search filters content",
+      "feature_id": "FEAT-UMRAH-001",
+      "priority": "P3",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open more > Umrah Guide",
+        "Type 'Tawaf' in search"
+      ],
+      "expected_result": [
+        "Results related to Tawaf are shown"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-RATHEEB-001",
+      "title": "Ratheeb sections are legible",
+      "feature_id": "FEAT-RATHEEB-001",
+      "priority": "P2",
+      "type": "visual",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female",
+        "Light mode"
+      ],
+      "steps": [
+        "Open more > Ratheeb al-Haddad",
+        "Read section #1 Arabic and transliteration"
+      ],
+      "expected_result": [
+        "Arabic and transliteration text is readable against its background"
+      ],
+      "test_data": [],
+      "tags": [
+        "contrast"
+      ]
+    },
+    {
+      "id": "UI-DUAS-001",
+      "title": "Dua category expands to show duas",
+      "feature_id": "FEAT-DUAS-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Duas",
+        "Tap 'Sleeping'",
+        "Search 'sleep'"
+      ],
+      "expected_result": [
+        "Two sleeping duas with Arabic and translation appear",
+        "Search returns matching duas"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-CAL-001",
+      "title": "Calendar highlights today and navigates months",
+      "feature_id": "FEAT-CAL-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Open Calendar",
+        "Tap next month arrow",
+        "Tap previous month arrow"
+      ],
+      "expected_result": [
+        "Today (11 Nov / 1 Jumada al-akhira) is highlighted",
+        "Header changes to the next Hijri month and back"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-I18N-001",
+      "title": "Malayalam translates the dashboard including navigation",
+      "feature_id": "FEAT-I18N-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "On Home choose 'മലയാളം' in the language selector",
+        "Read header, cards and bottom navigation",
+        "Switch back to English"
+      ],
+      "expected_result": [
+        "Dashboard texts and all bottom-nav labels are in Malayalam",
+        "Switching back restores English"
+      ],
+      "test_data": [],
+      "tags": [
+        "i18n"
+      ]
+    },
+    {
+      "id": "UI-THEME-001",
+      "title": "Dark mode toggles and persists",
+      "feature_id": "FEAT-THEME-001",
+      "priority": "P2",
+      "type": "ui",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Tap the moon icon on Home",
+        "Reload",
+        "Tap the sun icon"
+      ],
+      "expected_result": [
+        "Dark theme applied",
+        "Dark theme persists after reload",
+        "Light theme restored"
+      ],
+      "test_data": [],
+      "tags": []
+    },
+    {
+      "id": "UI-A11Y-001",
+      "title": "Icon-only buttons have accessible names",
+      "feature_id": "FEAT-A11Y-001",
+      "priority": "P2",
+      "type": "accessibility",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Inspect the accessibility tree on Prayer Times, Qibla, More and Settings headers"
+      ],
+      "expected_result": [
+        "Every button exposes a non-empty accessible name (e.g. Back, Settings)"
+      ],
+      "test_data": [],
+      "tags": [
+        "a11y"
+      ]
+    },
+    {
+      "id": "UI-A11Y-002",
+      "title": "Primary navigation is reachable by assistive tech",
+      "feature_id": "FEAT-A11Y-001",
+      "priority": "P2",
+      "type": "accessibility",
+      "platform": [
+        "web-mobile-375x812"
+      ],
+      "preconditions": [
+        "Onboarding completed with city Kochi (Kerala, India), any madhab, gender Female"
+      ],
+      "steps": [
+        "Inspect the accessibility tree on Home and More",
+        "Tab through the page with the keyboard"
+      ],
+      "expected_result": [
+        "Bottom-nav items and feature tiles are exposed as links/buttons",
+        "They are reachable by keyboard focus"
+      ],
+      "test_data": [],
+      "tags": [
+        "a11y"
+      ]
+    }
+  ]
+}

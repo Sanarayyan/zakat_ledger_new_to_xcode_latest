@@ -1,0 +1,4 @@
+-r requirements.txt
+# Only needed when the corresponding production database/cache is selected.
+psycopg[binary]==3.3.8
+redis==7.4.1

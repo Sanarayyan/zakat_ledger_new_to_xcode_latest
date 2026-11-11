@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:device-test": "vite build --mode device-test",
+    "test": "node --test tests/*.test.mjs",
+    "mobile:sync:device-test": "npm run build:device-test && cap sync ios && cap sync android",
     "preview": "vite preview",
     "test:rating": "node --test tests/inAppReviewService.test.mjs",
     "test:versionhub": "node --test tests/versionHubPolicy.test.mjs",
@@ -17,27 +20,31 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^8.0.1",
     "@capacitor-community/in-app-review": "^8.0.0",
     "@capacitor-community/text-to-speech": "^8.0.0",
-    "@capacitor/android": "^8.4.2",
+    "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.0",
-    "@capacitor/core": "^8.3.1",
+    "@capacitor/core": "^8.6.0",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/haptics": "^8.0.2",
-    "@capacitor/ios": "^8.4.0",
+    "@capacitor/ios": "^8.6.0",
     "@capacitor/local-notifications": "^8.0.2",
     "@capacitor/preferences": "^8.0.1",
+    "@capgo/capacitor-social-login": "^8.7.6",
     "@react-oauth/google": "^0.13.4",
     "@vitejs/plugin-react": "^5.1.4",
+    "decimal.js": "^10.6.0",
     "framer-motion": "^12.38.0",
-    "jwt-decode": "^4.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
     "vite": "^7.3.1"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.3.1"
+    "@capacitor/cli": "^8.6.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

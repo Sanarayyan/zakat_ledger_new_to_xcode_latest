@@ -1,7 +1,17 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import QuranAudioPlayer from './features/quran/QuranAudioPlayer';
+import { createLatestRequest, fetchJSON } from './services/latestRequest.mjs';
+import { loadQuranIndex } from './services/quranIndex.mjs';
+import { readStoredJSON } from './services/storedJson.mjs';
+import { appStorage } from './services/appStorage';
+import { applyTheme, storedTheme } from './services/startup.mjs';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
+import { createRequestScope } from './services/requestScope.mjs';
+import GoogleSignInButton from './components/GoogleSignInButton';
+import { saveSession, restoreSession, clearSession, signOutGoogle } from './services/authService';
+import { calculateZakat, calculationCash, validateCalculation, roundMoney } from './services/zakatCalculator.mjs';
+import { fetchGoldPrice, validateGoldPrice } from './services/goldPriceService.mjs';
 import './App.css';
 import Dashboard from './features/dashboard/Dashboard';
 import PrayerTimes from './features/prayer/PrayerTimes';
@@ -25,6 +35,12 @@ import AppOnboarding from './components/onboarding/AppOnboarding';
 import VersionHubUpdatePopup from './components/VersionHubUpdatePopup';
 import RatingManager from './components/rating/RatingManager';
 import SettingsPage from './features/more/SettingsPage';
+import { API_BASE_URL } from './config/api';
+import { buildCalculationPayload, calculationYearType, createLedgerService } from './services/ledgerService.mjs';
+
+const ledgerService = createLedgerService(API_BASE_URL);
+const LOCAL_DEVICE_TEST = import.meta.env.MODE === 'device-test';
+const localTestUser = { email: 'device-test@local.invalid', name: 'Device Tester', localOnly: true };
 
 // --- AUDIO SYSTEM HELPERS ---
 const getAudioUrl = (reciter, ayahNumber) => {
@@ -185,57 +201,13 @@ function ConfirmModal({ isOpen, type, title, message, onConfirm, onCancel }) {
     );
 }
 
-const computeCattleZakat = (type, countStr) => {
-    const count = parseInt(countStr) || 0;
-    if (type === 'camels') {
-        if (count < 5) return '0';
-        if (count >= 5 && count <= 9) return '1 Sheep';
-        if (count >= 10 && count <= 14) return '2 Sheep';
-        if (count >= 15 && count <= 19) return '3 Sheep';
-        if (count >= 20 && count <= 24) return '4 Sheep';
-        if (count >= 25 && count <= 35) return '1 Female Camel (1 year old)';
-        if (count >= 36 && count <= 45) return '1 Female Camel (2 years old)';
-        if (count >= 46 && count <= 60) return '1 Female Camel (3 years old)';
-        if (count >= 61 && count <= 75) return '1 Female Camel (4 years old)';
-        if (count >= 76 && count <= 90) return '2 Female Camels';
-        if (count >= 91 && count <= 120) return '2 Female Camels';
-        return 'Increase according to Islamic rules';
-    } else if (type === 'cows') {
-        if (count < 30) return '0';
-        if (count >= 30 && count <= 39) return '1 One-Year-Old Calf';
-        if (count >= 40 && count <= 59) return '1 Two-Year-Old Cow';
-        if (count >= 60 && count <= 69) return '2 One-Year Calves';
-        if (count >= 70 && count <= 79) return '1 One-Year Calf + 1 Two-Year Cow';
-        if (count >= 80 && count <= 89) return '2 Two-Year Cows';
-        if (count >= 90 && count <= 99) return '3 One-Year Calves';
-        return 'Increase according to Islamic rules';
-    } else if (type === 'sheep') {
-        if (count < 40) return '0';
-        if (count >= 40 && count <= 120) return '1 Sheep';
-        if (count >= 121 && count <= 200) return '2 Sheep';
-        if (count >= 201 && count <= 300) return '3 Sheep';
-        if (count > 300) return `${Math.floor(count / 100)} Sheep`;
-    } else if (type === 'goats') {
-        if (count < 40) return '0';
-        if (count >= 40 && count <= 120) return '1 Goat';
-        if (count >= 121 && count <= 200) return '2 Goats';
-        if (count >= 201 && count <= 300) return '3 Goats';
-        if (count > 300) return `${Math.floor(count / 100)} Goats`;
-    }
-    return '0';
-};
-
-const getCattleNisab = (type) => {
-    if (type === 'camels') return 5;
-    if (type === 'cows') return 30;
-    if (type === 'sheep' || type === 'goats') return 40;
-    return 30;
-};
-
 function UserDashboard() {
     const navigate = useNavigate();
+    const [loadedEmail, setLoadedEmail] = useState(null);
     const dataLoaded = useRef(false);  // guard: don't save before first load
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(LOCAL_DEVICE_TEST ? localTestUser : null);
+    const accountRequests = useMemo(() => createRequestScope(), []);
+    useEffect(() => { accountRequests.invalidate(); }, [user?.email]);
     const [records, setRecords] = useState([]);
     const [columns, setColumns] = useState(DEFAULT_COLUMNS);
     const [viewedYear, setViewedYear] = useState(new Date().getFullYear());
@@ -246,6 +218,8 @@ function UserDashboard() {
     const [showCalcInfo, setShowCalcInfo] = useState(false);
     const [currentView, setCurrentView] = useState('home'); // 'home', 'dashboard', 'calculator', 'create-group', 'add-record', 'onboarding', 'history'
     const [calcHistory, setCalcHistory] = useState([]);
+    const [saveStatus, setSaveStatus] = useState('');
+    const [historyError, setHistoryError] = useState('');
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [selectedGroupId, setSelectedGroupId] = useState(null);
     const [groups, setGroups] = useState([]);
@@ -281,16 +255,12 @@ function UserDashboard() {
     const [calcModalStep, setCalcModalStep] = useState(1);
     const [activeAccordion, setActiveAccordion] = useState(null);
     const { lang, setLang, t } = useLanguage();
-    const [isLightMode, setIsLightMode] = useState(() => {
-        const saved = localStorage.getItem('theme');
-        return saved ? saved === 'light-mode' : true;
-    });
+    const [isLightMode, setIsLightMode] = useState(() => storedTheme(appStorage) === 'light-mode');
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const theme = isLightMode ? 'light-mode' : 'dark-mode';
-        document.body.classList.remove('light-mode', 'dark-mode');
-        document.body.classList.add(theme);
-        localStorage.setItem('theme', theme);
+        applyTheme(document, theme);
+        appStorage.setItem('theme', theme);
     }, [isLightMode]);
 
     const [showCalcResultModal, setShowCalcResultModal] = useState(false);
@@ -324,8 +294,8 @@ function UserDashboard() {
     }, [isLightMode]);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem('zakat_user');
-        if (savedUser) setUser(JSON.parse(savedUser));
+        if (LOCAL_DEVICE_TEST) return;
+        setUser(restoreSession());
     }, []);
 
     useEffect(() => {
@@ -350,10 +320,10 @@ function UserDashboard() {
             return;
         }
         const email = user.email;
-        const savedRecords = localStorage.getItem(`zakat_records_${email}`);
-        const savedCols = localStorage.getItem(`zakat_columns_${email}`);
-        const savedCalc = localStorage.getItem(`zakat_calc_${email}`);
-        const savedGroups = localStorage.getItem(`zakat_groups_${email}`);
+        const savedRecords = appStorage.getItem(`zakat_records_${email}`);
+        const savedCols = appStorage.getItem(`zakat_columns_${email}`);
+        const savedCalc = appStorage.getItem(`zakat_calc_${email}`);
+        const savedGroups = appStorage.getItem(`zakat_groups_${email}`);
 
         if (savedRecords) setRecords(JSON.parse(savedRecords));
         else setRecords([]);
@@ -412,18 +382,19 @@ function UserDashboard() {
         setCalcModalStep(1);
         // Mark data as loaded so the save effect can now safely run
         dataLoaded.current = true;
+        setLoadedEmail(email);
     }, [user]);
 
     // Save data whenever it changes — but ONLY after initial load to avoid overwriting good data
     useEffect(() => {
         if (!user) return;
-        if (!dataLoaded.current) return;  // still in initial load phase, skip
+        if (!dataLoaded.current || loadedEmail !== user.email) return;  // still in initial load phase, skip
         const email = user.email;
-        localStorage.setItem(`zakat_records_${email}`, JSON.stringify(records));
-        localStorage.setItem(`zakat_columns_${email}`, JSON.stringify(columns));
-        localStorage.setItem(`zakat_calc_${email}`, JSON.stringify(calcData));
-        localStorage.setItem(`zakat_groups_${email}`, JSON.stringify(groups));
-    }, [records, columns, calcData, groups, user]);
+        appStorage.setItem(`zakat_records_${email}`, JSON.stringify(records));
+        appStorage.setItem(`zakat_columns_${email}`, JSON.stringify(columns));
+        appStorage.setItem(`zakat_calc_${email}`, JSON.stringify(calcData));
+        appStorage.setItem(`zakat_groups_${email}`, JSON.stringify(groups));
+    }, [records, columns, calcData, groups, user, loadedEmail]);
 
     const annualRecords = useMemo(() => {
         return [...records]
@@ -479,32 +450,22 @@ function UserDashboard() {
     // If Google says it's real, Django returns the verified email/name.
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
-            console.log('🔐 Verifying Google login with backend...');
-            const response = await fetch('http://localhost:8000/api/auth/google/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ credential: credentialResponse.credential }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Backend verification failed');
-            }
-
-            const verifiedData = await response.json();
+            const verifiedData = await ledgerService.login(credentialResponse.credential, credentialResponse.challengeId);
+            if (!verifiedData.accessToken) throw new Error('Login did not return an access token');
 
             // Now we use the data VERIFIED by the server
             const userData = {
                 email: verifiedData.email,
                 name: verifiedData.name,
-                picture: verifiedData.picture
+                picture: verifiedData.picture,
+                accessToken: verifiedData.accessToken,
+                expiresAt: verifiedData.expiresAt,
             };
 
+            await saveSession(userData);
             setUser(userData);
-            localStorage.setItem('zakat_user', JSON.stringify(userData));
             setAuthError('');
             
-            console.log('✅ Google login verified by Django!', userData);
             
             // Always show the introduction page on every login
             setCurrentView('onboarding');
@@ -514,10 +475,31 @@ function UserDashboard() {
         }
     };
 
-    const handleLogout = () => {
-        dataLoaded.current = false;  // reset so next login re-guards the save effect
+    const handleLogout = async () => {
+        const token = user?.accessToken;
+        accountRequests.invalidate();
+        setLoadedEmail(null);
+        dataLoaded.current = false;
         setUser(null);
-        localStorage.removeItem('zakat_user');
+        setCalcHistory([]);
+        setIsLoadingHistory(false);
+        setServerResult(null);
+        setShowCalcResultModal(false);
+        pendingCalculation.current = null;
+        setSaveStatus('');
+        setHistoryError('');
+        try { await clearSession(); }
+        catch { setAuthError('Secure sign-out could not be saved. Keep the app open and retry saving.'); }
+        signOutGoogle().catch(() => {});
+        try { if (token) await ledgerService.logout(token); }
+        catch { setAuthError('Signed out on this device. The server was unreachable; the old session expires automatically.'); }
+    };
+
+    const handleLedgerError = (error) => {
+        if (error.status === 401) {
+            void handleLogout();
+            setAuthError(t('session_expired'));
+        }
     };
 
     const openModal = (record = null, explicitGroupId = undefined) => {
@@ -672,341 +654,108 @@ function UserDashboard() {
         '18K': 0.75
     };
 
+    const [serverResult, setServerResult] = useState(null);
+    const [calculationError, setCalculationError] = useState('');
+    const pendingCalculation = useRef(null);
+    const submitting = useRef(false);
+    const payloadForCurrentForm = () => buildCalculationPayload(calcData, selectedCategory,
+        calculationCash(calcData, selectedCategory, moneyCalcType));
     const zakatResults = useMemo(() => {
-        const zakatRate = calcData.yearType === 'islamic' ? 0.025 : (calcData.yearType === 'calendar' ? 0.02577 : 0);
-        const goldRate24K = parseFloat(calcData.goldRate) || 0;
+        if (showCalcResultModal && serverResult) return serverResult;
+        try { return calculateZakat(payloadForCurrentForm()); }
+        catch { return { zakatRateDisplay: calculationYearType(calcData, selectedCategory) === 'calendar' ? '2.577' : '2.5' }; }
+    }, [calcData, moneyCalcType, selectedCategory, showCalcResultModal, serverResult]);
 
-        let totalGoldValue = 0;
-        let totalGoldWeight = 0;
-
-        calcData.goldEntries.forEach(entry => {
-            const weight = parseFloat(entry.weight) || 0;
-            const caliberFactor = CALIBERS[entry.caliber] || 1;
-            
-            // Calculate the Adjusted Price explicitly per user request:
-            // Adjusted Price = Live 24K Rate * Purity Multiplier
-            const adjustedPrice = Math.round(goldRate24K * caliberFactor);
-            const entryValue = weight * adjustedPrice; 
-            totalGoldValue += entryValue;
-            
-            // For accurate Nisab check (87.48g), we use the pure gold equivalent.
-            totalGoldWeight += (weight * caliberFactor); 
-        });
-
-        const goldZakatAmount = totalGoldValue * zakatRate;
-        const goldZakatWeight = totalGoldWeight * zakatRate;
-
-        let cashValue = 0;
-        if (moneyCalcType === 'detailed') {
-            const financial = Object.values(calcData.detailedMoney.financial).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0);
-            const creditor = Object.values(calcData.detailedMoney.creditor).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0);
-            const debtor = Object.values(calcData.detailedMoney.debtor).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0);
-            cashValue = (financial + creditor) - debtor;
-            if (cashValue < 0) cashValue = 0;
-        } else if (selectedCategory === 'cattle') {
-            const trade = parseFloat(calcData.cattleTradeProfit) || 0;
-            const milk = parseFloat(calcData.cattleMilkProfit) || 0;
-            const worker = parseFloat(calcData.cattleWorkerProfit) || 0;
-            cashValue = trade + milk + worker;
-        } else {
-            cashValue = parseFloat(calcData.cash) || 0;
-        }
-        
-        const cashZakatAmount = cashValue * zakatRate;
-
-        const totalZakatPayable = goldZakatAmount + cashZakatAmount;
-        
-        const cattleZakatDue = computeCattleZakat(calcData.cattleType || 'camels', calcData.cattle);
-
-        // --- Stocks Calculation ---
-        const numShares = parseFloat(calcData.stocksNumShares) || 0;
-        const marketPrice = parseFloat(calcData.stocksMarketPrice) || 0;
-        const dividend = parseFloat(calcData.stocksDividend) || 0;
-        const nonHalalPct = parseFloat(calcData.stocksNonHalalPct) || 0;
-        const shareType = calcData.stocksShareType;
-
-        let stocksTotalValue = 0;
-        let stocksZakatAmount = 0;
-        let stocksPurificationAmount = 0;
-        let stocksZakatableBase = 0;
-
-        if (shareType === 'trading') {
-            stocksTotalValue = numShares * marketPrice;
-            stocksZakatableBase = stocksTotalValue;
-            stocksZakatAmount = stocksTotalValue * 0.025;
-        } else if (shareType === 'investment') {
-            stocksTotalValue = numShares * marketPrice;
-            stocksZakatableBase = stocksTotalValue * 0.25;
-            stocksZakatAmount = stocksZakatableBase * 0.025;
-        } else if (shareType === 'purification') {
-            stocksPurificationAmount = dividend * (nonHalalPct / 100);
-        }
-
-        // Thresholds
-        const goldNisab = 87.48;
-        const moneyNisabValue = goldRate24K * goldNisab;
-        
-        const isBelowNisab = 
-            selectedCategory === 'gold' ? totalGoldWeight < goldNisab : 
-            selectedCategory === 'cattle' ? (
-                ((calcData.cattleType === 'camels') && ((parseInt(calcData.cattle) || 0) < 5)) || 
-                ((calcData.cattleType === 'cows') && ((parseInt(calcData.cattle) || 0) < 30)) || 
-                ((calcData.cattleType === 'sheep') && ((parseInt(calcData.cattle) || 0) < 40)) ||
-                ((calcData.cattleType === 'goats') && ((parseInt(calcData.cattle) || 0) < 40))
-            ) : 
-            selectedCategory === 'money' ? cashValue < moneyNisabValue :
-            selectedCategory === 'stocks' ? (
-                shareType === 'purification' ? false : stocksTotalValue < moneyNisabValue
-            ) :
-            false;
-
-        return {
-            goldValue: totalGoldValue,
-            goldWeight: totalGoldWeight,
-            goldZakatAmount,
-            goldZakatWeight,
-            cashValue,
-            cashZakatAmount,
-            totalZakatPayable,
-            cattleZakatDue,
-            isBelowNisab,
-            zakatRateDisplay: calcData.yearType ? (calcData.yearType === 'islamic' ? '2.5' : '2.577') : '---',
-            stocksTotalValue,
-            stocksZakatableBase,
-            stocksZakatAmount,
-            stocksPurificationAmount,
-            shareType
-        };
-    }, [calcData, moneyCalcType, selectedCategory, CALIBERS]);
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // DJANGO API INTEGRATION (Day 4)
-    //
-    // This sends the same data to the Django backend and logs the result.
-    // Currently runs in PARALLEL with the React calculation so you can
-    // compare both results in the browser Console (F12 → Console tab).
-    //
-    // HOW TO SEE IT WORKING:
-    //   1. Open the calculator in the app
-    //   2. Fill in some gold details and click Calculate
-    //   3. Open browser DevTools (F12) → Console tab
-    //   4. Look for "🕌 Django API result:" — that's your backend responding!
-    //
-    // FUTURE: Once you're confident, replace zakatResults useMemo with
-    // the API response and remove the local calculation entirely.
-    // ─────────────────────────────────────────────────────────────────────────
     const callDjangoAPI = async () => {
-        // ── UPGRADED: Now uses /api/calculations/ (saves to DB!) ─────────────
-        // Before: POST /api/calculate/   → calculates, returns result, forgets it
-        // Now:    POST /api/calculations/ → calculates, saves to DB, returns result
-        //
-        // The difference:
-        //   /api/calculate/    = stateless  (no memory, like a calculator app)
-        //   /api/calculations/ = stateful   (saves history — this is the LEDGER!)
-        // ─────────────────────────────────────────────────────────────────────
-        const DJANGO_SAVE_URL = 'http://localhost:8000/api/calculations/';
-
-        const payload = {
-            userEmail:         user?.email || 'anonymous@zakatledger.app',
-            category:          selectedCategory,
-            yearType:          calcData.yearType,
-            goldRate:          calcData.goldRate,
-            goldEntries:       calcData.goldEntries,
-            cash:              calcData.cash,
-            cattleType:        calcData.cattleType,
-            cattle:            calcData.cattle,
-            stocksShareType:   calcData.stocksShareType,
-            stocksNumShares:   calcData.stocksNumShares,
-            stocksDividend:    calcData.stocksDividend,
-            stocksNonHalalPct: calcData.stocksNonHalalPct,
-        };
-
+        if (submitting.current || !pendingCalculation.current) return;
+        submitting.current = true;
+        setSaveStatus('saving');
+        setCalculationError('');
         try {
-            console.log('📤 Saving calculation to Django DB...');
-
-            const response = await fetch(DJANGO_SAVE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) throw new Error(`Django returned HTTP ${response.status}`);
-
-            const saved = await response.json();
-
-            // ✅ Permanently stored in db.sqlite3!
-            console.log(`💾 Saved to DB! Record ID #${saved.id}`);
-            
-            // If the user is on the history view, we should refresh the list immediately
-            if (currentView === 'history') fetchHistory();
-
-        } catch (err) {
-            // React still works if Django is offline — graceful fallback
-            console.warn('⚠️ Could not save to Django. React still works.', err.message);
-        }
+            if (LOCAL_DEVICE_TEST) {
+                validateCalculation(pendingCalculation.current);
+                setServerResult(calculateZakat(pendingCalculation.current));
+                setSaveStatus('local');
+            } else {
+                const response = await accountRequests.run(() => ledgerService.save(user?.accessToken, pendingCalculation.current));
+                if (!response) return;
+                setServerResult(response.value.calculation);
+                setSaveStatus('saved');
+            }
+            setShowCalcResultModal(true);
+        } catch (error) {
+            setSaveStatus('error');
+            setCalculationError(error.message);
+            handleLedgerError(error);
+        } finally { submitting.current = false; }
     };
 
-    // ── HISTORY FETCHING (Day 4) ──────────────────────────────────────────
     const fetchHistory = async () => {
-        if (!user?.email) return;
-        
+        if (LOCAL_DEVICE_TEST) {
+            setHistoryError(t('device_test_cloud_unavailable'));
+            return;
+        }
+        if (!user?.accessToken) return;
         setIsLoadingHistory(true);
+        setHistoryError('');
         try {
-            const response = await fetch(`http://localhost:8000/api/calculations/?email=${user.email}`);
-            if (!response.ok) throw new Error('Could not fetch history');
-            
-            const data = await response.json();
-            setCalcHistory(data.results || []);
-        } catch (err) {
-            console.error('❌ History fetch error:', err.message);
+            const response = await accountRequests.run(() => ledgerService.history(user.accessToken));
+            if (!response) return;
+            setCalcHistory(response.value.results || []);
+        } catch (error) {
+            setHistoryError(t('history_load_failed'));
+            handleLedgerError(error);
         } finally {
             setIsLoadingHistory(false);
         }
     };
 
+    useEffect(() => {
+        if (currentView === 'history') fetchHistory();
+    }, [currentView, user?.accessToken]);
+
     const deleteHistoryItem = async (id) => {
-        if (!window.confirm('Permanently delete this calculation from your ledger?')) return;
-        
+        if (!window.confirm(t('confirm_delete_calculation'))) return;
         try {
-            const response = await fetch(`http://localhost:8000/api/calculations/${id}/?email=${user?.email}`, {
-                method: 'DELETE',
-            });
-            
-            if (response.ok) {
-                // Success — update local state so the item disappears immediately
-                setCalcHistory(prev => prev.filter(item => item.id !== id));
-                console.log(`🗑️ Deleted record #${id}`);
-            }
-        } catch (err) {
-            console.error('❌ Delete error:', err.message);
+            const response = await accountRequests.run(() => ledgerService.delete(user?.accessToken, id));
+            if (!response) return;
+            setCalcHistory(prev => prev.filter(item => item.id !== id));
+        } catch (error) {
+            showNotify(t('history_delete_failed'), 'error');
+            handleLedgerError(error);
         }
     };
 
-    const handleCalculateSubmit = () => {
-
-        // 1. Empty Check
-        let hasData = false;
-        if (selectedCategory === 'gold') {
-            hasData = calcData.goldEntries.some(e => parseFloat(e.weight) > 0);
-        } else if (selectedCategory === 'money') {
-            if (moneyCalcType === 'quick') hasData = parseFloat(calcData.cash) > 0;
-            else {
-                const financial = Object.values(calcData.detailedMoney.financial).some(v => parseFloat(v) > 0);
-                const creditor = Object.values(calcData.detailedMoney.creditor).some(v => parseFloat(v) > 0);
-                hasData = financial || creditor;
-            }
-        } else if (selectedCategory === 'cattle') {
-            hasData = parseFloat(calcData.cattle) > 0 || parseFloat(calcData.cattleTradeProfit) > 0 || parseFloat(calcData.cattleMilkProfit) > 0 || parseFloat(calcData.cattleWorkerProfit) > 0;
-        } else if (selectedCategory === 'stocks') {
-            if (calcData.stocksShareType === 'purification') {
-                hasData = parseFloat(calcData.stocksDividend) > 0;
-            } else if (calcData.stocksShareType === 'trading' || calcData.stocksShareType === 'investment') {
-                hasData = parseFloat(calcData.stocksNumShares) > 0 && parseFloat(calcData.stocksMarketPrice) > 0;
-            } else {
-                hasData = false;
-            }
+    const handleCalculateSubmit = async () => {
+        if (submitting.current) return;
+        try {
+            const payload = payloadForCurrentForm();
+            validateCalculation(payload);
+            pendingCalculation.current = { ...payload, requestId: crypto.randomUUID() };
+            setServerResult(null);
+            setShowCalcResultModal(false);
+            await callDjangoAPI();
+        } catch (error) {
+            setCalculationError(error.message);
+            setSaveStatus('error');
         }
-
-        if (!hasData) {
-            showNotify(t('enter_asset_details'), 'error');
-            return;
-        }
-
-        const closeInfo = () => setDeleteModal({ ...deleteModal, isOpen: false });
-
-        // 2. Specific Rule Pop-ups
-        if (selectedCategory === 'gold') {
-            const pureWeight = calcData.goldEntries.reduce((sum, e) => sum + (parseFloat(e.weight) || 0) * (CALIBERS[e.caliber] || 1), 0);
-            if (pureWeight < 87.48) {
-                setDeleteModal({
-                    isOpen: true,
-                    type: 'info',
-                    title: t('below_gold_nisab_title'),
-                    message: t('below_gold_nisab_message', { pureWeight: pureWeight.toFixed(2) }),
-                    onConfirm: () => { 
-                        setDeleteModal(prev => ({ ...prev, isOpen: false })); 
-                        setShowCalcResultModal(true); 
-                    }
-                });
-                return;
-            }
-        }
-
-        if (selectedCategory === 'cattle') {
-            if (parseFloat(calcData.cattle) < 30) {
-                setDeleteModal({
-                    isOpen: true,
-                    type: 'info',
-                    title: t('cattle_zakat_rule_title'),
-                    message: t('cattle_zakat_rule_message', { cattleCount: calcData.cattle }),
-                    onConfirm: () => { 
-                        setDeleteModal(prev => ({ ...prev, isOpen: false })); 
-                        setShowCalcResultModal(true); 
-                    }
-                });
-                return;
-            }
-        }
-
-        if (selectedCategory === 'stocks' && calcData.stocksShareType !== 'purification') {
-            const goldNisabValue = parseFloat(calcData.goldRate) * 87.48;
-            const totalVal = (parseFloat(calcData.stocksNumShares) || 0) * (parseFloat(calcData.stocksMarketPrice) || 0);
-            if (totalVal < goldNisabValue) {
-                setDeleteModal({
-                    isOpen: true,
-                    type: 'info',
-                    title: t('stocks_zakat_below_nisab_title'),
-                    message: t('stocks_zakat_below_nisab_message', { goldNisabValue: Math.round(goldNisabValue).toLocaleString(), totalVal: Math.round(totalVal).toLocaleString() }),
-                    onConfirm: () => { 
-                        setDeleteModal(prev => ({ ...prev, isOpen: false })); 
-                        setShowCalcResultModal(true); 
-                    }
-                });
-                return;
-            }
-        }
-
-        // 🔥 Call Django backend in parallel — check Console (F12) to see results!
-        // This doesn't affect the UI — it just logs for learning purposes.
-        callDjangoAPI();
-
-        setShowCalcResultModal(true);
     };
-
 
     const handleColChange = (id, field, value) => {
         setColumns(columns.map(c => c.id === id ? { ...c, [field]: value } : c));
     };
 
+    const priceRequest = useRef(0);
     const fetchGoldRate = async () => {
+        const request = ++priceRequest.current;
         setIsFetchingRate(true);
         setRateError('');
         try {
-            // Fetch gold price in USD/oz
-            const goldRes = await fetch('https://api.gold-api.com/price/XAU');
-            if (!goldRes.ok) throw new Error('Network response from gold API was not ok');
-            const goldData = await goldRes.json();
-            const goldPriceUSDPerOz = goldData.price;
-
-            // Fetch USD/Currency exchange rate
-            const exRes = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`);
-            if (!exRes.ok) throw new Error('Network response from exchange API was not ok');
-            const exData = await exRes.json();
-            const usdToLocal = exData.rates[calcData.currency] || exData.rates.INR;
-
-            // Market Adjustment for Kerala, India (March 2026)
-            // Calibrated to match the exact Google snippet/retail board rate (₹16,222)
-            // Factor includes: 6% Import Duty + 3% GST + Regional Retail Premium
-            const premiumFactor = 1.0767; 
-            const localPerGram = (goldPriceUSDPerOz / 31.1035) * usdToLocal * premiumFactor;
-
-            setCalcData(prev => ({ ...prev, goldRate: Math.round(localPerGram) }));
+            const price = await fetchGoldPrice();
+            if (request === priceRequest.current) setCalcData(previous => ({ ...previous, ...price }));
         } catch (error) {
-            console.error("Failed to fetch gold rate:", error);
-            setRateError(t('price_unavailable_error'));
-        } finally {
-            setIsFetchingRate(false);
-        }
+            if (request === priceRequest.current) setRateError(error.message || 'Gold price unavailable. Confirm a current price manually.');
+        } finally { if (request === priceRequest.current) setIsFetchingRate(false); }
     };
 
     const getRelativeDateLabel = (dateStr) => {
@@ -1026,17 +775,11 @@ function UserDashboard() {
     };
 
     useEffect(() => {
-        if (!calcData.goldRate || calcData.goldRate === 0 || calcData.goldRate === '0') {
-            fetchGoldRate();
-        }
-
-        const fetchInterval = setInterval(() => {
-            fetchGoldRate();
-        }, 1800000); // 30 minutes interval for better real-time accuracy during active hours
-
-        return () => clearInterval(fetchInterval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        if (!loadedEmail) return;
+        try { validateGoldPrice(calcData); }
+        catch { fetchGoldRate(); }
+        return () => { priceRequest.current++; };
+    }, [loadedEmail]);
 
     const addNewColumn = () => {
         const label = prompt(t('enter_column_name'));
@@ -1067,6 +810,9 @@ function UserDashboard() {
             hasHawl: true
         }));
         setSelectedCategory(null);
+        setServerResult(null);
+        setCalculationError('');
+        pendingCalculation.current = null;
         setMoneyCalcType('quick');
         setShowCalcResultModal(false);
         setCurrentView('calculator');
@@ -1076,7 +822,6 @@ function UserDashboard() {
         const handleSetView = (e) => {
             if (e.detail) {
                 setCurrentView(e.detail);
-                if (e.detail === 'history') fetchHistory();
                 if (e.detail === 'calculator') openCalculator();
             }
         };
@@ -1095,7 +840,11 @@ function UserDashboard() {
                     <div className="auth-content">
                         {authError && <div className="auth-error-msg">{authError}</div>}
                         <div className="google-auth-wrapper">
-                            <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setAuthError(t('auth_failed'))} useOneTap theme="filled_blue" shape="pill" />
+                            {LOCAL_DEVICE_TEST ? (
+                                <button className="btn-primary" onClick={() => setUser(localTestUser)}>{t('continue_device_test')}</button>
+                            ) : import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+                                <GoogleSignInButton service={ledgerService} onSuccess={handleGoogleSuccess} onError={setAuthError} />
+                            ) : <p>{t('login_not_configured')}</p>}
                         </div>
                     </div>
                     <p className="auth-footer">{t('secure_tracking_message')}</p>
@@ -1106,7 +855,7 @@ function UserDashboard() {
 
     if (currentView === 'onboarding') {
         const handleCompleteOnboarding = (target) => {
-            // Do NOT write to localStorage — intro should show on every login
+            // Do NOT write to appStorage — intro should show on every login
             setCurrentView(target);
         };
 
@@ -1123,6 +872,7 @@ function UserDashboard() {
             <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
                     className="back-btn" 
+                    aria-label="Back"
                     onClick={() => {
                         if (currentView === 'home') {
                             navigate('/home');
@@ -2003,7 +1753,12 @@ function UserDashboard() {
                         </div>
 
                         <div className="history-container">
-                            {isLoadingHistory ? (
+                            {historyError ? (
+                                <div role="alert">
+                                    <p>{historyError}</p>
+                                    <button className="btn-primary" onClick={fetchHistory}>{t('retry')}</button>
+                                </div>
+                            ) : isLoadingHistory ? (
                                 <div className="loader-centered">Loading History...</div>
                             ) : calcHistory.length === 0 ? (
                                 <div className="empty-state-card">
@@ -2023,7 +1778,7 @@ function UserDashboard() {
                                                 </div>
                                                 <div className="history-amount">
                                                     <span className="total-label">{t('total_zakat_due')}:</span>
-                                                    <span className="amount-value highlight-gold">₹{parseFloat(item.total_zakat).toLocaleString()}</span>
+                                                    <span className="amount-value highlight-gold">{item.is_below_nisab ? 'NIL' : item.category === 'cattle' ? `${item.result?.cattleZakatDue === '0' ? 'No animals due' : item.result?.cattleZakatDue || 'See calculation details'} + ₹${Number(item.total_zakat).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : `₹${Number(item.total_zakat).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
                                                 </div>
                                             </div>
                                             <div className="history-item-footer">
@@ -2326,12 +2081,12 @@ function UserDashboard() {
                                                 <input
                                                     type="number"
                                                     className="cattle-profit-input"
-                                                    placeholder="Profit from trading"
+                                                    placeholder="Market value of cattle held for trade"
                                                     min="0"
                                                     value={calcData.cattleTradeProfit || ''}
                                                     onChange={(e) => setCalcData({ ...calcData, cattleTradeProfit: e.target.value })}
                                                 />
-                                                <p className="cattle-note">If cattle are kept for trade, calculate 2.5% of their total market value.</p>
+                                                <p className="cattle-note">For cattle held for trade, enter their total market value. Do not also include these animals in the grazing-livestock count.</p>
                                             </div>
                                         </div>
 
@@ -2562,45 +2317,38 @@ function UserDashboard() {
                                     </div>
                                 )}
 
+                                <div className="calc-info-display-refined">
+                                    <label htmlFor="confirmed-gold-price">{t('price_24k_label')}</label>
+                                    <input id="confirmed-gold-price" type="number" min="0.01" step="0.01" value={calcData.goldRate || ''}
+                                        onChange={event => {
+                                            priceRequest.current++;
+                                            setIsFetchingRate(false);
+                                            setCalcData(previous => ({ ...previous, goldRate: event.target.value, goldRateSource: 'manual', goldRateCheckedAt: '' }));
+                                        }} />
+                                    <button type="button" disabled={isFetchingRate} onClick={fetchGoldRate}>{t('refresh_market_price')}</button>
+                                    <button type="button" onClick={() => {
+                                        const price = Number(calcData.goldRate);
+                                        if (!Number.isFinite(price) || price <= 0 || price > 99999999.99 || roundMoney(price) !== price) {
+                                            setRateError('Enter a positive price with at most two decimal places.'); return;
+                                        }
+                                        priceRequest.current++;
+                                        setIsFetchingRate(false);
+                                        setCalcData(previous => ({ ...previous, goldRateSource: 'manual', goldRateCheckedAt: new Date().toISOString() }));
+                                        setRateError('');
+                                    }}>{t('confirm_current_price')}</button>
+                                    <p>{calcData.goldRateSource === 'manual' ? t('manual_gold_price') : t('market_gold_price')}
+                                        {calcData.goldRateCheckedAt && ` • ${t('price_checked')} ${new Date(calcData.goldRateCheckedAt).toLocaleString()}`}</p>
+                                    {rateError && <p role="alert">{rateError}</p>}
+                                    {!(selectedCategory === 'stocks' && calcData.stocksShareType === 'purification') && <label>
+                                        <input type="checkbox" checked={calcData.hasHawl !== false} onChange={event => setCalcData(previous => ({ ...previous, hasHawl: event.target.checked }))} />
+                                        {t('hawl_confirmation')}
+                                    </label>}
+                                </div>
+                                {calculationError && <div role="alert"><p>{calculationError}</p>{pendingCalculation.current && <button onClick={callDjangoAPI}>{t('retry_same_calculation')}</button>}</div>}
                                 <div className="calc-action-refined">
-                                    <button className="btn-calculate-submit" onClick={handleCalculateSubmit}>
+                                    <button className="btn-calculate-submit" onClick={handleCalculateSubmit} disabled={saveStatus === 'saving'}>
                                         {t('calc_submit')}
                                     </button>
-                                </div>
-
-                                <h2>{t('recently_read')}</h2>
-                                <div className="recents-list">
-                                    {recents.map((item, idx) => (
-                                        <div 
-                                            key={idx} 
-                                            className="recent-item-refined"
-                                            onClick={() => navigate(item.type === 'juz' ? `/quran/juz/${item.id}` : `/quran/${item.id}?mode=reading`)}
-                                        >
-                                            <div className="recent-main-info">
-                                                <div className="recent-arabic">{item.surahName || item.englishName || `Juz ${item.id}`}</div>
-                                                <div className="recent-meta-desc">
-                                                    {item.type === 'juz' ? `${t('juz_label')} ${item.id}` : `${t('surah_label')} ${item.id}`} • {t('ayah_label')} {item.ayahNumber}
-                                                </div>
-                                            </div>
-                                            <div className="recent-time-badge">
-                                                {(() => {
-                                                    const getTimeAgo = (dateString) => {
-                                                        const date = new Date(dateString);
-                                                        const now = new Date();
-                                                        const seconds = Math.floor((now - date) / 1000);
-                                                        if (seconds < 60) return t('just_now');
-                                                        const minutes = Math.floor(seconds / 60);
-                                                        if (minutes < 60) return t('minutes_ago').replace('{{minutes}}', minutes);
-                                                        const hours = Math.floor(minutes / 60);
-                                                        if (hours < 24) return t('hours_ago').replace('{{hours}}', hours);
-                                                        const days = Math.floor(hours / 24);
-                                                        return t('days_ago').replace('{{days}}', days);
-                                                    };
-                                                    return getTimeAgo(item.timestamp);
-                                                })()}
-                                            </div>
-                                        </div>
-                                    ))}
                                 </div>
 
                         {selectedCategory === 'money' && (
@@ -2612,8 +2360,8 @@ function UserDashboard() {
                     </div>
                 )}
 
-                        {showCalcResultModal && (
-                            <div className="modal-overlay">
+                        {showCalcResultModal && createPortal(
+                            <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={t('calc_summary')}>
                                 <div className="modal-card calc-summary-modal-refined fade-in">
                                     <div className="modal-header-refined">
                                         <h2>{t('calc_summary')}</h2>
@@ -2622,10 +2370,10 @@ function UserDashboard() {
                                     
 
                                     <div className="modal-body-refined">
-                                        {zakatResults.isBelowNisab ? (
+                                        {zakatResults.isBelowNisab || (zakatResults.hasHawl === false && zakatResults.shareType !== 'purification') ? (
                                             <div className="below-nisab-message">
                                                 <div className="warning-icon">ℹ️</div>
-                                                <p>{t('nisaab_warning')}</p>
+                                                <p>{zakatResults.hasHawl === false ? t('hawl_not_completed') : t('nisaab_warning')}</p>
                                             </div>
                                         ) : (
                                             <div className="summary-details-refined">
@@ -2637,7 +2385,7 @@ function UserDashboard() {
                                                         </div>
                                                         <div className="summary-row-refined">
                                                             <span>Zakat on Gold ({zakatResults.zakatRateDisplay}%):</span>
-                                                            <span className="val">₹{Math.round(zakatResults.goldZakatAmount).toLocaleString()}</span>
+                                                            <span className="val">₹{Number(zakatResults.goldZakatAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                         </div>
                                                         <div className="summary-row-refined">
                                                             <span>Zakat on Gold (in Grams):</span>
@@ -2648,7 +2396,7 @@ function UserDashboard() {
                                                 {selectedCategory === 'money' && (
                                                     <div className="summary-row-refined">
                                                         <span>Zakat on Cash & Savings:</span>
-                                                        <span className="val">₹{Math.round(zakatResults.cashZakatAmount).toLocaleString()}</span>
+                                                        <span className="val">₹{Number(zakatResults.cashZakatAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                     </div>
                                                 )}
                                                 {selectedCategory === 'cattle' && (
@@ -2674,7 +2422,7 @@ function UserDashboard() {
                                                         {(parseFloat(calcData.cattleTradeProfit) > 0 || parseFloat(calcData.cattleMilkProfit) > 0 || parseFloat(calcData.cattleWorkerProfit) > 0) && (
                                                             <div className="summary-row-refined">
                                                                 <span>Zakat on Cattle Profit (2.5%):</span>
-                                                                <span className="val">₹{Math.round(zakatResults.cashZakatAmount).toLocaleString()}</span>
+                                                                <span className="val">₹{Number(zakatResults.cashZakatAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                             </div>
                                                         )}
                                                     </>
@@ -2701,17 +2449,17 @@ function UserDashboard() {
                                                                 </div>
                                                                 <div className="summary-row-refined">
                                                                     <span>Total Portfolio Value:</span>
-                                                                    <span className="val">₹{Math.round(zakatResults.stocksTotalValue).toLocaleString()}</span>
+                                                                    <span className="val">₹{Number(zakatResults.stocksTotalValue).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {zakatResults.shareType === 'investment' && (
                                                                     <div className="summary-row-refined">
                                                                         <span>Zakatable Base (25%):</span>
-                                                                        <span className="val">₹{Math.round(zakatResults.stocksZakatableBase).toLocaleString()}</span>
+                                                                        <span className="val">₹{Number(zakatResults.stocksZakatableBase).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                     </div>
                                                                 )}
                                                                 <div className="summary-row-refined">
                                                                     <span>Zakat on Stocks (2.5%):</span>
-                                                                    <span className="val">₹{Math.round(zakatResults.stocksZakatAmount).toLocaleString()}</span>
+                                                                    <span className="val">₹{Number(zakatResults.stocksZakatAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                             </>
                                                         )}
@@ -2727,7 +2475,7 @@ function UserDashboard() {
                                                                 </div>
                                                                 <div className="summary-row-refined">
                                                                     <span>Amount to Purify (Donate):</span>
-                                                                    <span className="val" style={{ color: '#059669', fontWeight: 700 }}>₹{Math.round(zakatResults.stocksPurificationAmount).toLocaleString()}</span>
+                                                                    <span className="val" style={{ color: '#059669', fontWeight: 700 }}>₹{Number(zakatResults.stocksPurificationAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                             </>
                                                         )}
@@ -2743,26 +2491,35 @@ function UserDashboard() {
                                                  t('total_payable')}
                                             </h3>
                                             <div className={`total-amount-refined ${selectedCategory === 'stocks' && zakatResults.shareType === 'purification' ? 'purification-total' : ''}`}>
-                                                {zakatResults.isBelowNisab
+                                                {(zakatResults.isBelowNisab || (zakatResults.hasHawl === false && zakatResults.shareType !== 'purification'))
                                                     ? 'NIL'
                                                     : selectedCategory === 'cattle'
-                                                        ? (zakatResults.cattleZakatDue === '0' ? 'NIL' : zakatResults.cattleZakatDue)
+                                                        ? `${zakatResults.cattleZakatDue === '0' ? 'No animals due' : zakatResults.cattleZakatDue} + ₹${Number(zakatResults.totalZakatPayable).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                                                         : selectedCategory === 'stocks'
                                                             ? zakatResults.shareType === 'purification'
-                                                                ? `₹${Math.round(zakatResults.stocksPurificationAmount).toLocaleString()}`
-                                                                : `₹${Math.round(zakatResults.stocksZakatAmount).toLocaleString()}`
-                                                            : `₹${Math.round(zakatResults.totalZakatPayable).toLocaleString()}`
+                                                                ? `₹${Number(zakatResults.stocksPurificationAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                                                : `₹${Number(zakatResults.stocksZakatAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                                            : `₹${Number(zakatResults.totalZakatPayable).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                                                 }
                                             </div>
                                         </div>
                                     </div>
 
+                                    <div role={saveStatus === 'error' ? 'alert' : 'status'} aria-live="polite">
+                                        {saveStatus === 'saving' && t('calculation_saving')}
+                                        {saveStatus === 'saved' && t('calculation_saved')}
+                                        {saveStatus === 'local' && t('device_test_cloud_unavailable')}
+                                        {saveStatus === 'error' && <>
+                                            <p>{t('calculation_save_failed')}</p>
+                                            <button className="btn-primary" onClick={callDjangoAPI}>{t('retry')}</button>
+                                        </>}
+                                    </div>
                                     <div className="modal-footer-refined">
                                         <button className="btn-modal-download" onClick={() => window.print()}>{t('download_pdf')}</button>
                                         <button className="btn-modal-close" onClick={() => setShowCalcResultModal(false)}>{t('close')}</button>
                                     </div>
                                 </div>
-                            </div>
+                            </div>, document.body
                         )}
                     </div>
                 )}
@@ -2902,6 +2659,8 @@ function QuranPage() {
     const location = useLocation();
     const [surahs, setSurahs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [indexError, setIndexError] = useState(false);
+    const [indexAttempt, setIndexAttempt] = useState(0);
     const { lang, setLang, t } = useLanguage();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [streakUpdate, setStreakUpdate] = useState(0);
@@ -2913,9 +2672,9 @@ function QuranPage() {
     }, []);
 
     useEffect(() => {
-        let sessions = parseInt(localStorage.getItem('zakat_quran_sessions') || '0', 10);
+        let sessions = parseInt(appStorage.getItem('zakat_quran_sessions') || '0', 10);
         sessions += 1;
-        localStorage.setItem('zakat_quran_sessions', sessions.toString());
+        appStorage.setItem('zakat_quran_sessions', sessions.toString());
         if (window.checkAppRating) window.checkAppRating('quran');
     }, []);
     const [browseMode, setBrowseMode] = useState('surah'); // 'surah' or 'juz'
@@ -2940,12 +2699,12 @@ function QuranPage() {
     };
 
     const [favorites, setFavorites] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('quran_favorites') || '[]'); } catch { return []; }
+        return readStoredJSON(appStorage, 'quran_favorites', []);
     });
 
     useEffect(() => {
         const handleStorageChange = () => {
-            try { setFavorites(JSON.parse(localStorage.getItem('quran_favorites') || '[]')); } catch {}
+            try { setFavorites(readStoredJSON(appStorage, 'quran_favorites', [])); } catch {}
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -2971,7 +2730,7 @@ function QuranPage() {
     }, [sectionTab, lastReadingMode]);
 
     useEffect(() => {
-        const savedRecents = JSON.parse(localStorage.getItem('quran_recents') || '[]');
+        const savedRecents = readStoredJSON(appStorage, 'quran_recents', []);
         setRecents(savedRecents);
     }, []);
 
@@ -2988,12 +2747,12 @@ function QuranPage() {
     }, [showResetKhatamModal]);
     useEffect(() => {
         const handleKhatamCompleted = () => {
-            const hist = JSON.parse(localStorage.getItem('khatamHistory') || '[]');
+            const hist = readStoredJSON(appStorage, 'khatamHistory', []);
             const todayStr = new Date().toDateString();
             if (hist.length > 0 && new Date(hist[0].completedAt).toDateString() === todayStr) return;
             
             hist.unshift({ completedAt: Date.now() });
-            localStorage.setItem('khatamHistory', JSON.stringify(hist));
+            appStorage.setItem('khatamHistory', JSON.stringify(hist));
             // Show celebratory reset modal
             setShowResetKhatamModal(true);
         };
@@ -3009,12 +2768,12 @@ function QuranPage() {
     const TOTAL_AYAHS_GLOBAL = 6236;
 
     const getKhatamStats = () => {
-        const furthestAyah = parseInt(localStorage.getItem("khatamFurthestAyah") || "0", 10);
+        const furthestAyah = parseInt(appStorage.getItem("khatamFurthestAyah") || "0", 10);
         const percent = Math.floor((furthestAyah / TOTAL_AYAHS_GLOBAL) * 100);
         return { totalRead: furthestAyah, percent };
     };
     const getJuzProgress = (juzItem) => {
-        const furthestAyah = parseInt(localStorage.getItem("khatamFurthestAyah") || "0", 10);
+        const furthestAyah = parseInt(appStorage.getItem("khatamFurthestAyah") || "0", 10);
         const startGlobalAyah = JUZ_DATA_LIST.slice(0, juzItem.num - 1).reduce((acc, curr) => acc + curr.totalAyahs, 1);
         const endGlobalAyah = startGlobalAyah + juzItem.totalAyahs - 1;
 
@@ -3029,9 +2788,9 @@ function QuranPage() {
     const { totalRead: totalReadCount, percent: khatamPercentage } = getKhatamStats();
     
     const resetKhatamProgress = () => {
-        localStorage.removeItem('khatamProgress');
-        localStorage.removeItem('khatamFurthestAyah');
-        localStorage.removeItem('khatamResumeState');
+        appStorage.removeItem('khatamProgress');
+        appStorage.removeItem('khatamFurthestAyah');
+        appStorage.removeItem('khatamResumeState');
         setShowResetKhatamModal(false);
         window.location.reload();
     };
@@ -3039,7 +2798,7 @@ function QuranPage() {
     const removeFavorite = (ayahNum) => {
         const newFavs = favorites.filter(f => f.ayahNumber !== ayahNum);
         setFavorites(newFavs);
-        localStorage.setItem('quran_favorites', JSON.stringify(newFavs));
+        appStorage.setItem('quran_favorites', JSON.stringify(newFavs));
         window.dispatchEvent(new Event('storage'));
     };
     
@@ -3065,21 +2824,27 @@ function QuranPage() {
     // t is provided by useLanguage
 
     useEffect(() => {
+        const controller = new AbortController();
+        let current = true;
+        loadQuranIndex(controller)
+            .then(({ surahs, juz }) => {
+                if (!current) return;
+                setSurahs(surahs);
+                setJuzMeta(juz);
+            })
+            .catch(() => { if (current) setIndexError(true); })
+            .finally(() => { if (current) setLoading(false); });
+        return () => {
+            current = false;
+            controller.abort();
+        };
+    }, [indexAttempt]);
+
+    const retryQuranIndex = () => {
+        setIndexError(false);
         setLoading(true);
-        Promise.all([
-            fetch('https://api.alquran.cloud/v1/surah').then(res => res.json()),
-            fetch('https://api.alquran.cloud/v1/meta').then(res => res.json())
-        ])
-        .then(([surahData, metaData]) => {
-            setSurahs(surahData.data);
-            setJuzMeta(metaData.data.juzs.references);
-            setLoading(false);
-        })
-        .catch(err => {
-            console.error("Error fetching Quran metadata:", err);
-            setLoading(false);
-        });
-    }, []);
+        setIndexAttempt(attempt => attempt + 1);
+    };
 
     const switchLang = (l) => setLang(l);
 
@@ -3089,6 +2854,7 @@ function QuranPage() {
             <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button
                     className="back-btn"
+                    aria-label={t('back')}
                     onClick={() => navigate('/')}
                 >
                     {BACK_ICON}
@@ -3217,6 +2983,11 @@ function QuranPage() {
                             {/* List */}
                             {loading ? (
                                 <div className="loading-state">Loading...</div>
+                            ) : indexError ? (
+                                <div className="loading-state">
+                                    <p role="alert">{t('quran_index_error')}</p>
+                                    <button type="button" className="btn-retry" onClick={retryQuranIndex}>{t('retry')}</button>
+                                </div>
                             ) : browseMode === 'surah' ? (
                                 (searchQuery ? filteredSurahs : surahs).length > 0 ? (
                                     <div className="qh-surah-list">
@@ -3304,7 +3075,7 @@ function QuranPage() {
                                     <div>
                                         <div style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>Daily Streak</div>
                                         <div style={{fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-primary)'}}>
-                                            {JSON.parse(localStorage.getItem('khatamStreak') || '{"consecutiveDays":0}').consecutiveDays} Days
+                                            {readStoredJSON(appStorage, 'khatamStreak', {"consecutiveDays":0}).consecutiveDays} Days
                                         </div>
                                     </div>
                                 </div>
@@ -3322,7 +3093,7 @@ function QuranPage() {
                                 )}
                                 <div className="khatam-buttons">
                                     <button className="btn-khatam-primary" onClick={() => {
-                                        const resume = JSON.parse(localStorage.getItem('khatamResumeState'));
+                                        const resume = readStoredJSON(appStorage, 'khatamResumeState', null);
                                         if (resume) {
                                             if (resume.type === 'juz') {
                                                 navigate(`/quran/juz/${resume.juz}?mode=khatam`, { state: { ayah: resume.ayah } });
@@ -3353,7 +3124,7 @@ function QuranPage() {
                             <div className="khatam-juz-list">
                                 {JUZ_DATA_LIST.map(juzItem => {
                                     const { state, pct, readCount } = getJuzProgress(juzItem);
-                                    const resumeState = JSON.parse(localStorage.getItem('khatamResumeState'));
+                                    const resumeState = readStoredJSON(appStorage, 'khatamResumeState', null);
                                     const currentJuzNum = resumeState?.juz || (recents[0]?.type === 'juz' ? (recents[0]?.juz || recents[0]?.id) : null);
                                     const isActive = parseInt(currentJuzNum) === juzItem.num;
                                     
@@ -3395,14 +3166,14 @@ function QuranPage() {
                             </div>
                         </div>
 
-                        {JSON.parse(localStorage.getItem('khatamHistory') || '[]').length > 0 && (
+                        {readStoredJSON(appStorage, 'khatamHistory', []).length > 0 && (
                             <div className="khatam-history-list-section" style={{marginTop: '32px'}}>
                                 <div className="khatam-section-title">
                                     <span>Past Khatams</span>
                                     <span className="khatam-section-subtitle">Your completed journeys</span>
                                 </div>
                                 <div className="khatam-juz-list">
-                                    {JSON.parse(localStorage.getItem('khatamHistory') || '[]').map((h, i, arr) => (
+                                    {readStoredJSON(appStorage, 'khatamHistory', []).map((h, i, arr) => (
                                         <div key={i} className="khatam-juz-card completed">
                                             <div className="khatam-juz-header">
                                                 <div className="khatam-juz-info">
@@ -3455,13 +3226,13 @@ function QuranBookmarksPage() {
     const { t } = useLanguage();
 
     const [bookmarks, setBookmarks] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('quran_bookmarks') || '[]'); } catch { return []; }
+        return readStoredJSON(appStorage, 'quran_bookmarks', []);
     });
 
     // Stay in sync when other tabs/pages modify bookmarks
     useEffect(() => {
         const sync = () => {
-            try { setBookmarks(JSON.parse(localStorage.getItem('quran_bookmarks') || '[]')); } catch {}
+            try { setBookmarks(readStoredJSON(appStorage, 'quran_bookmarks', [])); } catch {}
         };
         window.addEventListener('storage', sync);
         return () => window.removeEventListener('storage', sync);
@@ -3470,7 +3241,7 @@ function QuranBookmarksPage() {
     const removeBookmark = (id) => {
         const updated = bookmarks.filter(b => b.id !== id);
         setBookmarks(updated);
-        localStorage.setItem('quran_bookmarks', JSON.stringify(updated));
+        appStorage.setItem('quran_bookmarks', JSON.stringify(updated));
         window.dispatchEvent(new Event('storage'));
     };
 
@@ -3625,9 +3396,9 @@ function useKhatamTracker(dataObj, viewMode, isJuz = false) {
                             pageNum = a.page;
                         }
 
-                        const currentFurthest = parseInt(localStorage.getItem('khatamFurthestAyah') || '0', 10);
+                        const currentFurthest = parseInt(appStorage.getItem('khatamFurthestAyah') || '0', 10);
                         if (globalAyahNum > currentFurthest) {
-                            localStorage.setItem('khatamFurthestAyah', globalAyahNum.toString());
+                            appStorage.setItem('khatamFurthestAyah', globalAyahNum.toString());
                             
                             // Check completion
                             if (globalAyahNum >= 6236) {
@@ -3636,7 +3407,7 @@ function useKhatamTracker(dataObj, viewMode, isJuz = false) {
                             
                             // Update streak
                             const todayStr = new Date().toISOString().split('T')[0];
-                            const streak = JSON.parse(localStorage.getItem('khatamStreak') || '{"lastReadDate":"","consecutiveDays":0,"totalSessions":0}');
+                            const streak = readStoredJSON(appStorage, 'khatamStreak', {"lastReadDate":"","consecutiveDays":0,"totalSessions":0});
                             if (streak.lastReadDate !== todayStr) {
                                 const yesterday = new Date();
                                 yesterday.setDate(yesterday.getDate() - 1);
@@ -3647,7 +3418,7 @@ function useKhatamTracker(dataObj, viewMode, isJuz = false) {
                                 }
                                 streak.totalSessions += 1;
                                 streak.lastReadDate = todayStr;
-                                localStorage.setItem('khatamStreak', JSON.stringify(streak));
+                                appStorage.setItem('khatamStreak', JSON.stringify(streak));
                                 window.dispatchEvent(new Event('khatam_streak_updated'));
                             }
                             
@@ -3656,7 +3427,7 @@ function useKhatamTracker(dataObj, viewMode, isJuz = false) {
                         }
 
                         // Update resume state exactly to this position
-                        localStorage.setItem('khatamResumeState', JSON.stringify({
+                        appStorage.setItem('khatamResumeState', JSON.stringify({
                             surah: sNum,
                             ayah: globalAyahNum,
                             juz: juzNum,
@@ -3688,6 +3459,7 @@ function useKhatamTracker(dataObj, viewMode, isJuz = false) {
 }
 
 function SurahDetailPage() {
+    const detailRequest = useRef(createLatestRequest());
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -3696,10 +3468,16 @@ function SurahDetailPage() {
     
     const [surah, setSurah] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
+    const [loadAttempt, setLoadAttempt] = useState(0);
     const { lang, setLang, t } = useLanguage();
-    const [reciter, setReciter] = useState('ar.alafasy');
+    const [reciter, setReciter] = useState(() => appStorage.getItem('quran_reciter') || 'ar.alafasy');
+    const reciterRef = useRef(reciter);
+    reciterRef.current = reciter;
     const [viewMode, setViewMode] = useState('ayah'); // 'ayah' or 'page'
     const [playingAyah, setPlayingAyah] = useState(null);
+    const [surahComplete, setSurahComplete] = useState(false);
+    const [autoNext, setAutoNext] = useState(() => appStorage.getItem('quran_auto_next') === 'true');
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1);
     const playbackRateRef = useRef(1);
@@ -3710,28 +3488,28 @@ function SurahDetailPage() {
     const [allSurahs, setAllSurahs] = useState([]);
 
     useEffect(() => {
-        const cached = localStorage.getItem('all_surahs_meta');
+        const cached = appStorage.getItem('all_surahs_meta');
         if (cached) {
-            try { setAllSurahs(JSON.parse(cached)); } catch {}
+            try { setAllSurahs(readStoredJSON(appStorage, 'all_surahs_meta', [])); } catch {}
         } else {
             fetch('https://api.alquran.cloud/v1/surah')
                 .then(r => r.json())
                 .then(d => {
                     if (d.data) {
                         setAllSurahs(d.data);
-                        localStorage.setItem('all_surahs_meta', JSON.stringify(d.data));
+                        appStorage.setItem('all_surahs_meta', JSON.stringify(d.data));
                     }
                 }).catch(() => {});
         }
     }, []);
 
     const [bookmarksArray, setBookmarksArray] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('quran_bookmarks')) || []; } catch { return []; }
+        return readStoredJSON(appStorage, 'quran_bookmarks', []);
     });
 
     useEffect(() => {
         const handleStorageChange = () => {
-            try { setBookmarksArray(JSON.parse(localStorage.getItem('quran_bookmarks')) || []); } catch {}
+            try { setBookmarksArray(readStoredJSON(appStorage, 'quran_bookmarks', [])); } catch {}
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -3745,10 +3523,10 @@ function SurahDetailPage() {
         setTimeout(() => setToastMessage(''), 3000);
     };
     const handleBookmark = (ayah) => {
-        const currentBookmarks = JSON.parse(localStorage.getItem('quran_bookmarks') || '[]');
+        const currentBookmarks = readStoredJSON(appStorage, 'quran_bookmarks', []);
         if (isBookmarkedAyah(ayah.number)) {
             const updated = currentBookmarks.filter(b => b.globalAyahNumber !== ayah.number);
-            localStorage.setItem('quran_bookmarks', JSON.stringify(updated));
+            appStorage.setItem('quran_bookmarks', JSON.stringify(updated));
             window.dispatchEvent(new Event('storage'));
             showToast(t('bookmark_removed') || 'Bookmark removed');
         } else {
@@ -3763,7 +3541,7 @@ function SurahDetailPage() {
                 timestamp: Date.now()
             };
             const updated = [newBookmark, ...currentBookmarks];
-            localStorage.setItem('quran_bookmarks', JSON.stringify(updated));
+            appStorage.setItem('quran_bookmarks', JSON.stringify(updated));
             window.dispatchEvent(new Event('storage'));
             showToast(t('bookmark_saved') || 'Bookmark saved');
         }
@@ -3771,8 +3549,8 @@ function SurahDetailPage() {
     };
 
     const markSessionComplete = (ayah) => {
-        localStorage.setItem('khatamFurthestAyah', ayah.number.toString());
-        localStorage.setItem('khatamResumeState', JSON.stringify({
+        appStorage.setItem('khatamFurthestAyah', ayah.number.toString());
+        appStorage.setItem('khatamResumeState', JSON.stringify({
             surah: surah.number,
             ayah: ayah.number,
             juz: ayah.juz,
@@ -3786,12 +3564,12 @@ function SurahDetailPage() {
     };
 
     const [favorites, setFavorites] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('quran_favorites') || '[]'); } catch { return []; }
+        return readStoredJSON(appStorage, 'quran_favorites', []);
     });
 
     useEffect(() => {
         const handleStorageChange = () => {
-            try { setFavorites(JSON.parse(localStorage.getItem('quran_favorites') || '[]')); } catch {}
+            try { setFavorites(readStoredJSON(appStorage, 'quran_favorites', [])); } catch {}
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -3804,7 +3582,7 @@ function SurahDetailPage() {
     const toggleStar = (ayah) => {
         if (isStarred(ayah.number)) {
             const newFavs = favorites.filter(f => f.ayahNumber !== ayah.number);
-            localStorage.setItem('quran_favorites', JSON.stringify(newFavs));
+            appStorage.setItem('quran_favorites', JSON.stringify(newFavs));
             setFavorites(newFavs);
             window.dispatchEvent(new Event('storage'));
             showToast(t('removed_from_favorites') || 'Removed from Favorites');
@@ -3821,7 +3599,7 @@ function SurahDetailPage() {
                 type: 'surah'
             };
             const newFavs = [...favorites, pin];
-            localStorage.setItem('quran_favorites', JSON.stringify(newFavs));
+            appStorage.setItem('quran_favorites', JSON.stringify(newFavs));
             setFavorites(newFavs);
             window.dispatchEvent(new Event('storage'));
             showToast(t('added_to_favorites') || 'Added to Favorites');
@@ -3829,14 +3607,14 @@ function SurahDetailPage() {
         setActiveMenu(null);
     };
 
-    const [bookmarks, setBookmarks] = useState(JSON.parse(localStorage.getItem('bookmarks') || '[]'));
+    const [bookmarks, setBookmarks] = useState(readStoredJSON(appStorage, 'bookmarks', []));
     const [isTopMenuOpen, setIsTopMenuOpen] = useState(false);
     
     // Quran Reading Settings Modal States
-    const [quranTheme, setQuranTheme] = useState(localStorage.getItem('quran_theme') || 'modern');
-    const [fontSize, setFontSize] = useState(parseInt(localStorage.getItem('quran_font_size') || '24'));
-    const [showTranslation, setShowTranslation] = useState(localStorage.getItem('quran_show_translation') !== 'false');
-    const [showTransliteration, setShowTransliteration] = useState(localStorage.getItem('quran_show_transliteration') !== 'false');
+    const [quranTheme, setQuranTheme] = useState(appStorage.getItem('quran_theme') || 'modern');
+    const [fontSize, setFontSize] = useState(parseInt(appStorage.getItem('quran_font_size') || '24'));
+    const [showTranslation, setShowTranslation] = useState(appStorage.getItem('quran_show_translation') !== 'false');
+    const [showTransliteration, setShowTransliteration] = useState(appStorage.getItem('quran_show_transliteration') !== 'false');
 
     const toggleBookmark = (surahNum, ayahNum, surahName) => {
         let newBookmarks = [...bookmarks];
@@ -3848,7 +3626,7 @@ function SurahDetailPage() {
             newBookmarks.push({ surah: surahNum, ayah: ayahNum, surahName });
         }
         
-        localStorage.setItem('bookmarks', JSON.stringify(newBookmarks));
+        appStorage.setItem('bookmarks', JSON.stringify(newBookmarks));
         setBookmarks(newBookmarks);
         setActiveMenu(null);
     };
@@ -3858,16 +3636,19 @@ function SurahDetailPage() {
     };
 
     const audioRef = useRef(null);
+    const autoPlayOnEntry = useRef(location.state?.autoPlay === true);
+    const playingAyahRef = useRef(playingAyah);
+    playingAyahRef.current = playingAyah;
 
     useEffect(() => {
-        console.log(`[DEBUG] Reciter selected: ${reciter}`);
+        appStorage.setItem('quran_reciter', reciter);
         if (playingAyah !== null && audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
             // The Ayah number to fetch (if 0, it means we are playing the Bismillah preamp which corresponds to Ayah 1's audio file)
             const targetAyah = playingAyah === 0 ? 1 : playingAyah;
             
             // Only update if we're actually changing reciters while an ayah is active
-            const url = getAudioUrl(reciter, targetAyah);
+            const url = getAudioUrl(reciterRef.current, targetAyah);
             if (audioRef.current.src !== url) {
                 audioRef.current.src = url;
                 audioRef.current.load();
@@ -3884,7 +3665,7 @@ function SurahDetailPage() {
     // Recents Tracking
     useEffect(() => {
         if (surah && !loading) {
-            const recentsRepo = JSON.parse(localStorage.getItem('quran_recents') || '[]');
+            const recentsRepo = readStoredJSON(appStorage, 'quran_recents', []);
             const currentAyahObj = surah.ayahs.find(a => a.number === playingAyah) || surah.ayahs[0];
             
             const newRecent = {
@@ -3899,11 +3680,11 @@ function SurahDetailPage() {
                 type: 'surah'
             };
             const filtered = recentsRepo.filter(r => r.id !== surah.number || r.type !== 'surah');
-            localStorage.setItem('quran_recents', JSON.stringify([newRecent, ...filtered].slice(0, 5)));
+            appStorage.setItem('quran_recents', JSON.stringify([newRecent, ...filtered].slice(0, 5)));
 
             // Save specific Khatam resume state
             if (mode === 'khatam') {
-                localStorage.setItem("khatamResumeState", JSON.stringify({
+                appStorage.setItem("khatamResumeState", JSON.stringify({
                     surah: surah.number,
                     ayah: currentAyahObj?.number || 0
                 }));
@@ -3949,14 +3730,21 @@ function SurahDetailPage() {
     // t is provided by useLanguage
 
     useEffect(() => {
+        setPlayingAyah(null);
+        setIsAudioPlaying(false);
+        setSurahComplete(false);
         setLoading(true);
+        setLoadError('');
+        setSurah(null);
         // Map language to Quran translation edition
         const translationEdition = lang === 'ml' ? 'ml.abdulhameed' : 'en.asad';
         
         // Fetch clean Arabic text (quran-uthmani), selected translation, and audio recitation
-        fetch(`https://api.alquran.cloud/v1/surah/${id}/editions/quran-uthmani,${translationEdition}`)
-            .then(res => res.json())
-            .then(data => {
+        detailRequest.current.run(signal => fetchJSON(`https://api.alquran.cloud/v1/surah/${id}/editions/quran-uthmani,${translationEdition}`, { signal }))
+            .then(result => {
+                if (!result) return;
+                const data = result.value;
+                if (data.code !== 200 || !Array.isArray(data.data?.[0]?.ayahs) || data.data[0].number !== Number(id) || data.data[0].ayahs.length !== data.data[1]?.ayahs?.length) throw new Error('Invalid Surah response');
                 const arabic = data.data[0];
                 const translation = data.data[1];
                 // const audio = data.data[2]; // Removed
@@ -3978,23 +3766,15 @@ function SurahDetailPage() {
                 setSurah(combinedSurah);
                 setLoading(false);
 
-                // Auto-play if moving from previous surah
-                if (location.state?.autoPlay) {
-                    setTimeout(() => {
-                        const firstAyah = combinedSurah.ayahs[0];
-                        if (firstAyah) {
-                            handlePlayAudio(firstAyah.number, getAudioUrl(reciter, firstAyah.number));
-                        }
-                    }, 500);
-                    // Clear state to avoid replay on manual refresh
-                    window.history.replaceState({ ...location.state, autoPlay: false }, document.title);
-                }
+
             })
             .catch(err => {
                 console.error("Error fetching surah details:", err);
+                setLoadError('Could not load this Surah. Please retry.');
                 setLoading(false);
             });
-    }, [id, lang, location.state]);
+        return () => detailRequest.current.cancel();
+    }, [id, lang, loadAttempt]);
 
     const switchLang = (l) => setLang(l);
 
@@ -4005,7 +3785,16 @@ function SurahDetailPage() {
         }
     }, [playbackRate]);
 
+    const changeSurah = (number, autoPlay = false) => {
+        if (number < 1 || number > 114) return;
+        audioRef.current?.pause();
+        navigate(`/quran/${number}${mode === 'khatam' ? '?mode=khatam' : ''}`, { state: { autoPlay } });
+    };
+    const autoNextRef = useRef(autoNext);
+    autoNextRef.current = autoNext;
+
     useEffect(() => {
+        if (!surah) return;
         if (!audioRef.current) {
             audioRef.current = new Audio();
         }
@@ -4030,47 +3819,25 @@ function SurahDetailPage() {
         };
         
         const handleEnded = () => {
-            setPlayingAyah(currentNum => {
-                if (currentNum === null) return null;
-                
-                let nextAyah;
-                // If Bismillah preamp finished, play first ayah of surah
-                if (currentNum === 0) {
-                    nextAyah = surah?.ayahs[0];
-                } else {
-                    const nextNum = currentNum + 1;
-                    nextAyah = surah?.ayahs?.find(a => a.number === nextNum);
-                }
-                
-                if (nextAyah) {
-                    // Ayah tracking is handled automatically
-
-                    audio.pause();
-                    audio.src = getAudioUrl(reciter, nextAyah.number);
-                    audio.load();
-                    audio.playbackRate = playbackRateRef.current;
-                    audio.play().catch(err => {
-                        if (err.name !== 'AbortError') console.error("Audio playback error:", err);
-                    });
-                    return nextAyah.number;
-                } else {
-                    // End of surah reached
-                    const nextSurahNum = (surah?.number || 0) + 1;
-                    if (nextSurahNum <= 114) {
-                        setTimeout(() => {
-                            const nextUrl = mode === 'khatam' 
-                                ? `/quran/${nextSurahNum}?mode=khatam` 
-                                : `/quran/${nextSurahNum}`;
-                            navigate(nextUrl, { state: { autoPlay: true } });
-                        }, 100);
-                    } else {
-                        setTimeout(() => {
-                            alert("Khatam Completed! Alhamdulillah.");
-                        }, 500);
-                    }
-                    return null;
-                }
-            });
+            const currentNum = playingAyahRef.current;
+            if (currentNum === null) return;
+            const nextAyah = currentNum === 0 ? surah?.ayahs[0]
+                : surah?.ayahs?.find(a => a.number === currentNum + 1);
+            if (nextAyah) {
+                audio.src = getAudioUrl(reciterRef.current, nextAyah.number);
+                audio.load();
+                audio.playbackRate = playbackRateRef.current;
+                audio.play().catch(err => {
+                    if (err.name !== 'AbortError') console.error('Audio playback error:', err);
+                });
+                setPlayingAyah(nextAyah.number);
+            } else {
+                setPlayingAyah(null);
+                setIsAudioPlaying(false);
+                const nextSurahNum = (surah?.number || 0) + 1;
+                if (autoNextRef.current && nextSurahNum <= 114) changeSurah(nextSurahNum, true);
+                else setSurahComplete(true);
+            }
         };
 
         audio.addEventListener('play', handlePlay);
@@ -4079,7 +3846,13 @@ function SurahDetailPage() {
         audio.addEventListener('loadstart', handleLoadStart);
         audio.addEventListener('error', handleError);
         audio.addEventListener('ended', handleEnded);
-        
+
+        if (autoPlayOnEntry.current) {
+            autoPlayOnEntry.current = false;
+            const firstAyah = surah.ayahs[0];
+            if (firstAyah) handlePlayAudio(firstAyah.number, getAudioUrl(reciterRef.current, firstAyah.number));
+        }
+
         return () => {
             audio.removeEventListener('play', handlePlay);
             audio.removeEventListener('pause', handlePause);
@@ -4088,16 +3861,18 @@ function SurahDetailPage() {
             audio.removeEventListener('error', handleError);
             audio.removeEventListener('ended', handleEnded);
             audio.pause();
-            audio.src = "";
+            audio.removeAttribute('src');
+            audio.load();
         };
     }, [surah]);
 
     const handlePlayAudio = (ayahNum, audioUrl) => {
         const audio = audioRef.current;
+        setSurahComplete(false);
 
         // Bismillah Preamp Logic: If starting playback from Ayah 1 (global number check)
         if (ayahNum === surah?.ayahs[0]?.number && surah?.number !== 1 && surah?.number !== 9 && playingAyah === null) {
-            audio.src = getAudioUrl(reciter, 1);
+            audio.src = getAudioUrl(reciterRef.current, 1);
             audio.load();
             audio.playbackRate = playbackRateRef.current;
             audio.play().catch(err => console.error("Audio playback error:", err));
@@ -4124,7 +3899,7 @@ function SurahDetailPage() {
     const playSurah = () => {
         if (surah && surah.ayahs.length > 0) {
             if (playingAyah !== null) {
-                if (isAudioPlaying) {
+                if (!audioRef.current.paused) {
                     audioRef.current.pause();
                 } else {
                     audioRef.current.playbackRate = playbackRate;
@@ -4132,17 +3907,19 @@ function SurahDetailPage() {
                 }
             } else {
                 if (surah.number !== 1 && surah.number !== 9) {
-                    handlePlayAudio(0, getAudioUrl(reciter, 1));
+                    handlePlayAudio(0, getAudioUrl(reciterRef.current, 1));
                 } else {
-                    handlePlayAudio(surah.ayahs[0].number, getAudioUrl(reciter, surah.ayahs[0].number));
+                    handlePlayAudio(surah.ayahs[0].number, getAudioUrl(reciterRef.current, surah.ayahs[0].number));
                 }
             }
         }
     };
 
 
+    if (loadError) return <div role="alert"><p>{loadError}</p><button onClick={() => setLoadAttempt(value => value + 1)}>{t('retry')}</button></div>;
+
     return (
-        <div className="app-container">
+        <div className={`app-container quran-reader ${playingAyah !== null ? 'has-audio' : ''}`}>
             <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
                     className="back-btn" 
@@ -4166,13 +3943,21 @@ function SurahDetailPage() {
                                 <div className="premium-menu-section" onClick={(e) => e.stopPropagation()}>
                                     <span className="premium-menu-label">A {t('text_size') || 'Text Size'}</span>
                                     <div className="text-size-controls">
-                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.max(16, fontSize - 2)); localStorage.setItem('quran_font_size', Math.max(16, fontSize - 2)); }}>A−</button>
-                                        <button className="text-size-btn default" onClick={() => { setFontSize(24); localStorage.setItem('quran_font_size', 24); }}>{t('default') || 'Default'}</button>
-                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.min(48, fontSize + 2)); localStorage.setItem('quran_font_size', Math.min(48, fontSize + 2)); }}>A+</button>
+                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.max(16, fontSize - 2)); appStorage.setItem('quran_font_size', Math.max(16, fontSize - 2)); }}>A−</button>
+                                        <button className="text-size-btn default" onClick={() => { setFontSize(24); appStorage.setItem('quran_font_size', 24); }}>{t('default') || 'Default'}</button>
+                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.min(48, fontSize + 2)); appStorage.setItem('quran_font_size', Math.min(48, fontSize + 2)); }}>A+</button>
                                     </div>
                                 </div>
 
                                 <div className="premium-menu-section" onClick={(e) => e.stopPropagation()}>
+                                    <label className="quran-auto-next">
+                                        <input type="checkbox" checked={autoNext} onChange={event => {
+                                            const enabled = event.target.checked;
+                                            setAutoNext(enabled);
+                                            appStorage.setItem('quran_auto_next', String(enabled));
+                                        }} />
+                                        {lang === 'ml' ? 'അടുത്ത സൂറത്ത് സ്വയം പ്ലേ ചെയ്യുക' : 'Automatically play the next Surah'}
+                                    </label>
                                     <span className="premium-menu-label">🎤 {t('reciter') || 'Reciter'}</span>
                                     <div className="reciter-options">
                                         {[
@@ -4280,9 +4065,10 @@ function SurahDetailPage() {
                                                     <div className="ayah-info">
                                                         <button 
                                                             className="btn-audio-play" 
+                                                            aria-label={`Play ayah ${ayah.numberInSurah}`}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handlePlayAudio(ayah.number, getAudioUrl(reciter, ayah.number));
+                                                                handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number));
                                                             }}
                                                         >
                                                             {playingAyah === ayah.number && isAudioPlaying ? PAUSE_ICON : PLAY_ICON}
@@ -4380,7 +4166,7 @@ function SurahDetailPage() {
                                                                 <span 
                                                                     id={`ayah-${ayah.number}`}
                                                                     className={`page-ayah-item ${playingAyah === ayah.number ? 'playing' : ''}`}
-                                                                    onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciter, ayah.number))}
+                                                                    onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number))}
                                                                     style={{ fontSize: `${fontSize}px`, lineHeight: 2.2 }}
                                                                 >
                                                                     {displayText} <span className="ayah-number-badge">{toArabicNumerals(ayah.numberInSurah)}</span>
@@ -4404,56 +4190,17 @@ function SurahDetailPage() {
                 ) : (
                     <div className="error-state">Surah not found.</div>
                 )}
-                {mode === 'khatam' && surah && surah.number < 114 && (
-                    <div className="khatam-footer-nav fade-in" style={{ marginBottom: playingAyah ? '100px' : '0' }}>
-                        <button 
-                            className="btn-next-surah"
-                            onClick={() => navigate(`/quran/${surah.number + 1}?mode=khatam`)}
-                        >
-                            Next Surah: {surah.number + 1} →
-                        </button>
-                    </div>
-                )}
-
-                {/* Surah Navigation (Floating/Fixed Bottom) */}
-                {surah && mode !== 'khatam' && (
-                    <div className="surah-navigation-floating fade-in">
-                        <button 
-
-                            className={`surah-nav-btn prev ${surah.number === 1 ? 'disabled' : ''}`}
-                            onClick={() => {
-                                if (surah.number > 1) {
-                                    navigate(`/quran/${surah.number - 1}${mode ? `?mode=${mode}` : ''}`, { state: { autoPlay: false } });
-                                    window.scrollTo(0, 0);
-                                }
-                            }}
-                            disabled={surah.number === 1}
-                        >
-                            <span className="nav-icon">◀</span>
-                            <div className="nav-text-group">
-                                <span className="nav-label">{t('previous') || 'Previous'}</span>
-                                <span className="nav-surah-name">{surah.number > 1 && allSurahs.length > 0 ? allSurahs[surah.number - 2].englishName : 'Surah'}</span>
-                            </div>
-                        </button>
-                        <button 
-                            className={`surah-nav-btn next ${surah.number === 114 ? 'disabled' : ''}`}
-                            onClick={() => {
-                                if (surah.number < 114) {
-                                    navigate(`/quran/${surah.number + 1}${mode ? `?mode=${mode}` : ''}`, { state: { autoPlay: false } });
-                                    window.scrollTo(0, 0);
-                                }
-                            }}
-                            disabled={surah.number === 114}
-                        >
-                            <div className="nav-text-group" style={{ alignItems: 'flex-end' }}>
-                                <span className="nav-label">{t('next') || 'Next'}</span>
-                                <span className="nav-surah-name">{surah.number < 114 && allSurahs.length > 0 ? allSurahs[surah.number].englishName : 'Surah'}</span>
-                            </div>
-                            <span className="nav-icon">▶</span>
-                        </button>
-                    </div>
-                )}
-
+                {surah && <div className={`surah-navigation ${surahComplete ? 'is-complete' : ''}`}>
+                    {surahComplete && <p role="status">{lang === 'ml' ? 'സൂറത്ത് പൂർത്തിയായി' : 'Surah finished'}</p>}
+                    <button type="button" disabled={surah.number === 1} onClick={() => changeSurah(surah.number - 1)}>
+                        {lang === 'ml' ? 'മുമ്പത്തെ സൂറത്ത്' : 'Previous Surah'}
+                        <small>{allSurahs.find(item => item.number === surah.number - 1)?.englishName}</small>
+                    </button>
+                    <button type="button" disabled={surah.number === 114} onClick={() => changeSurah(surah.number + 1, surahComplete)}>
+                        {lang === 'ml' ? 'അടുത്ത സൂറത്ത്' : 'Next Surah'}
+                        <small>{allSurahs.find(item => item.number === surah.number + 1)?.englishName}</small>
+                    </button>
+                </div>}
             </main>
 
             {toastMessage && (
@@ -4469,174 +4216,25 @@ function SurahDetailPage() {
                 <AutoScrollControl isVisible={true} />
             )}
 
-            {playingAyah !== null && (
-                <div className="sticky-audio-player fade-in-up">
-                    <div className="sap-info">
-                        <span className="sap-ayah-badge">Ayah {surah?.ayahs?.find(a => a.number === playingAyah)?.numberInSurah}</span>
-                        <span className="sap-status">Playing</span>
-                    </div>
-                    
-                    <div className="sap-speed-pills">
-                        {[0.75, 1, 1.25, 1.5, 2].map(rate => (
-                            <button 
-                                key={rate} 
-                                className={`speed-pill ${playbackRate === rate ? 'active' : ''}`}
-                                onClick={() => setPlaybackRate(rate)}
-                            >
-                                {rate}x
-                            </button>
-                        ))}
-                    </div>
-
-                    <button className="sap-play-pause" onClick={() => {
-                        if (audioRef.current.paused) {
-                            audioRef.current.playbackRate = playbackRate;
-                            audioRef.current.play().catch(err => console.error(err));
-                        } else {
-                            audioRef.current.pause();
-                        }
-                    }}>
-                        {playingAyah !== null && isAudioPlaying ? PAUSE_ICON : PLAY_ICON}
-                    </button>
-                    
-                    <button className="sap-close" onClick={() => {
+            {playingAyah !== null && audioRef.current && (
+                <QuranAudioPlayer audio={audioRef.current}
+                    track={playingAyah === 0 ? 'Bismillah' : `${lang === 'ml' ? 'ആയത്ത്' : 'Ayah'} ${surah?.ayahs?.find(ayah => ayah.number === playingAyah)?.numberInSurah ?? playingAyah}`}
+                    reciter={RECITERS.find(item => item.id === reciter)?.name || 'Hudhaify'}
+                    playing={isAudioPlaying} rate={playbackRate} onRate={setPlaybackRate} onToggle={playSurah} lang={lang}
+                    onClose={() => {
                         audioRef.current.pause();
-                        audioRef.current.currentTime = 0;
+                        audioRef.current.removeAttribute('src');
+                        audioRef.current.load();
+                        setIsAudioPlaying(false);
                         setPlayingAyah(null);
-                    }}>×</button>
-                </div>
+                    }} />
             )}
         </div>
     );
 }
 
-function AdminPanel() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [adminUser, setAdminUser] = useState('');
-    const [adminPass, setAdminPass] = useState('');
-    const [error, setError] = useState('');
-
-    const handleLogin = (e) => {
-        e.preventDefault();
-        if (adminUser === 'admin' && adminPass === 'zakat@2026') {
-            setIsAuthenticated(true);
-            setError('');
-        } else {
-            setError('Invalid Developer Credentials');
-        }
-    };
-
-    const handleWipeAll = () => {
-        if (confirm('CRITICAL ACTION: This will permanently delete ALL records, groups, and calculator data for EVERY email in the system. Are you absolutely sure?')) {
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('zakat_')) keysToRemove.push(key);
-            }
-            keysToRemove.forEach(k => localStorage.removeItem(k));
-            alert('System Reset Complete. All user data has been removed.');
-            window.location.reload();
-        }
-    };
-
-    const adminStats = useMemo(() => {
-        let totalAmount = 0;
-        let totalRecipients = new Set();
-        const users = [];
-
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('zakat_records_')) {
-                const email = key.replace('zakat_records_', '');
-                const userRecords = JSON.parse(localStorage.getItem(key)) || [];
-                const userTotal = userRecords.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
-                users.push({ email, recordCount: userRecords.length, totalDonated: userTotal });
-                totalAmount += userTotal;
-                userRecords.forEach(r => totalRecipients.add(r.recipient));
-            }
-        }
-        return { totalAmount, totalUsers: users.length, totalRecipients: totalRecipients.size, users };
-    }, []);
-
-    if (!isAuthenticated) {
-        return (
-            <div className="auth-container fade-in">
-                <form className="auth-card" onSubmit={handleLogin}>
-                    <div className="logo-section">
-                        <div className="logo-icon"><img src="/muslim-plus-logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div>
-                        <h1>Admin<span>Portal</span></h1>
-                        <p>Developer Access Only</p>
-                    </div>
-                    <div className="auth-content ad-log" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
-                        {error && <div className="auth-error-msg">{error}</div>}
-                        <input type="text" placeholder="Username" value={adminUser} onChange={e => setAdminUser(e.target.value)} required style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', color: 'white' }} />
-                        <input type="password" placeholder="Password" value={adminPass} onChange={e => setAdminPass(e.target.value)} required style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', color: 'white' }} />
-                        <button type="submit" className="btn-primary" style={{ width: '100%' }}>Enter Admin Mode</button>
-                    </div>
-                </form>
-            </div>
-        );
-    }
-
-    return (
-        <div className="app-layout">
-            <nav className="sidebar">
-                <div className="sidebar-brand"><div className="logo-icon"><img src="/muslim-plus-logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div><h2>Admin View</h2></div>
-                <div className="nav-links">
-                    <div className="nav-item active">Global Audit</div>
-                    <div className="nav-item" onClick={() => window.location.href = '/'}>Exit Admin</div>
-                </div>
-            </nav>
-            <main className="main-content fade-in">
-                <header className="page-header">
-                    <div className="header-info">
-                        <h1>System-Wide Overview</h1>
-                        <p>Aggregated data from all local storage entries</p>
-                    </div>
-                    <div className="header-actions">
-                        <button className="btn-icon danger sm" onClick={handleWipeAll} title="Wipe All System Data">🗑️ Wipe All Data</button>
-                    </div>
-                </header>
-                <section className="stats-grid">
-                    <div className="stat-card" style={{ borderColor: 'var(--primary)' }}>
-                        <div className="stat-label">Global Impact</div>
-                        <div className="stat-value">₹{adminStats.totalAmount.toLocaleString('en-IN')}</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-label">Registered Donors</div>
-                        <div className="stat-value">{adminStats.totalUsers}</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-label">Total Recipients</div>
-                        <div className="stat-value">{adminStats.totalRecipients}</div>
-                    </div>
-                </section>
-                <section className="data-table-container white-bg-table">
-                    <div className="table-header"><h3>{t('active_donor_list')}</h3></div>
-                    <div className="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr><th>User Email</th><th>Entries</th><th>Total Impact</th><th>Status</th></tr>
-                            </thead>
-                            <tbody>
-                                {adminStats.users.map((u, i) => (
-                                    <tr key={i}>
-                                        <td>{u.email}</td>
-                                        <td>{u.recordCount}</td>
-                                        <td>₹{u.totalDonated.toLocaleString('en-IN')}</td>
-                                        <td><span className="badge badge-success">Verified</span></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </main>
-        </div>
-    );
-}
-
 const JuzDetailPage = () => {
+    const detailRequest = useRef(createLatestRequest());
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -4648,7 +4246,9 @@ const JuzDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [viewMode, setViewMode] = useState('ayah');
-    const [reciter, setReciter] = useState('ar.alafasy');
+    const [reciter, setReciter] = useState(() => appStorage.getItem('quran_reciter') || 'ar.alafasy');
+    const reciterRef = useRef(reciter);
+    reciterRef.current = reciter;
     const [playingAyah, setPlayingAyah] = useState(null);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1);
@@ -4659,12 +4259,12 @@ const JuzDetailPage = () => {
     const [toastMessage, setToastMessage] = useState('');
 
     const [bookmarksArray, setBookmarksArray] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('quran_bookmarks')) || []; } catch { return []; }
+        return readStoredJSON(appStorage, 'quran_bookmarks', []);
     });
 
     useEffect(() => {
         const handleStorageChange = () => {
-            try { setBookmarksArray(JSON.parse(localStorage.getItem('quran_bookmarks')) || []); } catch {}
+            try { setBookmarksArray(readStoredJSON(appStorage, 'quran_bookmarks', [])); } catch {}
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -4679,10 +4279,10 @@ const JuzDetailPage = () => {
     };
 
     const handleBookmark = (ayah) => {
-        const currentBookmarks = JSON.parse(localStorage.getItem('quran_bookmarks') || '[]');
+        const currentBookmarks = readStoredJSON(appStorage, 'quran_bookmarks', []);
         if (isBookmarkedAyah(ayah.number)) {
             const updated = currentBookmarks.filter(b => b.globalAyahNumber !== ayah.number);
-            localStorage.setItem('quran_bookmarks', JSON.stringify(updated));
+            appStorage.setItem('quran_bookmarks', JSON.stringify(updated));
             window.dispatchEvent(new Event('storage'));
             showToast(t('bookmark_removed') || 'Bookmark removed');
         } else {
@@ -4698,7 +4298,7 @@ const JuzDetailPage = () => {
                 timestamp: Date.now()
             };
             const updated = [newBookmark, ...currentBookmarks];
-            localStorage.setItem('quran_bookmarks', JSON.stringify(updated));
+            appStorage.setItem('quran_bookmarks', JSON.stringify(updated));
             window.dispatchEvent(new Event('storage'));
             showToast(t('bookmark_saved') || 'Bookmark saved');
         }
@@ -4706,8 +4306,8 @@ const JuzDetailPage = () => {
     };
 
     const markSessionComplete = (ayah) => {
-        localStorage.setItem('khatamFurthestAyah', ayah.number.toString());
-        localStorage.setItem('khatamResumeState', JSON.stringify({
+        appStorage.setItem('khatamFurthestAyah', ayah.number.toString());
+        appStorage.setItem('khatamResumeState', JSON.stringify({
             surah: ayah.surah.number,
             ayah: ayah.number,
             juz: juzData.number,
@@ -4721,12 +4321,12 @@ const JuzDetailPage = () => {
     };
 
     const [favorites, setFavorites] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('quran_favorites') || '[]'); } catch { return []; }
+        return readStoredJSON(appStorage, 'quran_favorites', []);
     });
 
     useEffect(() => {
         const handleStorageChange = () => {
-            try { setFavorites(JSON.parse(localStorage.getItem('quran_favorites') || '[]')); } catch {}
+            try { setFavorites(readStoredJSON(appStorage, 'quran_favorites', [])); } catch {}
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -4739,7 +4339,7 @@ const JuzDetailPage = () => {
     const toggleStar = (ayah) => {
         if (isStarred(ayah.number)) {
             const newFavs = favorites.filter(f => f.ayahNumber !== ayah.number);
-            localStorage.setItem('quran_favorites', JSON.stringify(newFavs));
+            appStorage.setItem('quran_favorites', JSON.stringify(newFavs));
             setFavorites(newFavs);
             window.dispatchEvent(new Event('storage'));
             showToast(t('removed_from_favorites') || 'Removed from Favorites');
@@ -4757,7 +4357,7 @@ const JuzDetailPage = () => {
                 juz: juzData.number
             };
             const newFavs = [...favorites, pin];
-            localStorage.setItem('quran_favorites', JSON.stringify(newFavs));
+            appStorage.setItem('quran_favorites', JSON.stringify(newFavs));
             setFavorites(newFavs);
             window.dispatchEvent(new Event('storage'));
             showToast(t('added_to_favorites') || 'Added to Favorites');
@@ -4765,14 +4365,14 @@ const JuzDetailPage = () => {
         setActiveMenu(null);
     };
 
-    const [bookmarks, setBookmarks] = useState(JSON.parse(localStorage.getItem('bookmarks') || '[]'));
+    const [bookmarks, setBookmarks] = useState(readStoredJSON(appStorage, 'bookmarks', []));
     const [isTopMenuOpen, setIsTopMenuOpen] = useState(false);
     
     // Quran Reading Settings Modal States
-    const [quranTheme, setQuranTheme] = useState(localStorage.getItem('quran_theme') || 'modern');
-    const [fontSize, setFontSize] = useState(parseInt(localStorage.getItem('quran_font_size') || '24'));
-    const [showTranslation, setShowTranslation] = useState(localStorage.getItem('quran_show_translation') !== 'false');
-    const [showTransliteration, setShowTransliteration] = useState(localStorage.getItem('quran_show_transliteration') !== 'false');
+    const [quranTheme, setQuranTheme] = useState(appStorage.getItem('quran_theme') || 'modern');
+    const [fontSize, setFontSize] = useState(parseInt(appStorage.getItem('quran_font_size') || '24'));
+    const [showTranslation, setShowTranslation] = useState(appStorage.getItem('quran_show_translation') !== 'false');
+    const [showTransliteration, setShowTransliteration] = useState(appStorage.getItem('quran_show_transliteration') !== 'false');
 
     const toggleBookmark = (surahNum, ayahNum, surahName) => {
         let newBookmarks = [...bookmarks];
@@ -4784,7 +4384,7 @@ const JuzDetailPage = () => {
             newBookmarks.push({ surah: surahNum, ayah: ayahNum, surahName });
         }
         
-        localStorage.setItem('bookmarks', JSON.stringify(newBookmarks));
+        appStorage.setItem('bookmarks', JSON.stringify(newBookmarks));
         setBookmarks(newBookmarks);
         setActiveMenu(null);
     };
@@ -4798,11 +4398,11 @@ const JuzDetailPage = () => {
     const audioRef = useRef(null);
 
     useEffect(() => {
-        console.log(`[DEBUG] Juz Reciter selected: ${reciter}`);
+        appStorage.setItem('quran_reciter', reciter);
         if (playingAyah !== null && audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
             const targetAyah = playingAyah === 0 ? 1 : playingAyah;
-            const url = getAudioUrl(reciter, targetAyah);
+            const url = getAudioUrl(reciterRef.current, targetAyah);
             if (audioRef.current.src !== url) {
                 audioRef.current.src = url;
                 audioRef.current.load();
@@ -4817,7 +4417,7 @@ const JuzDetailPage = () => {
 
     useEffect(() => {
         if (juzData && !loading) {
-            const recentsRepo = JSON.parse(localStorage.getItem('quran_recents') || '[]');
+            const recentsRepo = readStoredJSON(appStorage, 'quran_recents', []);
             const currentAyahObj = juzData.ayahs.find(a => a.number === playingAyah) || juzData.ayahs[0];
 
             const newRecent = {
@@ -4833,7 +4433,7 @@ const JuzDetailPage = () => {
                 type: 'juz'
             };
             const filtered = recentsRepo.filter(r => r.id !== id || r.type !== 'juz');
-            localStorage.setItem('quran_recents', JSON.stringify([newRecent, ...filtered].slice(0, 5)));
+            appStorage.setItem('quran_recents', JSON.stringify([newRecent, ...filtered].slice(0, 5)));
         }
     }, [juzData, loading, playingAyah, id, mode]);
 
@@ -4871,19 +4471,20 @@ const JuzDetailPage = () => {
 
     useEffect(() => {
         const fetchJuz = async () => {
+            setJuzData(null);
             setLoading(true);
+            setError(null);
             try {
                 const translationEdition = lang === 'ml' ? 'ml.abdulhameed' : 'en.asad';
                 
-                const [arabicRes, transRes] = await Promise.all([
-                    fetch(`https://api.alquran.cloud/v1/juz/${id}/quran-uthmani`),
-                    fetch(`https://api.alquran.cloud/v1/juz/${id}/${translationEdition}`)
-                ]);
+                const result = await detailRequest.current.run(signal => Promise.all([
+                    fetchJSON(`https://api.alquran.cloud/v1/juz/${id}/quran-uthmani`, { signal }),
+                    fetchJSON(`https://api.alquran.cloud/v1/juz/${id}/${translationEdition}`, { signal })
+                ]));
+                if (!result) return;
+                const [arabicData, transData] = result.value;
                 
-                const arabicData = await arabicRes.json();
-                const transData = await transRes.json();
-                
-                if (arabicData.code === 200 && transData.code === 200) {
+                if (arabicData.code === 200 && transData.code === 200 && arabicData.data?.number === Number(id) && Array.isArray(arabicData.data?.ayahs) && arabicData.data.ayahs.length === transData.data?.ayahs?.length) {
                     const structuredAyahs = arabicData.data.ayahs.map((ayah, index) => ({
                         ...ayah,
                         translation: transData.data.ayahs[index].text,
@@ -4905,6 +4506,7 @@ const JuzDetailPage = () => {
             }
         };
         fetchJuz();
+        return () => detailRequest.current.cancel();
     }, [id, lang]);
 
     useEffect(() => {
@@ -4958,7 +4560,11 @@ const JuzDetailPage = () => {
                     const currentAyahData = juzData.ayahs.find(a => a.number === currentPlayingNum);
                     if (currentAyahData) markSessionComplete(currentAyahData);
                     
-                    handlePlayAudio(nextAyah.number, getAudioUrl(reciter, nextAyah.number));
+                    audio.src = getAudioUrl(reciterRef.current, nextAyah.number);
+                    audio.load();
+                    audio.playbackRate = playbackRateRef.current;
+                    audio.play().catch(err => console.error('Audio playback error:', err));
+                    setPlayingAyah(nextAyah.number);
                 } else {
                     setPlayingAyah(null);
                 }
@@ -4980,16 +4586,17 @@ const JuzDetailPage = () => {
             audio.removeEventListener('error', handleError);
             audio.removeEventListener('ended', handleEnded);
             audio.pause();
-            audio.src = "";
+            audio.removeAttribute('src');
+            audio.load();
         };
-    }, [juzData, reciter]);
+    }, [juzData]);
 
     const handlePlayAudio = (ayahNumber, audioUrl) => {
         const audio = audioRef.current;
 
         const currentAyahObj = juzData?.ayahs?.find(a => a.number === ayahNumber);
         if (currentAyahObj?.numberInSurah === 1 && currentAyahObj?.surah?.number !== 1 && currentAyahObj?.surah?.number !== 9 && playingAyah === null) {
-            audio.src = getAudioUrl(reciter, 1);
+            audio.src = getAudioUrl(reciterRef.current, 1);
             audio.load();
             audio.playbackRate = playbackRateRef.current;
             audio.play().catch(err => console.error("Audio playback error:", err));
@@ -5025,7 +4632,7 @@ const JuzDetailPage = () => {
             }
         } else {
             const firstAyah = juzData.ayahs[0];
-            handlePlayAudio(firstAyah.number, getAudioUrl(reciter, firstAyah.number));
+            handlePlayAudio(firstAyah.number, getAudioUrl(reciterRef.current, firstAyah.number));
         }
     };
 
@@ -5034,7 +4641,7 @@ const JuzDetailPage = () => {
     if (!juzData) return null;
 
     return (
-        <div className={`app-container theme-${quranTheme}`}>
+        <div className={`app-container quran-reader theme-${quranTheme} ${playingAyah !== null ? 'has-audio' : ''}`}>
             <header className="header" style={{ position: 'sticky', top: 0 }}>
                 <button 
                     className="back-btn" 
@@ -5058,9 +4665,9 @@ const JuzDetailPage = () => {
                                 <div className="premium-menu-section" onClick={(e) => e.stopPropagation()}>
                                     <span className="premium-menu-label">A {t('text_size') || 'Text Size'}</span>
                                     <div className="text-size-controls">
-                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.max(16, fontSize - 2)); localStorage.setItem('quran_font_size', Math.max(16, fontSize - 2)); }}>A−</button>
-                                        <button className="text-size-btn default" onClick={() => { setFontSize(24); localStorage.setItem('quran_font_size', 24); }}>{t('default') || 'Default'}</button>
-                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.min(48, fontSize + 2)); localStorage.setItem('quran_font_size', Math.min(48, fontSize + 2)); }}>A+</button>
+                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.max(16, fontSize - 2)); appStorage.setItem('quran_font_size', Math.max(16, fontSize - 2)); }}>A−</button>
+                                        <button className="text-size-btn default" onClick={() => { setFontSize(24); appStorage.setItem('quran_font_size', 24); }}>{t('default') || 'Default'}</button>
+                                        <button className="text-size-btn" onClick={() => { setFontSize(Math.min(48, fontSize + 2)); appStorage.setItem('quran_font_size', Math.min(48, fontSize + 2)); }}>A+</button>
                                     </div>
                                 </div>
 
@@ -5160,7 +4767,7 @@ const JuzDetailPage = () => {
                                     )}
                                     <div className="ayah-top">
                                         <div className="ayah-info">
-                                            <button className="btn-audio-play" onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciter, ayah.number))}>
+                                            <button className="btn-audio-play" aria-label={`Play ayah ${ayah.numberInSurah}`} onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number))}>
                                                 {playingAyah === ayah.number && isAudioPlaying ? PAUSE_ICON : PLAY_ICON}
                                             </button>
                                             <span className="ayah-index-arabic">{ayah.numberInSurah}</span>
@@ -5255,7 +4862,7 @@ const JuzDetailPage = () => {
                                                                 <span 
                                                                     id={`ayah-${ayah.number}`}
                                                                     className={`page-ayah-item ${playingAyah === ayah.number ? 'playing active-ayah' : ''}`}
-                                                                    onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciter, ayah.number))}
+                                                                    onClick={() => handlePlayAudio(ayah.number, getAudioUrl(reciterRef.current, ayah.number))}
                                                                     style={{ fontSize: `${fontSize}px`, lineHeight: 2.2 }}
                                                                 >
                                                                     {displayText} <span className="ayah-number-badge">{toArabicNumerals(ayah.numberInSurah)}</span>
@@ -5329,42 +4936,18 @@ const JuzDetailPage = () => {
                 <AutoScrollControl isVisible={true} />
             )}
 
-            {playingAyah !== null && (
-                <div className="sticky-audio-player fade-in-up">
-                    <div className="sap-info">
-                        <span className="sap-ayah-badge">Ayah {juzData?.ayahs?.find(a => a.number === playingAyah)?.numberInSurah || playingAyah}</span>
-                        <span className="sap-status">Playing</span>
-                    </div>
-                    
-                    <div className="sap-speed-pills">
-                        {[0.75, 1, 1.25, 1.5, 2].map(rate => (
-                            <button 
-                                key={rate} 
-                                className={`speed-pill ${playbackRate === rate ? 'active' : ''}`}
-                                onClick={() => setPlaybackRate(rate)}
-                            >
-                                {rate}x
-                            </button>
-                        ))}
-                    </div>
-
-                    <button className="sap-play-pause" onClick={() => {
-                        if (audioRef.current.paused) {
-                            audioRef.current.playbackRate = playbackRate;
-                            audioRef.current.play().catch(err => console.error(err));
-                        } else {
-                            audioRef.current.pause();
-                        }
-                    }}>
-                        {playingAyah !== null && isAudioPlaying ? PAUSE_ICON : PLAY_ICON}
-                    </button>
-                    
-                    <button className="sap-close" onClick={() => {
+            {playingAyah !== null && audioRef.current && (
+                <QuranAudioPlayer audio={audioRef.current}
+                    track={playingAyah === 0 ? 'Bismillah' : `${lang === 'ml' ? 'ആയത്ത്' : 'Ayah'} ${juzData?.ayahs?.find(ayah => ayah.number === playingAyah)?.numberInSurah ?? playingAyah}`}
+                    reciter={RECITERS.find(item => item.id === reciter)?.name || 'Hudhaify'}
+                    playing={isAudioPlaying} rate={playbackRate} onRate={setPlaybackRate} onToggle={playJuz} lang={lang}
+                    onClose={() => {
                         audioRef.current.pause();
-                        audioRef.current.currentTime = 0;
+                        audioRef.current.removeAttribute('src');
+                        audioRef.current.load();
+                        setIsAudioPlaying(false);
                         setPlayingAyah(null);
-                    }}>×</button>
-                </div>
+                    }} />
             )}
         </div>
     );
@@ -5429,10 +5012,16 @@ function AsmaPageWrapper() {
     return <AsmaUlHusna onBack={() => navigate(-1)} />;
 }
 
+function QuranReaderRoute({ Reader }) {
+    const { id } = useParams();
+    return <Reader key={id} />;
+}
+
 function App() {
+    const { t } = useLanguage();
     const [showSplash, setShowSplash] = useState(true);
     const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
-        return localStorage.getItem('app_onboarding_completed') === 'true';
+        return appStorage.getItem('app_onboarding_completed') === 'true';
     });
 
     useEffect(() => {
@@ -5444,12 +5033,12 @@ function App() {
         if (!hasCompletedOnboarding) return;
         
         // Track app launch for rating
-        let launches = parseInt(localStorage.getItem('zakat_launch_count') || '0', 10);
+        let launches = parseInt(appStorage.getItem('zakat_launch_count') || '0', 10);
         launches += 1;
-        localStorage.setItem('zakat_launch_count', launches.toString());
+        appStorage.setItem('zakat_launch_count', launches.toString());
 
-        if (!localStorage.getItem('zakat_first_launch')) {
-            localStorage.setItem('zakat_first_launch', new Date().toISOString());
+        if (!appStorage.getItem('zakat_first_launch')) {
+            appStorage.setItem('zakat_first_launch', new Date().toISOString());
         }
 
         // Trigger rating check after a brief delay
@@ -5486,11 +5075,10 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/home" element={<Dashboard />} />
                 <Route path="/zakat" element={<UserDashboard />} />
-                <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/quran" element={<QuranPage />} />
                 <Route path="/quran/bookmarks" element={<QuranBookmarksPage />} />
-                <Route path="/quran/:id" element={<SurahDetailPage />} />
-                <Route path="/quran/juz/:id" element={<JuzDetailPage />} />
+                <Route path="/quran/:id" element={<QuranReaderRoute Reader={SurahDetailPage} />} />
+                <Route path="/quran/juz/:id" element={<QuranReaderRoute Reader={JuzDetailPage} />} />
                 <Route path="/prayer" element={<PrayerTimes />} />
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/qibla" element={<QiblaFinder />} />

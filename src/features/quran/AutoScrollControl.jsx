@@ -145,6 +145,7 @@ const AutoScrollControl = ({ isVisible }) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.5, y: 50 }}
                         className="as-v3-trigger glass-morphism"
+                        aria-label="Read mode"
                         onClick={handleToggle}
                         whileTap={{ scale: 0.9 }}
                     >

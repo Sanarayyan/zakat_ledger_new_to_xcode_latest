@@ -1,279 +1,209 @@
-import * as Icons from '../../components/IconLibrary';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import { getDevicePosition, locationDisplayName, locationErrorMessage } from '../../services/locationService.mjs';
+import { qiblaBearing, distanceToMakkah, browserCompassHeading, headingDifference, normalizeHeading, smoothHeading } from './qiblaMath.mjs';
 import './QiblaFinder.css';
 import { useLanguage } from '../../LanguageContext';
 import { usePrayer } from '../../PrayerContext';
+
+const QiblaCompass = registerPlugin('QiblaCompass');
+const compassTicks = Array.from({ length: 60 }, (_, i) => (
+    <div key={i} className={`compass-tick-premium ${i % 5 === 0 ? 'major' : ''}`} style={{ transform: `rotate(${i * 6}deg)` }} />
+));
 
 export default function QiblaFinder() {
     const navigate = useNavigate();
     const { t, lang } = useLanguage();
     
-    // States
-    const [status, setStatus] = useState('initial'); // 'initial', 'needs-permission', 'loading', 'active', 'location-denied', 'compass-denied'
+    const { settings } = usePrayer();
+    const [status, setStatus] = useState('initial');
     const [qiblaDir, setQiblaDir] = useState(null);
     const [distance, setDistance] = useState(null);
     const [compassDir, setCompassDir] = useState(null);
     const [isFallback, setIsFallback] = useState(false);
-    const [isAligned, setIsAligned] = useState(false);
-    
-    // Refs
-    const continuousHeadingRef = useRef(0);
-    const lastRawHeadingRef = useRef(null);
-    const watcherIdRef = useRef(null);
+    const [sensorHint, setSensorHint] = useState('');
+    const [locationError, setLocationError] = useState('');
+    const [refreshingLocation, setRefreshingLocation] = useState(false);
+    const continuousHeadingRef = useRef(null);
+    const sensorRef = useRef(null);
     const frameRef = useRef(null);
     const fallbackTimerRef = useRef(null);
-    const successTriggeredRef = useRef(false);
-    const hasAbsoluteRef = useRef(false);
-    const hasWebkitHeadingRef = useRef(false);
-    const orientationStartedRef = useRef(false);
-    
-    // Smoothing
-    const LPF_ALPHA = 0.08; 
-    
-    // Makkah
-    const KAABA_LAT = 21.422487;
-    const KAABA_LNG = 39.826206;
+    const lastHeadingAt = useRef(null);
+    const generationRef = useRef(0);
+    const isNative = Capacitor.isNativePlatform();
+    const isAndroid = Capacitor.getPlatform() === 'android';
+    const isAligned = status === 'active' && !isFallback && !refreshingLocation && !sensorHint && compassDir !== null
+        && Math.abs(headingDifference(qiblaDir, compassDir % 360)) <= 5;
+
+    const updateHeading = heading => {
+        if (!Number.isFinite(heading)) return;
+        lastHeadingAt.current = performance.now();
+        // Use the exact final reading; the CSS transition handles the visual easing.
+        continuousHeadingRef.current = smoothHeading(continuousHeadingRef.current, heading, 1);
+        if (frameRef.current === null) {
+            frameRef.current = requestAnimationFrame(() => {
+                setCompassDir(continuousHeadingRef.current);
+                setIsFallback(false);
+                frameRef.current = null;
+            });
+        }
+    };
+
+    const handleOrientation = useCallback(event => {
+        updateHeading(browserCompassHeading(event, window.screen?.orientation?.angle ?? window.orientation ?? 0));
+    }, []);
+
+    const stopTracking = () => {
+        if (sensorRef.current) {
+            sensorRef.current.remove().catch(() => {});
+            sensorRef.current = null;
+            QiblaCompass.stop().catch(() => {});
+        }
+        if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+        clearInterval(fallbackTimerRef.current);
+        window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+        window.removeEventListener('deviceorientation', handleOrientation, true);
+    };
+
+    const applyPosition = coords => {
+        setQiblaDir(qiblaBearing(coords.latitude, coords.longitude));
+        setDistance(distanceToMakkah(coords.latitude, coords.longitude));
+        setStatus('active');
+    };
+
+    const startQiblaFinder = async () => {
+        const generation = ++generationRef.current;
+        stopTracking();
+        continuousHeadingRef.current = null;
+        lastHeadingAt.current = null;
+        setCompassDir(null);
+        setIsFallback(false);
+        setSensorHint('');
+        setLocationError('');
+        setStatus('loading');
+        if (!isNative) {
+            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        }
+        let coords;
+        const saved = settings?.location;
+        const validSaved = Number.isFinite(saved?.lat) && Math.abs(saved.lat) <= 90
+            && Number.isFinite(saved?.lng) && Math.abs(saved.lng) <= 180 && !saved.city?.includes('(Fallback)');
+        const refreshSavedLocation = isAndroid && validSaved;
+        setRefreshingLocation(refreshSavedLocation);
+        if (validSaved) {
+            coords = { latitude: saved.lat, longitude: saved.lng };
+            applyPosition(coords);
+            setLocationError(`${t('using_selected_city')}: ${locationDisplayName(saved, lang)}`);
+        } else {
+            try {
+                const position = await getDevicePosition();
+                if (generation !== generationRef.current) return;
+                coords = position.coords;
+                applyPosition(coords);
+            } catch (error) {
+                if (generation !== generationRef.current) return;
+                setLocationError(locationErrorMessage(error, lang));
+                setStatus('location-denied');
+                stopTracking();
+                return;
+            }
+        }
+        const startedAt = performance.now();
+        fallbackTimerRef.current = setInterval(() => {
+            if (performance.now() - (lastHeadingAt.current ?? startedAt) > 4500) setIsFallback(true);
+        }, 500);
+
+        if (isNative) {
+            try {
+                const listener = await QiblaCompass.addListener('heading', ({ heading, level, calibrated, trueNorth }) => {
+                    if (generation !== generationRef.current) return;
+                    setSensorHint(!level ? 'level' : !calibrated ? 'calibrate' : trueNorth === false ? 'magnetic' : '');
+                    updateHeading(heading);
+                });
+                if (generation !== generationRef.current) { await listener.remove(); return; }
+                sensorRef.current = listener;
+                const { available } = await QiblaCompass.start({ lat: coords.latitude, lng: coords.longitude });
+                if (generation === generationRef.current && !available) setIsFallback(true);
+            } catch {
+                if (generation === generationRef.current) setIsFallback(true);
+            }
+        }
+
+        if (refreshSavedLocation && generation === generationRef.current) {
+            try {
+                const { coords: current } = await getDevicePosition({ quick: true });
+                if (generation !== generationRef.current) return;
+                if (sensorRef.current) {
+                    await QiblaCompass.start({ lat: current.latitude, lng: current.longitude });
+                }
+                if (generation !== generationRef.current) return;
+                applyPosition(current);
+                setLocationError(lang === 'ml' ? 'ഫോണിന്റെ സ്ഥലം ഉപയോഗിക്കുന്നു' : 'Using phone location');
+            } catch {
+                // The saved city remains available when the phone cannot get a fix.
+            } finally {
+                if (generation === generationRef.current) setRefreshingLocation(false);
+            }
+        }
+    };
+
+    const requestPermissionAndStart = async () => {
+        if (!isNative && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                if (await DeviceOrientationEvent.requestPermission() !== 'granted') {
+                    setStatus('compass-denied');
+                    return;
+                }
+            } catch {
+                setStatus('compass-denied');
+                return;
+            }
+        }
+        startQiblaFinder();
+    };
 
     useEffect(() => {
-        const isIOS = typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function';
-        if (isIOS) {
+        if (!isNative && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             setStatus('needs-permission');
         } else {
             startQiblaFinder();
         }
-
         return () => {
-            if (watcherIdRef.current !== null && navigator.geolocation) {
-                navigator.geolocation.clearWatch(watcherIdRef.current);
-            }
-            if (frameRef.current !== null) {
-                cancelAnimationFrame(frameRef.current);
-            }
-            if (fallbackTimerRef.current !== null) {
-                clearTimeout(fallbackTimerRef.current);
-            }
-            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
-            window.removeEventListener('deviceorientation', handleOrientation, true);
+            generationRef.current++;
+            stopTracking();
         };
     }, []);
 
-
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; 
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2); 
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        return Math.round(R * c);
-    };
-
-    const calculateQibla = (lat, lng) => {
-        const φ1 = lat * Math.PI / 180;
-        const λ1 = lng * Math.PI / 180;
-        const φ2 = KAABA_LAT * Math.PI / 180;
-        const λ2 = KAABA_LNG * Math.PI / 180;
-
-        const Δλ = λ2 - λ1;
-        const y = Math.sin(Δλ);
-        const x = Math.cos(φ1) * Math.tan(φ2) - Math.sin(φ1) * Math.cos(Δλ);
-        
-        let qibla = Math.atan2(y, x) * 180 / Math.PI;
-        qibla = (qibla + 360) % 360;
-        setQiblaDir(qibla);
-        setDistance(calculateDistance(lat, lng, KAABA_LAT, KAABA_LNG));
-    };
-
-    const startLocation = () => {
-        if (!navigator.geolocation) {
-            setStatus('location-denied');
-            return;
-        }
-
-        const successCb = (position) => {
-            const { latitude, longitude } = position.coords;
-            calculateQibla(latitude, longitude);
-            setStatus('active');
-            
-            watcherIdRef.current = navigator.geolocation.watchPosition((pos) => {
-                calculateQibla(pos.coords.latitude, pos.coords.longitude);
-            }, () => {}, { enableHighAccuracy: true });
-        };
-
-        const errorCb = (error) => {
-            console.error("Location error (High Accuracy):", error);
-            // Fallback location
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const { latitude, longitude } = pos.coords;
-                    calculateQibla(latitude, longitude);
-                    setStatus('active');
-                },
-                (err2) => {
-                    console.error("Location error (Fallback):", err2);
-                    setStatus('location-denied');
-                },
-                { enableHighAccuracy: false, timeout: 10000, maximumAge: Infinity }
-            );
-        };
-
-        navigator.geolocation.getCurrentPosition(successCb, errorCb, { 
-            enableHighAccuracy: true, 
-            timeout: 15000, 
-            maximumAge: 0 
-        });
-    };
-
-    const handleOrientation = (e) => {
-        let heading = null;
-
-        if (
-            Number.isFinite(e.webkitCompassHeading) &&
-            e.webkitCompassHeading >= 0
-        ) {
-            // iOS supplies its calibrated magnetic heading here. Once this
-            // source is available, ignore alpha-based events so two competing
-            // coordinate systems cannot move the compass.
-            hasWebkitHeadingRef.current = true;
-            heading = e.webkitCompassHeading;
-        } else if (hasWebkitHeadingRef.current) {
-            return;
-        } else if (e.absolute === true || e.type === 'deviceorientationabsolute') {
-            hasAbsoluteRef.current = true;
-            const screenAngle = window.screen?.orientation?.angle ?? window.orientation ?? 0;
-            heading = (360 - e.alpha + screenAngle + 360) % 360;
-        } else if (e.alpha !== null) {
-            if (hasAbsoluteRef.current) return; // Prevent jitter if absolute is supported
-            const screenAngle = window.screen?.orientation?.angle ?? window.orientation ?? 0;
-            heading = (360 - e.alpha + screenAngle + 360) % 360;
-        } else {
-            return;
-        }
-
-        if (heading !== null) {
-            setIsFallback(false);
-            
-            if (lastRawHeadingRef.current === null) {
-                continuousHeadingRef.current = heading;
-                lastRawHeadingRef.current = heading;
-            } else {
-                // Correct Low-Pass Filter logic tracking shortest path difference
-                let diff = heading - continuousHeadingRef.current;
-                
-                // Normalize diff to -180 to 180
-                diff = ((diff + 540) % 360) - 180;
-                
-                const smoothing = hasWebkitHeadingRef.current ? 0.2 : LPF_ALPHA;
-                continuousHeadingRef.current += diff * smoothing;
-                lastRawHeadingRef.current = heading;
-            }
-        }
-    };
-
-    const animationLoop = () => {
-        if (lastRawHeadingRef.current !== null) {
-            setCompassDir(continuousHeadingRef.current);
-        }
-        frameRef.current = requestAnimationFrame(animationLoop);
-    };
-
-    const startOrientation = () => {
-        if (orientationStartedRef.current) return;
-        orientationStartedRef.current = true;
-
-        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-        window.addEventListener('deviceorientation', handleOrientation, true);
-        
-        frameRef.current = requestAnimationFrame(animationLoop);
-        
-        fallbackTimerRef.current = setTimeout(() => {
-            if (lastRawHeadingRef.current === null) {
-                setIsFallback(true);
-            }
-        }, 2500);
-    };
-
-    const startQiblaFinder = () => {
-        setStatus('loading');
-        startOrientation();
-        startLocation(); 
-    };
-
-    const requestPermissionAndStart = async () => {
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try {
-                const response = await DeviceOrientationEvent.requestPermission();
-                if (response === 'granted') {
-                    startQiblaFinder();
-                } else {
-                    setStatus('compass-denied');
-                }
-            } catch (err) {
-                console.error("Compass Permission request failed", err);
-                setStatus('compass-denied');
-            }
-        } else {
-            startQiblaFinder();
-        }
-    };
+    useEffect(() => {
+        if (!isAligned) return;
+        Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
+        window.checkAppRating?.('qibla');
+    }, [isAligned]);
 
     const getGuidanceState = (qibla, heading) => {
-        // Calculate raw difference
-        let difference = qibla - heading;
-        
-        // Normalize using shortest rotation path formula
-        let normalizedDiff = ((difference + 540) % 360) - 180;
-
-        // Temporary console logs for debugging
-        console.log(`[Qibla Debug] Device Heading: ${heading.toFixed(2)}° | Qibla Bearing: ${qibla.toFixed(2)}° | Relative Angle: ${normalizedDiff.toFixed(2)}°`);
-
-        const absOffset = Math.abs(normalizedDiff);
-        let status = 'none';
-        let text = '';
-        let isNowAligned = false;
-
-        // Alignment threshold is ±5°
-        if (absOffset <= 5.0) { 
-            status = 'aligned';
-            text = lang === 'ml' ? '<Icons.CheckIcon /> ഖിബ്ലയ്ക്ക് നേരെ' : '<Icons.CheckIcon /> Facing Qibla';
-            isNowAligned = true;
-        } else if (absOffset <= 25) {
-            status = normalizedDiff > 0 ? 'turn-right' : 'turn-left';
-            text = lang === 'ml' ? 'ഏകദേശം എത്തി' : 'Almost There';
-        } else {
-            status = normalizedDiff > 0 ? 'turn-right' : 'turn-left';
-            text = normalizedDiff > 0 
-                ? (lang === 'ml' ? 'വലത്തോട്ട് തിരിയുക →' : 'Turn Right →') 
-                : (lang === 'ml' ? '← ഇടത്തോട്ട് തിരിയുക' : '← Turn Left');
-        }
-
-        if (isNowAligned !== isAligned) {
-            setIsAligned(isNowAligned);
-            if (isNowAligned) {
-                try {
-                    Haptics.impact({ style: ImpactStyle.Heavy });
-                } catch (e) {
-                    console.log('Haptics not available');
-                }
-                if (window.checkAppRating) {
-                    window.checkAppRating('qibla');
-                }
-            }
-        }
-
-        return { status, text, isAligned: isNowAligned };
+        const difference = headingDifference(qibla, heading % 360);
+        const close = Math.abs(difference) <= 25;
+        return {
+            isAligned,
+            status: isAligned ? 'aligned' : difference > 0 ? 'turn-right' : 'turn-left',
+            text: isAligned ? (lang === 'ml' ? '✓ ഖിബ്ലയ്ക്ക് നേരെ' : '✓ Facing Qibla')
+                : close ? (lang === 'ml' ? 'ഏകദേശം എത്തി' : 'Almost There')
+                : difference > 0 ? (lang === 'ml' ? 'വലത്തോട്ട് തിരിയുക →' : 'Turn Right →')
+                : (lang === 'ml' ? '← ഇടത്തോട്ട് തിരിയുക' : '← Turn Left'),
+        };
     };
 
     const renderCompass = () => {
         if (status === 'active' && qiblaDir !== null) {
-            const displayCompassDir = isFallback ? 0 : compassDir || 0;
+            const hasLiveHeading = !isFallback && compassDir !== null;
+            const showNorthReference = isAndroid && (isFallback || sensorHint === 'calibrate');
             
             let guidance = null;
-            if (!isFallback && compassDir !== null) {
+            if (hasLiveHeading && !sensorHint && !refreshingLocation) {
                 guidance = getGuidanceState(qiblaDir, compassDir);
             }
 
@@ -283,29 +213,45 @@ export default function QiblaFinder() {
                     {isFallback && (
                          <div className="clean-guidance-header fallback">
                              <h2 className="minimal-instruction">{lang === 'ml' ? 'ലൈവ് കോമ്പസ് ലഭ്യമല്ല' : 'Live compass unavailable'}</h2>
-                             <p className="instruction-subtext">{lang === 'ml' ? 'സെൻസർ പിന്തുണ ലഭ്യമല്ല' : 'Device sensors restricted'}</p>
+                             <p className="instruction-subtext">{lang === 'ml' ? 'സെൻസർ പിന്തുണ ലഭ്യമല്ല' : 'No compass readings received. If your phone has a compass, hold it flat and retry. The bearing below is clockwise from true north.'}</p>
+                             <button className="qibla-btn minimal" onClick={requestPermissionAndStart}>{t('retry')}</button>
                          </div>
                     )}
+                    {!isFallback && compassDir === null && <p role="status">{lang === 'ml' ? 'കോമ്പസ് ആരംഭിക്കുന്നു…' : 'Starting compass…'}</p>}
+                    {!isFallback && sensorHint && <p role="status" className="qibla-location-note">
+                        {sensorHint === 'level'
+                            ? (lang === 'ml' ? 'ഫോൺ നിരപ്പായി പിടിക്കുക.' : 'Hold your phone flat, screen facing up.')
+                            : sensorHint === 'magnetic'
+                            ? (lang === 'ml' ? 'യഥാർത്ഥ വടക്ക് കണ്ടെത്താൻ ലൊക്കേഷൻ അനുവദിക്കുക.' : 'Waiting for true north. Allow location access for accurate alignment.')
+                            : (lang === 'ml' ? 'ഫോൺ 8 ആകൃതിയിൽ കറക്കുക.' : 'Move away from metal or magnets, then move your phone in a figure eight.')}
+                    </p>}
 
-                    <div className="qibla-compass-container-premium">
+                    {showNorthReference && <p className="qibla-location-note">
+                        {lang === 'ml'
+                            ? 'സ്ഥിരമായ വടക്ക് റഫറൻസ്. ഈ അമ്പ് ഫോണിനൊപ്പം തിരിയില്ല.'
+                            : 'North-up reference. Use a map or compass to find true north, then follow the marked bearing.'}
+                    </p>}
+
+                    {(hasLiveHeading || showNorthReference) && <div className={`qibla-compass-container-premium ${!showNorthReference && (sensorHint || refreshingLocation) ? 'unreliable' : ''}`}>
                         {/* Static Phone Top Marker */}
-                        <div className={`premium-phone-marker ${guidance?.isAligned ? 'aligned' : ''}`}></div>
+                        {!showNorthReference && <div className={`premium-phone-marker ${guidance?.isAligned ? 'aligned' : ''}`} />}
 
                         {/* Smooth animated rotating ring (Outer ring) */}
-                        <div className={`premium-compass-ring ${guidance?.isAligned ? 'aligned' : ''}`} style={{ transform: `rotate3d(0, 0, 1, ${-displayCompassDir}deg)` }}>
+                        <div className={`premium-compass-ring ${guidance?.isAligned ? 'aligned' : ''}`} style={{ transform: `rotate3d(0, 0, 1, ${showNorthReference ? 0 : -compassDir}deg)` }}>
                             <div className="compass-mark n">N</div>
                             <div className="compass-mark e">E</div>
                             <div className="compass-mark s">S</div>
                             <div className="compass-mark w">W</div>
                             
                             {/* Inner ticks */}
-                            {[...Array(60)].map((_, i) => (
-                                <div key={i} className={`compass-tick-premium ${i % 5 === 0 ? 'major' : ''}`} style={{ transform: `rotate(${i * 6}deg)` }}></div>
-                            ))}
+                            {compassTicks}
 
                             {/* Orbiting Kaaba Marker */}
-                            <div className="kaaba-orbit-container" style={{ transform: `rotate(${qiblaDir}deg)` }}>
+                            <div className="kaaba-orbit-container" style={{ transform: `rotate(${qiblaDir}deg)` }} aria-hidden="true">
                                 <div className={`kaaba-orbit-icon ${guidance?.isAligned ? 'aligned' : ''}`}>
+                                    <svg className="kaaba-orbit-arrow" viewBox="0 0 24 20" fill="currentColor">
+                                        <path d="M12 1 23 18l-11-5-11 5z" stroke="var(--bg-dark)" strokeWidth="1.5" strokeLinejoin="round" />
+                                    </svg>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
@@ -315,12 +261,23 @@ export default function QiblaFinder() {
                         
                         {/* Center static design (optional, to look premium) */}
                         <div className="premium-compass-center"></div>
-                    </div>
+                    </div>}
                     
+                    <p className="qibla-bearing">{t('qibla_bearing')}: {qiblaDir.toFixed(1)}°</p>
+                    {isAndroid && hasLiveHeading && !sensorHint && !refreshingLocation && <p className="qibla-location-note">
+                        {lang === 'ml' ? 'ഫോൺ ചൂണ്ടുന്ന ദിശ' : 'Phone heading from true north'}: {normalizeHeading(Math.round(compassDir))}°
+                    </p>}
+                    {refreshingLocation && <p className="qibla-location-note" role="status">
+                        {lang === 'ml' ? 'ഫോണിന്റെ സ്ഥലം പരിശോധിക്കുന്നു…' : 'Checking phone location…'}
+                    </p>}
+                    {locationError && <p className="qibla-location-note">{locationError}</p>}
                     {/* Live Guidance below compass */}
                     {!isFallback && guidance && (
                         <div className={`premium-guidance-text ${guidance.status}`}>
                             <h2>{guidance.text}</h2>
+                            <p>{lang === 'ml'
+                                ? 'ഫോൺ നിരപ്പായി പിടിക്കുക. അമ്പ് ഫോണിന്റെ മുകൾഭാഗത്തേക്ക് ചൂണ്ടുന്നതുവരെ ഫോണിനൊപ്പം തിരിയുക.'
+                                : 'Hold your phone flat. Turn with it until the arrow points past the top of your phone, then face that way.'}</p>
                         </div>
                     )}
                 </div>
@@ -341,10 +298,10 @@ export default function QiblaFinder() {
                             <span className="info-value">{distance.toLocaleString()} <small>km</small></span>
                         </div>
                     </div>
-                    {!isFallback && !isAligned && (
+                    {!isFallback && compassDir !== null && !sensorHint && !isAligned && (
                         <div className="qibla-bottom-card-minimal calibration-card">
                             <div className="compass-calibration-hint">
-                                {lang === 'ml' ? 'കോമ്പസ് കൃത്യത മെച്ചപ്പെടുത്താൻ ഫോൺ 8 ആകൃതിയിൽ കറക്കുക.' : 'Move your phone in a figure-8 motion to improve compass accuracy.'}
+                                {lang === 'ml' ? 'കോമ്പസ് കൃത്യത മെച്ചപ്പെടുത്താൻ ഫോൺ 8 ആകൃതിയിൽ കറക്കുക.' : 'Hold your phone flat and turn slowly. Keep it away from metal or magnets.'}
                             </div>
                         </div>
                     )}
@@ -381,10 +338,11 @@ export default function QiblaFinder() {
             return (
                 <div className="qibla-action-card-minimal error">
                     <h2>{lang === 'ml' ? 'ലൊക്കേഷൻ ആവശ്യമാണ്' : 'Location Required'}</h2>
-                    <p>{lang === 'ml' ? 'ഖിബ്ല കണ്ടെത്താൻ ലൈവ് ലൊക്കേഷൻ അനുവദിക്കുക.' : 'Location permission is needed to find Qibla. Please enable it in your device settings.'}</p>
-                    <button className="qibla-btn minimal" onClick={() => { setStatus('initial'); startQiblaFinder(); }}>
+                    <p>{locationError}</p>
+                    <button className="qibla-btn minimal" onClick={requestPermissionAndStart}>
                         {lang === 'ml' ? 'വീണ്ടും ശ്രമിക്കുക' : 'Retry'}
                     </button>
+                    <button className="qibla-btn minimal" onClick={() => navigate('/prayer')}>{t('choose_city_manually')}</button>
                 </div>
             );
         }
@@ -392,7 +350,7 @@ export default function QiblaFinder() {
             return (
                 <div className="qibla-action-card-minimal">
                     <div className="qibla-loader-minimal"></div>
-                    <p>{lang === 'ml' ? 'ഖിബ്ല കണ്ടെത്തുന്നു...' : 'Calibrating compass...'}</p>
+                    <p>{lang === 'ml' ? 'ലൊക്കേഷനും ഖിബ്ല ദിശയും കണ്ടെത്തുന്നു...' : 'Finding your location and Qibla direction...'}</p>
                 </div>
             );
         }
@@ -402,7 +360,7 @@ export default function QiblaFinder() {
     return (
         <div className="qibla-page qibla-modern-theme">
             <div className="qibla-header-minimal">
-                <button className="qibla-back-btn" onClick={() => navigate(-1)}>
+                <button className="qibla-back-btn" aria-label={t('back')} onClick={() => navigate(-1)}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>

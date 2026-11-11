@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Geolocation } from '@capacitor/geolocation';
+import CitySearch from '../CitySearch';
+import { appStorage } from '../../services/appStorage';
+import React, { useState, useEffect, useRef } from 'react';
+import { getDeviceLocation, locationErrorMessage } from '../../services/locationService.mjs';
 import { usePrayer } from '../../PrayerContext';
+import { pressable } from '../../utils/pressable';
 import './AppOnboarding.css';
 
 // SVG Icons to avoid emojis and maintain a premium look
@@ -53,46 +56,21 @@ export default function AppOnboarding({ onComplete }) {
 
     const [isDetecting, setIsDetecting] = useState(false);
     const [locationError, setLocationError] = useState(false);
+    const [showCitySearch, setShowCitySearch] = useState(false);
+    const locationRequest = useRef(0);
+
+    useEffect(() => () => { locationRequest.current++; }, []);
 
     const handleAutoDetect = async () => {
+        const request = ++locationRequest.current;
         setIsDetecting(true);
         setLocationError(false);
+        setShowCitySearch(false);
         try {
-            let permission = await Geolocation.checkPermissions();
-            
-            if (permission.location !== 'granted') {
-                permission = await Geolocation.requestPermissions();
-            }
-
-            if (permission.location !== 'granted' && permission.location !== 'prompt-with-rationale') {
-                // Denied or disabled
-                setLocationError(true);
-                setIsDetecting(false);
-                return;
-            }
-
-            // Enforce a strict 15s timeout because Android Geolocation can hang indefinitely
-            const positionPromise = Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Location request timed out')), 15000));
-            
-            const position = await Promise.race([positionPromise, timeoutPromise]);
-            const { latitude, longitude } = position.coords;
-            
-            try {
-                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-                const data = await res.json();
-                setForm(prev => ({
-                    ...prev,
-                    lat: latitude,
-                    lng: longitude,
-                    city: data.city || data.locality || 'Detected Location'
-                }));
-            } catch (err) {
-                setForm(prev => ({ ...prev, lat: latitude, lng: longitude, city: 'Detected Location' }));
-            }
+            const location = await getDeviceLocation({ quick: true });
+            if (request === locationRequest.current) setForm(prev => ({ ...prev, ...location }));
         } catch (error) {
-            console.error("Location error:", error);
-            setLocationError(true);
+            if (request === locationRequest.current) setLocationError(locationErrorMessage(error));
         } finally {
             setIsDetecting(false);
         }
@@ -113,7 +91,14 @@ export default function AppOnboarding({ onComplete }) {
     };
 
     const skipLocation = () => {
+        locationRequest.current++;
         nextStep();
+    };
+
+    const openCitySearch = () => {
+        locationRequest.current++;
+        setLocationError(false);
+        setShowCitySearch(true);
     };
 
     const skipMadhab = () => {
@@ -165,24 +150,19 @@ export default function AppOnboarding({ onComplete }) {
         const finalGender = overrideGender || form.gender;
         // Save to global PrayerContext
         const newSettings = {
-            location: { 
-                lat: form.lat || 0, 
-                lng: form.lng || 0, 
-                city: form.city || 'Default' 
-            },
+            location: form.city ? { lat: form.lat, lng: form.lng, city: form.city, source: form.source || 'device' } : undefined,
             madhab: form.madhab || 'shafi',
             school: (form.madhab === 'hanafi') ? 1 : 0,
-            method: 1,
             notificationsEnabled: false // Can be enabled in settings later
         };
 
         updateSettings(newSettings);
         
         if (finalGender) {
-            localStorage.setItem('userGender', finalGender);
+            appStorage.setItem('userGender', finalGender);
         }
         
-        localStorage.setItem('app_onboarding_completed', 'true');
+        appStorage.setItem('app_onboarding_completed', 'true');
         
         setIsExiting(true);
         setTimeout(onComplete, 800);
@@ -227,22 +207,32 @@ export default function AppOnboarding({ onComplete }) {
                         ) : locationError ? (
                             <div className="onboarding-location-error" style={{ textAlign: 'center', marginBottom: '24px' }}>
                                 <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                                    Couldn't detect your location automatically.
+                                    {locationError}
                                 </p>
                                 <div className="onboarding-actions" style={{ flexDirection: 'column', gap: '12px' }}>
-                                    <button className="btn-onboarding-primary" onClick={handleAutoDetect}>Retry</button>
-                                    <button className="btn-onboarding-ghost" onClick={skipLocation}>Select city manually later</button>
+                                    <button className="btn-onboarding-primary" onClick={handleAutoDetect} disabled={isDetecting}>Retry</button>
+                                    <button className="btn-onboarding-ghost" onClick={openCitySearch}>Select city manually</button>
+                                    <button className="btn-onboarding-ghost" onClick={skipLocation}>Skip for now</button>
                                 </div>
                             </div>
                         ) : (
                             <div className="onboarding-actions" style={{marginBottom: '24px'}}>
                                 <button className="btn-onboarding-primary" onClick={handleAutoDetect} disabled={isDetecting}>
-                                    {isDetecting ? 'Detecting...' : 'Allow Location'}
+                                    {isDetecting && !showCitySearch ? 'Detecting...' : 'Use phone location'}
                                 </button>
-                                <button className="btn-onboarding-ghost" onClick={skipLocation} disabled={isDetecting}>
+                                <button className="btn-onboarding-ghost" onClick={skipLocation}>
                                     Skip for now
                                 </button>
+                                <button className="btn-onboarding-ghost" onClick={openCitySearch}>Select city manually</button>
                             </div>
+                        )}
+
+                        {showCitySearch && !form.city && (
+                            <CitySearch onSelect={location => {
+                                setForm(previous => ({ ...previous, ...location }));
+                                setLocationError(false);
+                                setShowCitySearch(false);
+                            }} />
                         )}
 
                         {form.city && (
@@ -261,12 +251,12 @@ export default function AppOnboarding({ onComplete }) {
                             Madhab selection helps provide accurate prayer time calculations and Islamic guidance preferences.
                         </p>
 
-                        <div className="selection-grid">
+                        <div className="selection-grid" role="radiogroup">
                             {['shafi', 'hanafi', 'maliki', 'hanbali'].map(m => (
                                 <div 
                                     key={m}
                                     className={`selection-card ${form.madhab === m ? 'active' : ''}`}
-                                    onClick={() => setForm({...form, madhab: m})}
+                                    {...pressable(() => setForm({...form, madhab: m}), { role: 'radio', 'aria-checked': form.madhab === m })}
                                 >
                                     <span className="card-title">{m.charAt(0).toUpperCase() + m.slice(1)}</span>
                                     <div className="card-indicator"></div>
@@ -293,12 +283,12 @@ export default function AppOnboarding({ onComplete }) {
                             We ask this to personalize certain Islamic guidance and features respectfully, including additional information relevant for women.
                         </p>
 
-                        <div className="selection-grid">
+                        <div className="selection-grid" role="radiogroup">
                             {['Female', 'Male'].map(g => (
                                 <div 
                                     key={g}
                                     className={`selection-card ${form.gender === g ? 'active' : ''}`}
-                                    onClick={() => setForm({...form, gender: g})}
+                                    {...pressable(() => setForm({...form, gender: g}), { role: 'radio', 'aria-checked': form.gender === g })}
                                 >
                                     <span className="card-title">{g}</span>
                                     <div className="card-indicator"></div>

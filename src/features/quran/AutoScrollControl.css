@@ -24,6 +24,20 @@ body.dark-mode .glass-morphism {
     box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6) !important;
 }
 
+/* Phones: Arabic is right-aligned, so dock the trigger left and icon-only (BUG-008). */
+@media (max-width: 600px) {
+    .autoscroll-v3-root {
+        right: auto !important;
+        left: 16px !important;
+    }
+    .as-v3-trigger .as-v3-label {
+        display: none;
+    }
+    .as-v3-trigger {
+        padding: 6px;
+    }
+}
+
 /* Trigger Button */
 .as-v3-trigger {
     display: flex;

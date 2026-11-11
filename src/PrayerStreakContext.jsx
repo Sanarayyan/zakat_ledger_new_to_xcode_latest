@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { calendarDay, prayerInstant, prayerDateInZone } from './services/prayerCalendar.mjs';
+import { buildFollowUpNotifications } from './services/prayerNotificationPolicy.mjs';
+import { createNotificationScheduler } from './services/notificationScheduler.mjs';
+import { Capacitor } from '@capacitor/core';
+import { readStoredJSON } from './services/storedJson.mjs';
+import { appStorage } from './services/appStorage';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { usePrayer } from './PrayerContext';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
@@ -45,58 +51,31 @@ function calculateStreakPure(completedMap, target) {
         checkDate.setDate(checkDate.getDate() - 1);
     }
 
-    console.log("--- STREAK DEBUGGING ---");
-    console.log("Current date:", todayKey);
-    console.log("Prayer completion status for today:", completedMap[todayKey] || {});
-    console.log("Daily completion result:", todayDone);
-    console.log("Calculated streak value:", currentStreak);
-
     return currentStreak;
 }
 
 const PrayerStreakContext = createContext(null);
 
 export function PrayerStreakProvider({ children }) {
-    const { timings, settings, updateSettings } = usePrayer();
+    const { timings, calendar, settings, updateSettings, resumeCount } = usePrayer();
     
-    // Unified setting: bind remindersEnabled directly to usePrayer settings notificationsEnabled
-    const remindersEnabled = settings?.notificationsEnabled ?? false;
+    const remindersEnabled = !!settings?.prayerRemindersEnabled;
+    const reminderQueue = useRef(createNotificationScheduler(LocalNotifications));
 
     const [store, setStore] = useState(() => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                const loadedCompleted = parsed.completed || parsed || {};
-                const loadedTarget = parsed.streakTarget ?? 5;
-                
-                // CRITICAL FIX: Recalculate streak from historical data on app startup 
-                // to correctly reset streak to 0 if days were missed while the app was closed.
-                const accurateStreak = calculateStreakPure(loadedCompleted, loadedTarget);
-                
-                return {
-                    completed: loadedCompleted,
-                    streak: accurateStreak,
-                    bestStreak: Math.max(parsed.bestStreak ?? 0, accurateStreak),
-                    streakTarget: loadedTarget,
-                };
-            }
-        } catch (e) {
-            console.error("Failed to parse prayer tracker storage", e);
-        }
-        return {
-            completed: {},
-            streak: 0,
-            bestStreak: 0,
-            streakTarget: 5,
-        };
+        const parsed = readStoredJSON(appStorage, STORAGE_KEY, {});
+        const loadedCompleted = parsed.completed || parsed;
+        const loadedTarget = parsed.streakTarget ?? 5;
+        const accurateStreak = calculateStreakPure(loadedCompleted, loadedTarget);
+        return { completed: loadedCompleted, streak: accurateStreak,
+            bestStreak: Math.max(Number(parsed.bestStreak) || 0, accurateStreak), streakTarget: loadedTarget };
     });
 
     const [dismissedPrompts, setDismissedPrompts] = useState({});
 
     // Persist stores on updates
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+        appStorage.setItem(STORAGE_KEY, JSON.stringify(store));
     }, [store]);
 
     const today = getTodayKey();
@@ -116,95 +95,21 @@ export function PrayerStreakProvider({ children }) {
         const rawTime = timings[key];
         if (!rawTime) return false;
 
-        const cleanTime = rawTime.split(' ')[0];
-        const [hours, minutes] = cleanTime.split(':').map(Number);
-        const prayerTime = new Date();
-        prayerTime.setHours(hours, minutes, 0, 0);
-
-        return new Date() < prayerTime;
-    }, [timings, today, store.completed]);
+        const prayerTime = prayerInstant(calendarDay(calendar, prayerDateInZone(calendar)), key);
+        return !!prayerTime && new Date() < prayerTime;
+    }, [timings, calendar, today, store.completed]);
 
     // Recalculate consecutive streak records
     const recalculateStreak = useCallback((completedMap, target = store.streakTarget) => {
         return calculateStreakPure(completedMap, target);
     }, [store.streakTarget]);
 
-    // Manage permission and local notifications dynamically
     useEffect(() => {
-        if (remindersEnabled) {
-            const requestPermissions = async () => {
-                try {
-                    const status = await LocalNotifications.checkPermissions();
-                    if (status.display !== 'granted') {
-                        await LocalNotifications.requestPermissions();
-                    }
-                } catch (e) {
-                    console.log("Local notifications display permission skipped on standard browser.", e);
-                }
-            };
-            requestPermissions();
-        }
-    }, [remindersEnabled]);
-
-    // Synchronize background notification schedule reactively for follow-up nudges
-    useEffect(() => {
-        const cancelAllAlerts = async () => {
-            try {
-                await LocalNotifications.cancel({ 
-                    notifications: [
-                        { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 }
-                    ] 
-                });
-            } catch (e) {
-                console.warn("Notification cancel skipped on web platform.", e);
-            }
-        };
-
-        if (!remindersEnabled) {
-            cancelAllAlerts();
-            return;
-        }
-
-        if (!timings) return;
-
-        const scheduleUpcomingAlerts = async () => {
-            try {
-                await cancelAllAlerts();
-
-                const now = new Date();
-                const scheduled = [];
-
-                PRAYERS.forEach((p, idx) => {
-                    const rawTime = timings[p.charAt(0).toUpperCase() + p.slice(1)];
-                    if (!rawTime) return;
-
-                    const cleanTime = rawTime.split(' ')[0];
-                    const [hours, minutes] = cleanTime.split(':').map(Number);
-                    const prayerTime = new Date();
-                    prayerTime.setHours(hours, minutes, 0, 0);
-
-                    // Gentle follow-up nudge (only 1 soft nudge 45 minutes later if still incomplete)
-                    const nudgeTime = new Date(prayerTime.getTime() + 45 * 60 * 1000);
-                    if (nudgeTime > now) {
-                        scheduled.push({
-                            title: `Prayer Reminder`,
-                            body: `You haven't marked ${p.toUpperCase()} as prayed yet.`,
-                            id: idx + 11,
-                            schedule: { at: nudgeTime }
-                        });
-                    }
-                });
-
-                if (scheduled.length > 0) {
-                    await LocalNotifications.schedule({ notifications: scheduled });
-                }
-            } catch (e) {
-                console.warn("LocalNotifications scheduling failed or is running inside standard browser.", e);
-            }
-        };
-
-        scheduleUpcomingAlerts();
-    }, [timings, remindersEnabled]);
+        if (!Capacitor.isNativePlatform()) return;
+        const notifications = remindersEnabled ? buildFollowUpNotifications(timings, todayData, new Date(), calendarDay(calendar, prayerDateInZone(calendar))) : [];
+        reminderQueue.current.replace([11, 12, 13, 14, 15], notifications).catch(console.error);
+        return () => reminderQueue.current.cancel();
+    }, [timings, calendar, remindersEnabled, store.completed, today, resumeCount]);
 
     // Handle toggling of a prayer state with locking validation
     const togglePrayer = useCallback((prayer, targetDateKey = today) => {
@@ -284,7 +189,7 @@ export function PrayerStreakProvider({ children }) {
         if (settings) {
             updateSettings({
                 ...settings,
-                notificationsEnabled: enabled
+                prayerRemindersEnabled: enabled
             });
         }
     }, [settings, updateSettings]);

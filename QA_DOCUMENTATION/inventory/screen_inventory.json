@@ -1,0 +1,193 @@
+{
+  "app": "Muslim Plus",
+  "build": "git 7a771a1 + uncommitted working tree (vite dev, web)",
+  "features": [
+    {
+      "id": "FEAT-ONB-001",
+      "name": "Onboarding (location, madhab, gender)",
+      "screens": [
+        "Splash",
+        "Location Setup",
+        "Select Madhab",
+        "Personalize Experience"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-DASH-001",
+      "name": "Home dashboard",
+      "screens": [
+        "Home"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-NAV-001",
+      "name": "Bottom navigation and routing",
+      "screens": [
+        "Bottom nav"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-PRAY-001",
+      "name": "Prayer times",
+      "screens": [
+        "Prayer Times"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-PRAY-002",
+      "name": "Prayer settings (location, madhab)",
+      "screens": [
+        "Prayer Settings sheet"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-QURAN-001",
+      "name": "Quran sura list",
+      "screens": [
+        "Quran"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-QURAN-002",
+      "name": "Quran reader",
+      "screens": [
+        "Surah reader",
+        "Reader options menu"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-TASBIH-001",
+      "name": "Tasbih counter",
+      "screens": [
+        "Tasbih",
+        "Continue Previous Dhikr dialog"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-QIBLA-001",
+      "name": "Qibla finder",
+      "screens": [
+        "Qibla"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-MORE-001",
+      "name": "More features hub",
+      "screens": [
+        "More Features"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-SET-001",
+      "name": "Settings and privacy",
+      "screens": [
+        "Settings",
+        "Choose Gender dialog"
+      ],
+      "criticality": "high"
+    },
+    {
+      "id": "FEAT-ASMA-001",
+      "name": "99 Names of Allah",
+      "screens": [
+        "99 Names of Allah"
+      ],
+      "criticality": "low"
+    },
+    {
+      "id": "FEAT-ZAKAT-001",
+      "name": "Zakath Ledger (coming soon)",
+      "screens": [
+        "More Features"
+      ],
+      "criticality": "low"
+    },
+    {
+      "id": "FEAT-WOMEN-001",
+      "name": "Women's Guidance",
+      "screens": [
+        "Women's Guidance"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-HAJJ-001",
+      "name": "Hajj Guide",
+      "screens": [
+        "Hajj Guide"
+      ],
+      "criticality": "low"
+    },
+    {
+      "id": "FEAT-UMRAH-001",
+      "name": "Umrah Guide",
+      "screens": [
+        "Umrah Guide"
+      ],
+      "criticality": "low"
+    },
+    {
+      "id": "FEAT-RATHEEB-001",
+      "name": "Ratheeb al-Haddad",
+      "screens": [
+        "Ratheeb al-Haddad"
+      ],
+      "criticality": "low"
+    },
+    {
+      "id": "FEAT-DUAS-001",
+      "name": "Duas / Dhikr",
+      "screens": [
+        "Duas / Dhikr"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-CAL-001",
+      "name": "Hijri calendar",
+      "screens": [
+        "Calendar"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-I18N-001",
+      "name": "Language switching (English / Malayalam)",
+      "screens": [
+        "Home header"
+      ],
+      "criticality": "medium"
+    },
+    {
+      "id": "FEAT-THEME-001",
+      "name": "Dark / light mode",
+      "screens": [
+        "Home header"
+      ],
+      "criticality": "low"
+    },
+    {
+      "id": "FEAT-A11Y-001",
+      "name": "Accessibility semantics",
+      "screens": [
+        "All"
+      ],
+      "criticality": "medium"
+    }
+  ],
+  "not_discovered_or_out_of_scope": [
+    "Google sign-in (mentioned in Settings privacy text; no sign-in entry found in the web UI)",
+    "Native-only: push notifications, Adhan playback, haptics, real compass/geolocation, in-app review, VersionHub update popup",
+    "Backend API (Django) – covered only by existing automated tests, not black-box"
+  ]
+}

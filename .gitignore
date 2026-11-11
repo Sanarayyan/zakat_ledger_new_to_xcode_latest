@@ -50,3 +50,10 @@ backend/venv/
 *.log
 scratch/
 test*.mp3
+
+# CodeGraph index
+.codegraph/
+
+__pycache__/
+*.pyc
+.claude/

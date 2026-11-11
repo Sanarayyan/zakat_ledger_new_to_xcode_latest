@@ -1,0 +1,142 @@
+{
+  "UI-ONB-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-ONB-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-ONB-003": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-ONB-004": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
+  },
+  "UI-ONB-005": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-ONB-006": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-DASH-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-DASH-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
+  },
+  "UI-NAV-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
+  },
+  "UI-NAV-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-PRAY-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-PRAY-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-QURAN-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-QURAN-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-QURAN-003": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-QURAN-004": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-TASBIH-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-TASBIH-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-QIBLA-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-SET-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-SET-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-SET-003": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-ASMA-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-ZAKAT-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
+  },
+  "UI-WOMEN-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-WOMEN-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-03-REGRESSION"
+  },
+  "UI-HAJJ-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-UMRAH-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-RATHEEB-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-DUAS-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-CAL-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-01"
+  },
+  "UI-I18N-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-THEME-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-02-REGRESSION"
+  },
+  "UI-A11Y-001": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
+  },
+  "UI-A11Y-002": {
+    "status": "PASS",
+    "from_run": "RUN-2026-11-11-04-REGRESSION"
+  }
+}

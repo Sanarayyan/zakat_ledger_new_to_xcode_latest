@@ -1,0 +1,30 @@
+.sticky-audio-player.quran-audio-player {
+    display: grid; gap: .125rem; max-width: 48rem; margin-inline: auto;
+    padding: .5rem max(.75rem, env(safe-area-inset-right)) calc(.35rem + env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left));
+    background: var(--bg-card, #fff); color: var(--text-main);
+}
+.quran-audio-controls, .quran-audio-progress { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.quran-audio-track { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.quran-audio-track > * { display: block; }
+.quran-audio-track span { color: var(--text-muted); font-size: .875rem; }
+.quran-audio-controls .sap-play-pause, .quran-audio-controls .sap-close {
+    flex: 0 0 44px; min-height: 44px; min-width: 44px; font-size: 1.125rem;
+}
+.quran-audio-controls select { min-height: 44px; font: inherit; color: inherit; background: var(--bg-card); border: 1px solid var(--border); border-radius: .5rem; }
+.quran-audio-progress { font-size: .8rem; font-variant-numeric: tabular-nums; }
+.quran-audio-progress input { flex: 1; min-width: 0; min-height: 44px; margin: 0; accent-color: var(--primary); }
+.quran-reader.has-audio .surah-detail-content { padding-bottom: calc(8rem + env(safe-area-inset-bottom)); }
+.quran-reader.has-audio [id^="ayah-"] { scroll-margin-bottom: calc(8rem + env(safe-area-inset-bottom)); }
+.surah-navigation { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; padding: .75rem; }
+.surah-navigation button {
+    flex: 1 1 8rem; min-height: 44px; font: inherit; color: var(--text-main);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: .75rem;
+}
+.surah-navigation p { flex-basis: 100%; margin: 0; }
+.surah-navigation.is-complete {
+    position: sticky; bottom: env(safe-area-inset-bottom); z-index: 20;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: .75rem;
+}
+.surah-navigation small { display: block; color: var(--text-muted); overflow-wrap: anywhere; }
+.surah-navigation button:disabled { opacity: .5; }
+.quran-auto-next { display: flex; gap: .5rem; align-items: start; margin-bottom: .5rem; }

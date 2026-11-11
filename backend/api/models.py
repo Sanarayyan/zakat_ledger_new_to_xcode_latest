@@ -13,6 +13,31 @@ After that you can open db.sqlite3 and literally SEE your data.
 
 from django.db import models
 import json
+import uuid
+
+
+class AccountDeletionReceipt(models.Model):
+    id = models.UUIDField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class LoginChallenge(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nonce_hash = models.CharField(max_length=64)
+    expires_at = models.DateTimeField(db_index=True)
+
+
+class GoogleIdentity(models.Model):
+    google_subject = models.CharField(max_length=255, unique=True)
+    user_email = models.EmailField(unique=True)
+
+
+class AccessSession(models.Model):
+    token_hash = models.CharField(max_length=64, unique=True)
+    user_email = models.EmailField(db_index=True)
+    google_subject = models.CharField(max_length=255)
+    expires_at = models.DateTimeField(db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class ZakatCalculation(models.Model):
@@ -100,10 +125,12 @@ class ZakatCalculation(models.Model):
     # When was this calculated?
     # auto_now_add=True means Django sets this automatically on creation
     created_at = models.DateTimeField(auto_now_add=True)
+    request_id = models.UUIDField(null=True, blank=True)
 
     class Meta:
         db_table = 'zakat_calculations'  # Exact table name in SQLite
         ordering = ['-created_at']       # Newest first when listing
+        constraints = [models.UniqueConstraint(fields=['user_email', 'request_id'], name='unique_user_calculation_request')]
 
     def __str__(self):
         # What shows in Django Admin panel
