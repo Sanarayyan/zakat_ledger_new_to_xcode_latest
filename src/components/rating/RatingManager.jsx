@@ -1,3 +1,5 @@
+import { createRatingTransaction } from '../../services/ratingTransaction.mjs';
+import { appStorage } from '../../services/appStorage';
 import React, { useEffect } from 'react';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
@@ -11,9 +13,10 @@ const RATING_PREF_KEY = 'zakat_app_rating_data';
 
 export default function RatingManager() {
     useEffect(() => {
+        let mounted = true;
         const reviewService = new InAppReviewService({
             gateway: {
-                isAvailable: async () => Capacitor.isNativePlatform(),
+                isAvailable: async () => mounted && Capacitor.isNativePlatform(),
                 requestReview: async () => InAppReview.requestReview(),
             },
             onError: (error) => {
@@ -21,7 +24,8 @@ export default function RatingManager() {
             },
         });
 
-        const handleCheckRating = async (event) => {
+        const transaction = createRatingTransaction();
+        const handleCheckRating = (event) => transaction.run(async isActive => {
             const triggerSource = event.detail?.source;
             if (!triggerSource) return;
 
@@ -38,8 +42,8 @@ export default function RatingManager() {
                 let shouldShow = false;
 
                 if (triggerSource === 'launch') {
-                    const launches = parseInt(localStorage.getItem('zakat_launch_count') || '0', 10);
-                    const firstLaunch = localStorage.getItem('zakat_first_launch');
+                    const launches = parseInt(appStorage.getItem('zakat_launch_count') || '0', 10);
+                    const firstLaunch = appStorage.getItem('zakat_first_launch');
                     
                     let daysSinceFirst = 0;
                     if (firstLaunch) {
@@ -58,14 +62,14 @@ export default function RatingManager() {
                     // Triggers when qibla is aligned
                     shouldShow = true;
                 } else if (triggerSource === 'duas') {
-                    const duaFavs = JSON.parse(localStorage.getItem('dua_favorites') || '[]');
+                    const duaFavs = JSON.parse(appStorage.getItem('dua_favorites') || '[]');
                     if (duaFavs.length >= 3) shouldShow = true;
                 } else if (triggerSource === 'quran') {
-                    const quranSessions = parseInt(localStorage.getItem('zakat_quran_sessions') || '0', 10);
+                    const quranSessions = parseInt(appStorage.getItem('zakat_quran_sessions') || '0', 10);
                     if (quranSessions >= 10) shouldShow = true;
                 }
 
-                if (shouldShow) {
+                if (shouldShow && isActive()) {
                     const result = await reviewService.requestAfterSuccessfulAction();
 
                     if (result === ReviewRequestResult.REQUESTED) {
@@ -96,18 +100,22 @@ export default function RatingManager() {
             } catch (e) {
                 console.error("Failed to check rating preferences", e);
             }
-        };
+        });
 
         // Attach global listener
         window.addEventListener('checkAppRating', handleCheckRating);
 
         // Expose a simple function to trigger the event safely from anywhere
-        window.checkAppRating = (source) => {
+        const triggerRating = (source) => {
             const event = new CustomEvent('checkAppRating', { detail: { source } });
             window.dispatchEvent(event);
         };
 
+        window.checkAppRating = triggerRating;
         return () => {
+            mounted = false;
+            transaction.dispose();
+            if (window.checkAppRating === triggerRating) delete window.checkAppRating;
             window.removeEventListener('checkAppRating', handleCheckRating);
         };
     }, []);

@@ -1,3 +1,4 @@
+import { appStorage } from '../../services/appStorage';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -101,7 +102,7 @@ const ReadingSettingsModal = ({
                                             className={`rsm-theme-card ${quranTheme === theme.id ? 'active' : ''}`}
                                             onClick={() => {
                                                 setQuranTheme(theme.id);
-                                                localStorage.setItem('quran_theme', theme.id);
+                                                appStorage.setItem('quran_theme', theme.id);
                                             }}
                                         >
                                             <div className={`rsm-theme-preview ${theme.bgClass}`}>
@@ -152,7 +153,7 @@ const ReadingSettingsModal = ({
                                         onChange={(e) => {
                                             const sz = parseInt(e.target.value);
                                             setFontSize(sz);
-                                            localStorage.setItem('quran_font_size', sz);
+                                            appStorage.setItem('quran_font_size', sz);
                                         }}
                                         className="rsm-slider"
                                     />
@@ -171,7 +172,7 @@ const ReadingSettingsModal = ({
                                             checked={showTranslation} 
                                             onChange={(e) => {
                                                 setShowTranslation(e.target.checked);
-                                                localStorage.setItem('quran_show_translation', e.target.checked);
+                                                appStorage.setItem('quran_show_translation', e.target.checked);
                                             }}
                                         />
                                         <span className="slider round"></span>
@@ -189,7 +190,7 @@ const ReadingSettingsModal = ({
                                             checked={showTransliteration} 
                                             onChange={(e) => {
                                                 setShowTransliteration(e.target.checked);
-                                                localStorage.setItem('quran_show_transliteration', e.target.checked);
+                                                appStorage.setItem('quran_show_transliteration', e.target.checked);
                                             }}
                                         />
                                         <span className="slider round"></span>

@@ -1,3 +1,9 @@
+import { gregorianDay, orderedHijriMonth, shiftHijriMonth } from '../../services/hijriMonth.mjs';
+import { ISLAMIC_EVENTS, EVENT_MESSAGES } from '../../services/calendarEvents.mjs';
+import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { createLatestRequest, fetchJSON } from '../../services/latestRequest.mjs';
+import { appStorage } from '../../services/appStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../LanguageContext';
@@ -8,28 +14,6 @@ const MONTH_KEYS = [
     'jumada_al_ula', 'jumada_al_akhira', 'rajab', 'shaban',
     'ramadan', 'shawwal', 'dhu_al_qidah', 'dhu_al_hijjah'
 ];
-
-const ISLAMIC_EVENTS = {
-    "1-1": { key: "hijri_new_year", type: "festival" },
-    "10-1": { key: "ashura", type: "special_day" },
-    "12-3": { key: "mawlid", type: "special_day" },
-    "1-9": { key: "start_ramadan", type: "special_day" },
-    "27-9": { key: "laylat_al_qadr", type: "special_day" },
-    "1-10": { key: "eid_al_fitr", type: "festival" },
-    "9-12": { key: "day_arafah", type: "special_day" },
-    "10-12": { key: "eid_al_adha", type: "festival" }
-};
-
-const EVENT_MESSAGES = {
-    "hijri_new_year": { title: "✨ Islamic New Year", body: "Welcome the new Hijri year with reflection and prayers." },
-    "ashura": { title: "🌙 Day of Ashura", body: "A blessed day for fasting and remembrance." },
-    "mawlid": { title: "✨ Mawlid al-Nabi", body: "Remembering the birth and life of the Prophet ﷺ." },
-    "start_ramadan": { title: "🌙 Ramadan Mubarak", body: "The blessed month of fasting has arrived." },
-    "laylat_al_qadr": { title: "✨ Laylat al-Qadr", body: "Seek the Night of Decree with abundant prayers." },
-    "eid_al_fitr": { title: "🌙 Eid al-Fitr Mubarak!", body: "May Allah accept your fasting and worship." },
-    "day_arafah": { title: "🕋 Day of Arafah Today", body: "A beautiful day for dua and reflection." },
-    "eid_al_adha": { title: "🕋 Eid al-Adha Mubarak!", body: "May Allah accept your sacrifices and prayers." }
-};
 
 export default function CalendarPage() {
     const navigate = useNavigate();
@@ -42,12 +26,14 @@ export default function CalendarPage() {
     const [loading, setLoading] = useState(true);
     const [isDark, setIsDark] = useState(false);
     const [error, setError] = useState(null);
-    const [isHijriPriority, setIsHijriPriority] = useState(localStorage.getItem('calendar_priority') === 'hijri');
-    const [notificationsEnabled, setNotificationsEnabled] = useState(localStorage.getItem('event_notifications') === 'true');
+    const [initAttempt, setInitAttempt] = useState(0);
+    const [isHijriPriority, setIsHijriPriority] = useState(appStorage.getItem('calendar_priority') === 'hijri');
+    const [notificationsEnabled, setNotificationsEnabled] = useState(appStorage.getItem('event_notifications') === 'true');
     const [toastMessage, setToastMessage] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const menuRef = useRef(null);
+    const calendarRequest = useRef(createLatestRequest());
 
     const showToast = (msg) => {
         setToastMessage(msg);
@@ -55,36 +41,35 @@ export default function CalendarPage() {
     };
 
     const checkEventNotifications = (hijri) => {
-        if (localStorage.getItem('event_notifications') !== 'true') return;
+        if (Capacitor.isNativePlatform() || appStorage.getItem('event_notifications') !== 'true') return;
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
         const hDay = parseInt(hijri.day);
         const hMonth = parseInt(hijri.month.number);
 
-        const checkDate = (d, m, isTomorrow) => {
+        const checkDate = (d, m, isTomorrow, year = hijri.year) => {
             const eventKey = `${d}-${m}`;
             const eventData = ISLAMIC_EVENTS[eventKey];
             if (eventData && EVENT_MESSAGES[eventData.key]) {
-                const uniqueId = `${eventData.key}-${hijri.year}-${isTomorrow ? 'tomorrow' : 'today'}`;
-                const lastNotified = localStorage.getItem('last_notified_event_date');
+                const uniqueId = `${eventData.key}-${year}-${isTomorrow ? 'tomorrow' : 'today'}`;
+                const lastNotified = appStorage.getItem('last_notified_event_date');
                 if (lastNotified !== uniqueId) {
                     const msg = EVENT_MESSAGES[eventData.key];
                     const title = isTomorrow ? `Tomorrow: ${msg.title}` : msg.title;
                     new Notification(title, { body: msg.body });
-                    localStorage.setItem('last_notified_event_date', uniqueId);
+                    appStorage.setItem('last_notified_event_date', uniqueId);
                 }
             }
         };
 
         checkDate(hDay, hMonth, false);
         
-        let nextDay = hDay + 1;
-        let nextMonth = hMonth;
-        if (nextDay > 30) {
-            nextDay = 1;
-            nextMonth = hMonth === 12 ? 1 : hMonth + 1;
-        }
-        checkDate(nextDay, nextMonth, true);
+        const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+        const date = `${tomorrow.getDate()}-${tomorrow.getMonth() + 1}-${tomorrow.getFullYear()}`;
+        fetchJSON(`https://api.aladhan.com/v1/gToH?date=${date}`).then(data => {
+            const next = data.data?.hijri;
+            if (next) checkDate(Number(next.day), Number(next.month.number), true, next.year);
+        }).catch(() => {});
     };
 
     useEffect(() => {
@@ -110,14 +95,17 @@ export default function CalendarPage() {
 
     useEffect(() => {
         const initCalendar = async () => {
+            setError(null);
+            setLoading(true);
             try {
                 const today = new Date();
                 const dd = String(today.getDate()).padStart(2, '0');
                 const mm = String(today.getMonth() + 1).padStart(2, '0');
                 const yyyy = today.getFullYear();
                 
-                const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dd}-${mm}-${yyyy}`);
-                const data = await res.json();
+                const result = await calendarRequest.current.run(signal => fetchJSON(`https://api.aladhan.com/v1/gToH?date=${dd}-${mm}-${yyyy}`, { signal }));
+                if (!result) return;
+                const data = result.value;
                 if (data.code === 200) {
                     const hijri = data.data.hijri;
                     setTodayHijri(hijri);
@@ -137,41 +125,35 @@ export default function CalendarPage() {
         };
 
         initCalendar();
-    }, []);
+        return () => calendarRequest.current.cancel();
+    }, [initAttempt]);
 
     const fetchMonthData = async (month, year) => {
         if (!month || !year) return;
         setLoading(true);
+        setError(null);
+        setSelectedDay(null);
+        let current = false;
         try {
-            const res = await fetch(`https://api.aladhan.com/v1/hToGCalendar/${month}/${year}`);
-            const data = await res.json();
-            if (data.code === 200) {
-                setCalendarData(data.data);
-            } else {
-                throw new Error("API Error");
-            }
+            const result = await calendarRequest.current.run(signal => fetchJSON(`https://api.aladhan.com/v1/hToGCalendar/${month}/${year}`, { signal }));
+            if (!result) return;
+            current = true;
+            const data = result.value;
+            if (data.code !== 200) throw new Error('Calendar request failed');
+            setCalendarData(orderedHijriMonth(data.data, month, year));
         } catch (err) {
+            current = true;
             console.error("Failed to fetch month data", err);
             setError("Failed to load calendar data.");
         } finally {
-            setLoading(false);
+            if (current) setLoading(false);
         }
     };
 
     const handleNavigate = (direction) => {
-        let newMonth = currentView.month + direction;
-        let newYear = currentView.year;
-
-        if (newMonth > 12) {
-            newMonth = 1;
-            newYear += 1;
-        } else if (newMonth < 1) {
-            newMonth = 12;
-            newYear -= 1;
-        }
-
-        setCurrentView({ month: newMonth, year: newYear });
-        fetchMonthData(newMonth, newYear);
+        const next = shiftHijriMonth(currentView, direction);
+        setCurrentView(next);
+        fetchMonthData(next.month, next.year);
     };
 
     const getEvent = (day, month) => {
@@ -183,23 +165,32 @@ export default function CalendarPage() {
     const togglePriority = () => {
         const newValue = !isHijriPriority;
         setIsHijriPriority(newValue);
-        localStorage.setItem('calendar_priority', newValue ? 'hijri' : 'gregorian');
+        appStorage.setItem('calendar_priority', newValue ? 'hijri' : 'gregorian');
     };
 
-    const toggleNotifications = () => {
+    const toggleNotifications = async () => {
         const newState = !notificationsEnabled;
+        if (Capacitor.isNativePlatform()) {
+            try {
+                if (newState && (await LocalNotifications.requestPermissions()).display !== 'granted') { showToast(t('enable_notifications')); return; }
+                setNotificationsEnabled(newState);
+                appStorage.setItem('event_notifications', String(newState));
+                window.dispatchEvent(new Event('event-reminders-change'));
+            } catch { showToast(t('notifications_unsupported')); }
+            return;
+        }
         
         if (newState) {
             if ('Notification' in window) {
                 if (Notification.permission === 'granted') {
                     setNotificationsEnabled(true);
-                    localStorage.setItem('event_notifications', 'true');
+                    appStorage.setItem('event_notifications', 'true');
                     showToast(t('reminders_enabled'));
                 } else if (Notification.permission !== 'denied') {
                     Notification.requestPermission().then(permission => {
                         if (permission === 'granted') {
                             setNotificationsEnabled(true);
-                            localStorage.setItem('event_notifications', 'true');
+                            appStorage.setItem('event_notifications', 'true');
                             showToast(t('reminders_enabled'));
                         } else {
                             showToast(t('enable_notifications'));
@@ -213,7 +204,7 @@ export default function CalendarPage() {
             }
         } else {
             setNotificationsEnabled(false);
-            localStorage.setItem('event_notifications', 'false');
+            appStorage.setItem('event_notifications', 'false');
             showToast(t('notifications_paused'));
         }
     };
@@ -228,14 +219,19 @@ export default function CalendarPage() {
 
     const currentMonthKey = currentView.month > 0 ? MONTH_KEYS[currentView.month - 1] : null;
 
+    const monthFormat = new Intl.DateTimeFormat(lang === 'ml' ? 'ml-IN' : 'en-GB', {
+        month: 'short', year: 'numeric', timeZone: 'UTC', calendar: 'gregory',
+    });
+    const range = !loading && calendarData.length ? [...new Set([
+        monthFormat.format(gregorianDay(calendarData[0].gregorian.date)),
+        monthFormat.format(gregorianDay(calendarData.at(-1).gregorian.date)),
+    ])].join(' – ') : '';
+
     const renderGridCells = () => {
         if (!calendarData.length || !calendarData[0].gregorian) return null;
         
-        const firstDay = calendarData[0].gregorian;
-        const [d, m, y] = firstDay.date.split('-');
-        const dateObj = new Date(y, m - 1, d);
-        const firstDayOfWeek = dateObj.getDay(); 
-        
+        const firstDayOfWeek = gregorianDay(calendarData[0].gregorian.date).getUTCDay();
+
         const cells = [];
         
         for (let i = 0; i < firstDayOfWeek; i++) {
@@ -250,9 +246,9 @@ export default function CalendarPage() {
             const extraCount = eventList.length - maxVisible;
 
             const isToday = todayHijri && 
-                            day.hijri.day === todayHijri.day && 
-                            day.hijri.month.number === todayHijri.month.number && 
-                            day.hijri.year === todayHijri.year;
+                            Number(day.hijri.day) === Number(todayHijri.day) && 
+                            Number(day.hijri.month.number) === Number(todayHijri.month.number) && 
+                            Number(day.hijri.year) === Number(todayHijri.year);
             
             const primaryDay = isHijriPriority ? day.hijri.day : day.gregorian.day;
             const secondaryDay = isHijriPriority ? day.gregorian.day : day.hijri.day;
@@ -260,26 +256,29 @@ export default function CalendarPage() {
             const hasEventClass = eventList.length > 0 ? `has-event ${eventList[0].type}` : '';
 
             cells.push(
-                <div 
+                <button type="button"
                     key={day.hijri.date} 
                     className={`grid-cell ${isToday ? 'today' : ''} ${selectedDay?.hijri?.date === day.hijri.date ? 'selected' : ''} ${hasEventClass}`}
+                    aria-label={`Hijri ${day.hijri.day} ${t(currentMonthKey)}, Gregorian ${day.gregorian.date}`}
+                    aria-current={isToday ? 'date' : undefined}
+                    aria-pressed={selectedDay?.hijri?.date === day.hijri.date}
                     onClick={() => setSelectedDay(day)}
                 >
-                    <div className="cell-content-wrapper">
+                    <span className="cell-content-wrapper">
                         <span className="cell-primary-day">{primaryDay}</span>
                         <span className="cell-secondary-day">{secondaryDay}</span>
-                    </div>
+                    </span>
                     {eventList.length > 0 && (
-                        <div className="event-markers-container">
+                        <span className="event-markers-container" aria-hidden="true">
                             {visibleEvents.map((ev, idx) => (
-                                <div key={idx} className={`event-marker ${ev.type}`}></div>
+                                <span key={idx} className={`event-marker ${ev.type}`}></span>
                             ))}
                             {extraCount > 0 && (
-                                <div className="event-marker-extra">+{extraCount}</div>
+                                <span className="event-marker-extra">+{extraCount}</span>
                             )}
-                        </div>
+                        </span>
                     )}
-                </div>
+                </button>
             );
         });
         
@@ -350,7 +349,7 @@ export default function CalendarPage() {
                     {error ? (
                         <div className="calendar-error-panel">
                             <p>{error}</p>
-                            <button onClick={() => window.location.reload()}>{t('retry') || 'Retry'}</button>
+                            <button onClick={() => currentView.month ? fetchMonthData(currentView.month, currentView.year) : setInitAttempt(attempt => attempt + 1)}>{t('retry')}</button>
                         </div>
                     ) : (loading && !calendarData.length) ? (
                         <div className="calendar-loading-inline">
@@ -377,9 +376,9 @@ export default function CalendarPage() {
                                             <span className="secondary-date">
                                                 {isHijriPriority 
                                                     ? today.toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-GB', { day: 'numeric', month: 'short' })
-                                                    : `${todayHijri.day} ${t(MONTH_KEYS[todayHijri.month.number - 1]).substring(0, 3)}`}
+                                                    : `${todayHijri.day} ${t(MONTH_KEYS[todayHijri.month.number - 1])}`}
                                             </span>
-                                            <span className="secondary-year">{isHijriPriority ? `${todayHijri.year} AH` : today.getFullYear()}</span>
+                                            <span className="secondary-year">{isHijriPriority ? today.getFullYear() : `${todayHijri.year} AH`}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -387,22 +386,26 @@ export default function CalendarPage() {
 
                             {/* Month Navigation */}
                             <div className="month-nav-container">
-                                <button className="nav-btn-refined" onClick={() => handleNavigate(-1)}>
+                                <button className="nav-btn-refined" aria-label="Previous Hijri month" onClick={() => handleNavigate(-1)}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                                 </button>
                                 <div className="current-month-display">
-                                    <h2>{currentMonthKey ? t(currentMonthKey) : '...'} {currentView.year || ''}</h2>
+                                    <h2>{currentMonthKey ? t(currentMonthKey) : '...'} {currentView.year || ''} AH</h2>
                                     <p className="gregorian-range-refined">
-                                        {calendarData.length > 0 && calendarData[0].gregorian ? `${calendarData[0].gregorian.month.en} ${calendarData[0].gregorian.year}` : '...'}
+                                        {range}
                                     </p>
                                 </div>
-                                <button className="nav-btn-refined" onClick={() => handleNavigate(1)}>
+                                <button className="nav-btn-refined" aria-label="Next Hijri month" onClick={() => handleNavigate(1)}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </button>
                             </div>
 
                             {/* Calendar Grid */}
                             <div className="calendar-grid-premium">
+                                <p className="calendar-date-key">
+                                    <strong>{isHijriPriority ? (lang === 'ml' ? 'ഹിജ്റി' : 'Hijri') : (lang === 'ml' ? 'ഗ്രിഗോറിയൻ' : 'Gregorian')}</strong>
+                                    <span> / {isHijriPriority ? (lang === 'ml' ? 'ഗ്രിഗോറിയൻ' : 'Gregorian') : (lang === 'ml' ? 'ഹിജ്റി' : 'Hijri')}</span>
+                                </p>
                                 <div className="weekday-header-refined">
                                     {(lang === 'ml' ? ['ഞാ', 'തി', 'ചൊ', 'ബു', 'വ്യാ', 'വെ', 'ശ'] : ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']).map((d, i) => <div key={i}>{d}</div>)}
                                 </div>

@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../LanguageContext';
 import { DHIKR_LIST } from './dhikrData';
@@ -18,9 +20,9 @@ export default function DhikrLibraryModal({ isOpen, onClose, onSelect, selectedI
 
     useEffect(() => {
         if (isOpen) {
-            setFavorites(JSON.parse(localStorage.getItem('tasbih_favorites') || '[]'));
-            setCustomDhikrs(JSON.parse(localStorage.getItem('tasbih_custom_dhikr') || '[]'));
-            setRecentDhikrs(JSON.parse(localStorage.getItem('tasbih_recent_dhikr') || '[]'));
+            setFavorites(readStoredJSON(appStorage, 'tasbih_favorites', []));
+            setCustomDhikrs(readStoredJSON(appStorage, 'tasbih_custom_dhikr', []));
+            setRecentDhikrs(readStoredJSON(appStorage, 'tasbih_recent_dhikr', []));
             setSearch('');
             setActiveTab('All');
         }
@@ -35,13 +37,13 @@ export default function DhikrLibraryModal({ isOpen, onClose, onSelect, selectedI
             updatedFavs.push(dhikr.id);
         }
         setFavorites(updatedFavs);
-        localStorage.setItem('tasbih_favorites', JSON.stringify(updatedFavs));
+        appStorage.setItem('tasbih_favorites', JSON.stringify(updatedFavs));
     };
 
     const handleSelect = (dhikr) => {
         // Save to recent
         let updatedRecents = [dhikr.id, ...recentDhikrs.filter(id => id !== dhikr.id)].slice(0, 5);
-        localStorage.setItem('tasbih_recent_dhikr', JSON.stringify(updatedRecents));
+        appStorage.setItem('tasbih_recent_dhikr', JSON.stringify(updatedRecents));
         onSelect(dhikr);
     };
 
@@ -58,7 +60,7 @@ export default function DhikrLibraryModal({ isOpen, onClose, onSelect, selectedI
         };
         const updated = [customEntry, ...customDhikrs];
         setCustomDhikrs(updated);
-        localStorage.setItem('tasbih_custom_dhikr', JSON.stringify(updated));
+        appStorage.setItem('tasbih_custom_dhikr', JSON.stringify(updated));
         setShowAddCustom(false);
         setNewCustom({ name: '', arabic: '', meaning_en: '', meaning_ml: '' });
         setActiveTab('Custom');

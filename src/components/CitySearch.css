@@ -1,0 +1,10 @@
+.city-search { display: grid; gap: .5rem; text-align: start; margin-block: .75rem; min-width: 0; }
+.city-search input, .city-search button {
+    width: 100%; min-height: 44px; padding: .55rem .75rem; color: inherit;
+    border: 1px solid var(--border, #80948a); border-radius: .65rem;
+    background: var(--bg-card, transparent); font: inherit; text-align: start;
+}
+.city-search input:focus-visible, .city-search button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.city-search ul { display: grid; gap: .375rem; list-style: none; padding: 0; margin: 0; }
+.city-search small { display: block; line-height: 1.4; overflow-wrap: anywhere; }
+.city-search [role="status"]:empty { display: none; }

@@ -1,7 +1,11 @@
+import { versionHubEndpoint } from './versionHubEndpoint.mjs';
+import { appStorage } from './appStorage';
 import { App } from '@capacitor/app';
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
+import { UPDATE_TEST_KEY, updateTestResponse } from './updateTestPolicy.mjs';
 
 let versionCheckPromise = null;
+let checkingVersion = false;
 
 export const versionHubService = {
     /**
@@ -9,18 +13,16 @@ export const versionHubService = {
      * Uses CapacitorHttp on native iOS/Android to bypass CORS.
      * Prevents duplicate requests per app launch by caching the promise.
      */
-    checkVersion: async () => {
+    checkVersion: async ({ retry = false } = {}) => {
+        if (retry && !checkingVersion) versionCheckPromise = null;
         if (versionCheckPromise) {
             return versionCheckPromise;
         }
 
+        checkingVersion = true;
         versionCheckPromise = (async () => {
             try {
-                const detectedPlatform = Capacitor.getPlatform();
-                const platform =
-                    detectedPlatform === 'web'
-                    ? 'ios'
-                    : detectedPlatform;
+                const platform = Capacitor.getPlatform();
                 console.log('VersionHub Platform:', platform);
 
                 let current_version = '1.0.0';
@@ -39,6 +41,10 @@ export const versionHubService = {
 
                 console.log('VersionHub current_version:', current_version);
                 console.log('VersionHub current_build_number:', current_build_number);
+                if (import.meta.env.MODE === 'device-test' && import.meta.env.VITE_VERSIONHUB_LIVE_TEST !== 'true') {
+                    const action = appStorage.getItem(UPDATE_TEST_KEY);
+                    if (action) return updateTestResponse(action, current_version);
+                }
 
                 const payload = {
                     application_name: import.meta.env.VITE_VERSIONHUB_APPLICATION_NAME || 'muslim_plus',
@@ -48,9 +54,7 @@ export const versionHubService = {
                     current_build_number: current_build_number
                 };
 
-                const url = import.meta.env.VITE_PRODUCTION_VERSIONHUB_URL
-                    || import.meta.env.VITE_LOCAL_VERSIONHUB_URL
-                    || import.meta.env.VITE_VERSIONHUB_URL;
+                const url = versionHubEndpoint(import.meta.env);
 
                 if (!url) {
                     console.warn('[VersionHub] URL not configured.');
@@ -76,6 +80,7 @@ export const versionHubService = {
                         data: payload,
                         connectTimeout: 5000,
                         readTimeout: 5000,
+                        disableRedirects: true,
                     });
                     console.log('[VersionHub] response status:', response.status);
                     if (response.status < 200 || response.status >= 300) {
@@ -86,18 +91,14 @@ export const versionHubService = {
                     // Fallback: use fetch on web browser
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 5000);
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(payload),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-                    console.log('[VersionHub] response status:', response.status);
-                    if (!response.ok) {
-                        throw new Error(`VersionHub API returned ${response.status}`);
-                    }
-                    data = await response.json();
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST', headers, body: JSON.stringify(payload), redirect: 'error', signal: controller.signal
+                        });
+                        console.log('[VersionHub] response status:', response.status);
+                        if (!response.ok) throw new Error(`VersionHub API returned ${response.status}`);
+                        data = await response.json();
+                    } finally { clearTimeout(timeoutId); }
                 }
 
                 console.log('[VersionHub] response body:', data);
@@ -110,7 +111,7 @@ export const versionHubService = {
                 console.error('[VersionHub] Check Failed:', error.message || error);
                 // Safe failure: return null to continue app launch, never crash
                 return null;
-            }
+            } finally { checkingVersion = false; }
         })();
 
         return versionCheckPromise;

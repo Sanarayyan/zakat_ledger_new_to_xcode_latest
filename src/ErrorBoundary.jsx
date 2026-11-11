@@ -20,11 +20,8 @@ export class ErrorBoundary extends React.Component {
       return (
         <div style={{ padding: 20, background: 'red', color: 'white', zIndex: 9999, position: 'relative' }}>
           <h1>Something went wrong.</h1>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo && this.state.errorInfo.componentStack}
-          </details>
+          <p>Your saved information has not been cleared. Reopen the app to try again.</p>
+          <button onClick={() => window.location.reload()}>Reopen app</button>
         </div>
       );
     }

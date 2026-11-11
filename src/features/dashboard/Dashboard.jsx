@@ -1,5 +1,8 @@
+import { locationDisplayName } from '../../services/locationService.mjs';
+import { appStorage } from '../../services/appStorage';
+import { applyTheme, storedTheme } from '../../services/startup.mjs';
 import * as Icons from '../../components/IconLibrary';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
@@ -12,12 +15,11 @@ import { getFormattedHijriDate } from '../../utils/hijri';
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const [isLightMode, setIsLightMode] = useState(() => {
-        const saved = localStorage.getItem('theme');
-        return saved ? saved === 'light-mode' : true;
-    });
+    const [isLightMode, setIsLightMode] = useState(() => storedTheme(appStorage) === 'light-mode');
     const { lang, setLang, t } = useLanguage();
-    const { nextPrayer, nextPrayerTime, countdown, timings, locating, loading, settings, locError, refresh } = usePrayer();
+    const locationSheet = useRef(null);
+    const [languageTouched, setLanguageTouched] = useState(false);
+    const { nextPrayer, nextPrayerTime, countdown, timings, locating, loading, settings, locError, detectLocation, error, refresh } = usePrayer();
     const { todayData, streak, todayComplete, completedCount, totalPrayers, prayers, togglePrayer, dismissedPrompts, dismissPrompt, isPrayerLocked } = usePrayerStreak();
     const [user, setUser] = useState(null);
     const dailyAyah = useDailyAyah(lang);
@@ -62,15 +64,14 @@ export default function Dashboard() {
         return getPrayerStatus(p) === 'missed' && !todayData[p] && !dismissedPrompts[p];
     });
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const theme = isLightMode ? 'light-mode' : 'dark-mode';
-        document.body.classList.remove('light-mode', 'dark-mode');
-        document.body.classList.add(theme);
-        localStorage.setItem('theme', theme);
+        applyTheme(document, theme);
+        appStorage.setItem('theme', theme);
     }, [isLightMode]);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('zakat_user');
+        const storedUser = appStorage.getItem('zakat_user');
         if (storedUser) {
             try {
                 setUser(JSON.parse(storedUser));
@@ -82,19 +83,38 @@ export default function Dashboard() {
 
     const toggleTheme = () => setIsLightMode(!isLightMode);
     
-    const setLanguage = (newLang) => setLang(newLang);
+    const handleAutoDetect = async () => {
+        const location = await detectLocation();
+        if (location) locationSheet.current?.close();
+    };
 
     return (
         <div className={`dash-wrapper ${isLightMode ? 'light' : 'dark'}`}>
             <div className="dash-container">
                 {/* Header */}
                 <header className="dash-header">
+                    <h1><img className="dash-brand" src="/muslim-plus-logo.png" alt="Muslim Plus" width="72" height="52" /></h1>
                     <div className="dash-actions">
-                        <div className="dash-lang-toggle">
-                            <button className={`dash-lang-btn ${lang === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')}>EN</button>
-                            <button className={`dash-lang-btn ${lang === 'ml' ? 'active' : ''}`} onClick={() => setLanguage('ml')}>മല</button>
-                        </div>
-                        <button className="dash-icon-btn" onClick={toggleTheme}>
+                        <label className={`dash-language ${languageTouched ? 'pointer-focus' : ''}`}>
+                            <span aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <ellipse cx="12" cy="12" rx="4" ry="10" />
+                                    <path d="M2 12h20M4 6.5h16M4 17.5h16" />
+                                </svg>
+                                {lang === 'ml' ? 'മല' : 'EN'}
+                                <i className="dash-chevron" />
+                            </span>
+                            <select aria-label={lang === 'ml' ? 'ഭാഷ' : 'Language'} value={lang}
+                                onPointerDown={() => setLanguageTouched(true)}
+                                onKeyDown={() => setLanguageTouched(false)}
+                                onBlur={() => setLanguageTouched(false)}
+                                onChange={event => setLang(event.target.value)}>
+                                <option value="en">English</option>
+                                <option value="ml" lang="ml">മലയാളം</option>
+                            </select>
+                        </label>
+                        <button type="button" className="dash-icon-btn" aria-label={t(isLightMode ? 'dark_mode' : 'light_mode')} onClick={toggleTheme}>
                             {isLightMode ? (
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                             ) : (
@@ -106,38 +126,34 @@ export default function Dashboard() {
 
                 {/* Main Date Card */}
                 <section className="dash-date-card">
-                    <div className="dash-date-bg-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 2.8l5 5V18h-2v-4H9v4H7v-8.2l5-5z"/></svg>
-                    </div>
                     <div className="dash-date-info">
-                        <span className="dash-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {t('todays_date')} 
-                            {settings?.location?.city && <span style={{ color: 'var(--text-muted)' }}>• {settings.location.city}</span>}
-                            {locError && (
-                                <button onClick={refresh} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'white', borderRadius: '4px', padding: '2px 6px', fontSize: '10px', marginLeft: 'auto', cursor: 'pointer' }}>
-                                    Retry Location
-                                </button>
-                            )}
-                        </span>
+                        <button type="button" className="dash-label dash-date-location" aria-haspopup="dialog" onClick={() => locationSheet.current.showModal()}>
+                            {t('todays_date')}
+                            {settings?.location && <span className="dash-city"> • {locationDisplayName(settings.location, lang)}</span>}
+                            <span className="dash-chevron" aria-hidden="true" />
+                        </button>
                         <h2>{new Date().toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</h2>
                         <p>{getFormattedHijriDate(new Date(), lang)}</p>
                     </div>
                     <div className="dash-prayer-info">
                         <div className="dash-prayer-next">
                             <span className="dash-label">{t('next_prayer')}</span>
-                            <span className="dash-prayer-name" style={{ fontSize: locating || loading ? '0.9rem' : 'inherit', opacity: locating || loading ? 0.8 : 1 }}>
-                                {locating ? 'Detecting Location...' : 
-                                 loading ? 'Fetching Prayers...' : 
-                                 nextPrayer ? `${t(nextPrayer.toLowerCase())} at ${nextPrayerTime}` : 
-                                 locError ? 'Location Failed' : 'Calculating...'}
+                            <span className="dash-prayer-name" role="status">
+                                {nextPrayer ? `${t(nextPrayer.toLowerCase())} · ${nextPrayerTime}` :
+                                    locating ? t('detecting_location') :
+                                    !settings?.location ? t('choose_location') :
+                                    loading ? (lang === 'ml' ? 'സമയം കണ്ടെത്തുന്നു…' : 'Loading prayer times…') :
+                                    (lang === 'ml' ? 'നമസ്കാര സമയം ലഭ്യമല്ല' : 'Prayer times unavailable')}
                             </span>
                         </div>
-                        <div className="dash-prayer-timer">
+                        {nextPrayer && countdown && <div className="dash-prayer-timer">
                             <span className="dash-label">{t('starts_in')}</span>
-                            <span className="dash-timer" style={{ opacity: locating || loading ? 0.5 : 1 }}>
-                                {locating || loading ? '--:--:--' : countdown || '--:--:--'}
-                            </span>
-                        </div>
+                            <span className="dash-timer">{countdown}</span>
+                        </div>}
+                        {settings?.location && !loading && (error || !nextPrayer) && <div className="dash-prayer-retry">
+                            {error && <small role="alert">{error}</small>}
+                            <button className="dash-location-button" onClick={refresh}>{t('retry')}</button>
+                        </div>}
                     </div>
 
                     {/* Missed Prayer Recovery / Nudge Alert Banner */}
@@ -368,6 +384,33 @@ export default function Dashboard() {
                         <span>{t('more') || 'More'}</span>
                     </div>
                 </nav>
+
+                <dialog ref={locationSheet} className="dash-location-sheet" aria-labelledby="dash-location-title">
+                    <h2 id="dash-location-title">{lang === 'ml' ? 'ലൊക്കേഷൻ ക്രമീകരണങ്ങൾ' : 'Location Settings'}</h2>
+                    <button type="button" className="dash-sheet-close" aria-label={t('close')} onClick={() => locationSheet.current.close()}>
+                        <Icons.CrossIcon />
+                    </button>
+                    <button type="button" className="dash-sheet-option" onClick={handleAutoDetect} disabled={locating}>
+                        <span className="dash-sheet-icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+                                <path d="M22 2 15 22l-4-9-9-4 20-7Z" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>{lang === 'ml' ? 'ലൊക്കേഷൻ കണ്ടെത്തുക' : 'Auto-detect Location'}</strong>
+                            <small role="status">{locating ? t('detecting_location') : lang === 'ml' ? 'ഫോണിലെ സ്ഥലം ഉപയോഗിക്കുക' : 'Use phone location'}</small>
+                        </span>
+                    </button>
+                    <button type="button" className="dash-sheet-option" onClick={() => {
+                        locationSheet.current.close();
+                        navigate('/prayer', { state: { chooseCity: true } });
+                    }}>
+                        <span className="dash-sheet-icon" aria-hidden="true"><Icons.SearchIcon /></span>
+                        <strong>{t('choose_city_manually')}</strong>
+                    </button>
+                    {locError && <p className="dash-location-error" role="alert">{locError}</p>}
+                    <p className="dash-sheet-helper">{lang === 'ml' ? 'നമസ്കാര സമയവും ഖിബ്ല ദിശയും പുതുക്കാൻ.' : 'Updates prayer times and the saved city for Qibla.'}</p>
+                </dialog>
             </div>
         </div>
     );

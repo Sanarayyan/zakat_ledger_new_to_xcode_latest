@@ -1,3 +1,8 @@
+import { RATHEEB_REMINDER_ID, RATHEEB_REMINDER_KEY, updateRatheebReminder } from '../../services/ratheebReminder.mjs';
+import { notificationWrites } from '../../services/notificationScheduler.mjs';
+import { createPositionPersistence } from '../../services/positionPersistence.mjs';
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -349,7 +354,6 @@ const RATHEEB_SECTIONS = [
 ];
 
 const AUDIO_URL = "https://archive.org/download/RatibAlHaddad/Ratib%20alHaddad_09.mp3";
-const REMINDER_ID = 401;
 
 export default function RatheebHaddad() {
     const navigate = useNavigate();
@@ -358,12 +362,10 @@ export default function RatheebHaddad() {
     // 1. Core States
     const [scrollProgress, setScrollProgress] = useState(0);
     const [counts, setCounts] = useState(() => {
-        const saved = localStorage.getItem('rh_counts');
-        try { return saved ? JSON.parse(saved) : {}; } catch (e) { return {}; }
+        return readStoredJSON(appStorage, 'rh_counts', {});
     });
     const [bookmarks, setBookmarks] = useState(() => {
-        const saved = localStorage.getItem('rh_bookmarks');
-        try { return saved ? JSON.parse(saved) : []; } catch (e) { return []; }
+        return readStoredJSON(appStorage, 'rh_bookmarks', []);
     });
     const [filterMode, setFilterMode] = useState('all');
 
@@ -379,16 +381,22 @@ export default function RatheebHaddad() {
     const [playerExpanded, setPlayerExpanded] = useState(false);
 
     const [reminderEnabled, setReminderEnabled] = useState(() => {
-        return localStorage.getItem('rh_reminder_enabled') === 'true';
+        return appStorage.getItem(RATHEEB_REMINDER_KEY) === 'true';
     });
 
     // Refs for synchronization to prevent stale state captures in async event loops
     const audioRef = useRef(null);
+    const positionSave = useRef(createPositionPersistence(position => appStorage.setItem('rh_audio_position', String(position))));
+    useEffect(() => {
+        const save = () => positionSave.current.flush();
+        document.addEventListener('visibilitychange', save);
+        return () => { document.removeEventListener('visibilitychange', save); save(); };
+    }, []);
     const activeSectionIdRef = useRef(1);
 
     // Save user selections
-    useEffect(() => { localStorage.setItem('rh_bookmarks', JSON.stringify(bookmarks)); }, [bookmarks]);
-    useEffect(() => { localStorage.setItem('rh_counts', JSON.stringify(counts)); }, [counts]);
+    useEffect(() => { appStorage.setItem('rh_bookmarks', JSON.stringify(bookmarks)); }, [bookmarks]);
+    useEffect(() => { appStorage.setItem('rh_counts', JSON.stringify(counts)); }, [counts]);
 
     // Handle viewport scroll progress bar
     useEffect(() => {
@@ -402,38 +410,43 @@ export default function RatheebHaddad() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Request & Sync local post-Maghrib notifications
+    const reminderBusy = useRef(false);
+    const [reminderChecking, setReminderChecking] = useState(reminderEnabled);
+    const [reminderSaving, setReminderSaving] = useState(false);
+    const [reminderError, setReminderError] = useState('');
+
+    useEffect(() => {
+        if (!reminderChecking) return;
+        let disposed = false;
+        LocalNotifications.getPending().then(({ notifications }) => {
+            // Older versions could save an enabled preference without creating an alarm.
+            if (!disposed && !notifications.some(n => n.id === RATHEEB_REMINDER_ID)) setReminderEnabled(false);
+        }).catch(() => {}).finally(() => { if (!disposed) setReminderChecking(false); });
+        return () => { disposed = true; };
+    }, [reminderChecking]);
+
     const syncNotification = useCallback(async (enabled) => {
-        localStorage.setItem('rh_reminder_enabled', enabled ? 'true' : 'false');
-        setReminderEnabled(enabled);
+        if (reminderBusy.current) return;
+        reminderBusy.current = true;
+        setReminderSaving(true);
+        setReminderError('');
         try {
-            await LocalNotifications.cancel({ notifications: [{ id: REMINDER_ID }] });
-            if (enabled) {
-                const perm = await LocalNotifications.requestPermissions();
-                if (perm.display === 'granted') {
-                    await LocalNotifications.schedule({
-                        notifications: [{
-                            id: REMINDER_ID,
-                            title: lang === 'ml' ? "റാത്തീബുൽ ഹദ്ദാദ് സമയം <Icons.BeadsIcon />" : "Ratheeb al-Haddad Time <Icons.BeadsIcon />",
-                            body: lang === 'ml' 
-                                ? "ആത്മീയ ശാന്തിക്കായി ഇന്നത്തെ റാത്തീബ് ഓതാൻ സമയമായി." 
-                                : "Time to recite today's Ratheeb al-Haddad for peace and protection.",
-                            schedule: { on: { hour: 18, minute: 30 }, repeats: true, allowWhileIdle: true },
-                            sound: 'beep.wav'
-                        }]
-                    });
-                } else {
-                    setReminderEnabled(false);
-                }
-            }
-        } catch (e) {
-            console.warn("Local notifications not available", e);
+            const changed = await notificationWrites.run(() => updateRatheebReminder(LocalNotifications, appStorage, enabled, lang));
+            if (changed) setReminderEnabled(enabled);
+            else setReminderError(lang === 'ml' ? 'ഫോൺ ക്രമീകരണങ്ങളിൽ നോട്ടിഫിക്കേഷനുകൾ അനുവദിക്കുക.'
+                : 'Allow app notifications in phone settings.');
+        } catch {
+            setReminderError(lang === 'ml' ? 'ഓർമ്മപ്പെടുത്തൽ മാറ്റാനായില്ല. വീണ്ടും ശ്രമിക്കുക.'
+                : 'Could not update the reminder. Try again.');
+        } finally {
+            reminderBusy.current = false;
+            setReminderSaving(false);
         }
     }, [lang]);
 
     // Recover saved position after initial component load
     useEffect(() => {
-        const savedTime = localStorage.getItem('rh_audio_position');
+        const savedTime = appStorage.getItem('rh_audio_position');
         if (savedTime && audioRef.current) {
             const parsed = parseFloat(savedTime);
             audioRef.current.currentTime = parsed;
@@ -453,7 +466,7 @@ export default function RatheebHaddad() {
         if (!audioRef.current) return;
         const cur = audioRef.current.currentTime;
         setCurrentTime(cur);
-        localStorage.setItem('rh_audio_position', cur.toString());
+        positionSave.current.update(cur);
 
         // Synced highlighting matching starting-ending audio intervals
         let matched = RATHEEB_SECTIONS.find(sec => cur >= sec.startTime && cur < sec.endTime);
@@ -635,7 +648,7 @@ export default function RatheebHaddad() {
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onPlay={() => { setIsPlaying(true); setIsBuffering(false); }}
-                onPause={() => setIsPlaying(false)}
+                onPause={() => { positionSave.current.flush(); setIsPlaying(false); }}
                 onWaiting={() => setIsBuffering(true)}
                 onCanPlay={() => setIsBuffering(false)}
                 onPlaying={() => { setIsPlaying(true); setIsBuffering(false); }}
@@ -674,16 +687,18 @@ export default function RatheebHaddad() {
                 <div className="rh-reminder-panel">
                     <div className="rh-reminder-text-box">
                         <span className="rh-reminder-title">
-                            {lang === 'ml' ? "പ്രതിദിന റാത്തീബ് നോട്ടിഫിക്കേഷൻ" : "Daily Maghrib Reminder"}
+                            {lang === 'ml' ? "പ്രതിദിന റാത്തീബ് നോട്ടിഫിക്കേഷൻ" : "Daily Ratheeb Reminder"}
                         </span>
                         <p className="rh-reminder-desc">
-                            {lang === 'ml' ? "എല്ലാ ദിവസവും മഗ്‌രിബിന് ശേഷം ഓതാൻ ഓർമ്മിപ്പിക്കുന്നു." : "Receive a gentle notification at 6:30 PM to recite daily."}
+                            {lang === 'ml' ? "എല്ലാ ദിവസവും പ്രാദേശിക സമയം വൈകുന്നേരം 6:30-ന് ഓർമ്മിപ്പിക്കുന്നു." : "Receive a daily reminder at 6:30 PM local time."}
                         </p>
+                        {reminderError && <p className="rh-reminder-desc" role="alert">{reminderError}</p>}
                     </div>
                     <label className="rh-switch">
                         <input 
                             type="checkbox" 
-                            checked={reminderEnabled} 
+                            checked={reminderEnabled}
+                            disabled={reminderChecking || reminderSaving}
                             onChange={(e) => syncNotification(e.target.checked)} 
                         />
                         <span className="rh-slider" />

@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -227,7 +229,7 @@ export default function TasbihCounter() {
     const [selectedDhikr, setSelectedDhikr] = useState(DHIKR_LIST[0]);
     
     const [soundEnabled, setSoundEnabled] = useState(() => {
-        const saved = localStorage.getItem('tasbihMuted');
+        const saved = appStorage.getItem('tasbihMuted');
         return saved !== 'true'; // Defaults to true (sound enabled)
     });
     const [vibrationOn, setVibrationOn] = useState(true);
@@ -235,7 +237,7 @@ export default function TasbihCounter() {
     const [showDhikrModal, setShowDhikrModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [tranquilBg, setTranquilBg] = useState(() => {
-        const saved = localStorage.getItem('tasbih_tranquil_scene');
+        const saved = appStorage.getItem('tasbih_tranquil_scene');
         if (saved === 'thasbeeh4') return 'thasbeeh4_video';
         if (saved === 'thasbeeh3') return 'thasbeeh3_video';
         if (saved === 'thasbeeh3_gif') return 'thasbeeh6_video';
@@ -251,12 +253,12 @@ export default function TasbihCounter() {
     const [hasAcknowledgedCompletion, setHasAcknowledgedCompletion] = useState(false);
     const [resumeData, setResumeData] = useState(null);
     const [playbackSpeed, setPlaybackSpeed] = useState(() => {
-        const saved = localStorage.getItem("tasbih_playback_speed");
+        const saved = appStorage.getItem("tasbih_playback_speed");
         return saved ? parseFloat(saved) : 1.0;
     });
     const [showSpeedMenu, setShowSpeedMenu] = useState(false);
     const [autoDhikrAudio, setAutoDhikrAudio] = useState(() => {
-        const saved = localStorage.getItem('tasbih_auto_audio');
+        const saved = appStorage.getItem('tasbih_auto_audio');
         return saved === 'true'; // Defaults to false
     });
     
@@ -368,13 +370,13 @@ export default function TasbihCounter() {
     };
 
     useEffect(() => {
-        localStorage.setItem('tasbih_tranquil_scene', tranquilBg);
+        appStorage.setItem('tasbih_tranquil_scene', tranquilBg);
     }, [tranquilBg]);
 
     // Initial Load & Resume Logic
     useEffect(() => {
       // Load vibration setting
-      const vibrationSetting = localStorage.getItem('tasbihVibration');
+      const vibrationSetting = appStorage.getItem('tasbihVibration');
       if (vibrationSetting !== null) setVibrationOn(vibrationSetting === 'true');
 
       // Handle navigation state for new session or resume
@@ -388,7 +390,7 @@ export default function TasbihCounter() {
       }
 
       // Determine last session
-      const storedSessions = JSON.parse(localStorage.getItem('tasbih_sessions') || '[]');
+      const storedSessions = readStoredJSON(appStorage, 'tasbih_sessions', []);
       storedSessions.sort((a, b) => new Date(b.lastActive) - new Date(a.lastActive));
       const lastSession = storedSessions[0];
 
@@ -405,7 +407,7 @@ export default function TasbihCounter() {
         setTotalCount(0);
         setHasAcknowledgedCompletion(false);
         setShowResumePrompt(false);
-        const savedThemeId = localStorage.getItem('selectedBeadTheme');
+        const savedThemeId = appStorage.getItem('selectedBeadTheme');
         if (savedThemeId) {
             const theme = BEAD_THEMES.find(t => t.id === savedThemeId);
             setSelectedTheme(theme || BEAD_THEMES[0]);
@@ -415,7 +417,7 @@ export default function TasbihCounter() {
     };
 
     const loadSession = (idToLoad) => {
-        const storedSessions = JSON.parse(localStorage.getItem('tasbih_sessions') || '[]');
+        const storedSessions = readStoredJSON(appStorage, 'tasbih_sessions', []);
         const sess = storedSessions.find(s => s.id === idToLoad);
         if (sess) {
             setSessionId(sess.id);
@@ -440,7 +442,7 @@ export default function TasbihCounter() {
 
     useEffect(() => {
         if (!sessionId) return;
-        const sessions = JSON.parse(localStorage.getItem('tasbih_sessions') || '[]');
+        const sessions = readStoredJSON(appStorage, 'tasbih_sessions', []);
         const idx = sessions.findIndex(s => s.id === sessionId);
         
         const sessionObj = {
@@ -458,11 +460,11 @@ export default function TasbihCounter() {
         if (idx >= 0) sessions[idx] = { ...sessions[idx], ...sessionObj };
         else sessions.push(sessionObj);
         
-        localStorage.setItem('tasbih_sessions', JSON.stringify(sessions));
+        appStorage.setItem('tasbih_sessions', JSON.stringify(sessions));
 
-        localStorage.setItem('tasbihMuted', (!soundEnabled).toString());
-        localStorage.setItem('tasbihVibration', vibrationOn);
-        localStorage.setItem('selectedBeadTheme', selectedTheme.id);
+        appStorage.setItem('tasbihMuted', (!soundEnabled).toString());
+        appStorage.setItem('tasbihVibration', vibrationOn);
+        appStorage.setItem('selectedBeadTheme', selectedTheme.id);
 
     }, [totalCount, sessionId, selectedDhikr, selectedTheme, soundEnabled, vibrationOn, goal, isCompleted, hasAcknowledgedCompletion]);
 
@@ -541,7 +543,7 @@ export default function TasbihCounter() {
         });
         
         // Analytics
-        const analytics = JSON.parse(localStorage.getItem('tasbih_analytics') || '{}');
+        const analytics = readStoredJSON(appStorage, 'tasbih_analytics', {});
         const today = new Date().toDateString();
         
         let streak = analytics.currentStreak || 0;
@@ -571,7 +573,7 @@ export default function TasbihCounter() {
         if (!analytics.dailyTotals[today]) analytics.dailyTotals[today] = {};
         analytics.dailyTotals[today][selectedDhikr.id] = (analytics.dailyTotals[today][selectedDhikr.id] || 0) + 1;
         analytics.lastActiveDate = today;
-        localStorage.setItem('tasbih_analytics', JSON.stringify(analytics));
+        appStorage.setItem('tasbih_analytics', JSON.stringify(analytics));
     };
 
     const decrement = async () => {
@@ -587,12 +589,12 @@ export default function TasbihCounter() {
 
     const beads = Array.from({ length: beadCount });
     
-    const maxRadius = 170; // Half of 340px max width
+    const maxRadius = 152;
     
     // Reduce size on mobile for better breathing room
     const isMobile = dimensions.width <= 480;
     const widthFactor = isMobile ? 0.35 : 0.375; // Approx 70% of width
-    const heightFactor = isMobile ? 0.20 : 0.28; // Safe scale to fit inside flex main-screen
+    const heightFactor = isMobile ? 0.18 : 0.24; // Safe scale to fit inside flex main-screen
     
     // Ensure perfectly round circle that shrinks on both small width AND small height screens
     const calculatedRadius = Math.min(
@@ -754,6 +756,7 @@ export default function TasbihCounter() {
 
             <main 
                 className="main-screen"
+                style={{ minHeight: radius * 2 + 34 }}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -763,7 +766,7 @@ export default function TasbihCounter() {
                     <div className="tasbih-display">
                         <div className={`tasbih-main-number ${isCompleted ? 'goal-glow' : ''}`} 
                              style={{ 
-                                 fontSize: goal !== 'unlimited' ? (radius < 130 ? '52px' : '72px') : (radius < 130 ? '72px' : '96px'),
+                                 fontSize: `clamp(1.75rem, ${radius * (goal === 'unlimited' ? 0.53 : 0.39)}px, 5rem)`,
                                  transition: 'font-size 0.3s ease'
                              }}>
                             {goal !== 'unlimited' ? (
@@ -837,7 +840,7 @@ export default function TasbihCounter() {
                             <path d="M4 14h16" />
                             <path d="M16 6l4 4-4 4" />
                         </svg>
-                        Swipe Left / Right to Change Dhikr
+                        {lang === 'ml' ? 'എണ്ണാൻ ടാപ്പ് ചെയ്യുക · ദിക്ർ മാറ്റാൻ സ്വൈപ്പ് ചെയ്യുക' : 'Tap to count · Swipe to change dhikr'}
                     </span>
                 </div>
 
@@ -921,9 +924,9 @@ export default function TasbihCounter() {
                                         const next = !prev;
                                         if (next && !soundEnabled) {
                                             setSoundEnabled(true);
-                                            localStorage.setItem('tasbihMuted', 'false');
+                                            appStorage.setItem('tasbihMuted', 'false');
                                         }
-                                        localStorage.setItem('tasbih_auto_audio', next ? 'true' : 'false');
+                                        appStorage.setItem('tasbih_auto_audio', next ? 'true' : 'false');
                                         return next;
                                     });
                                 }}>
@@ -941,7 +944,7 @@ export default function TasbihCounter() {
                                             className={`premium-pill-btn ${playbackSpeed === speed ? 'active-glow' : ''}`} 
                                             onClick={() => {
                                                 setPlaybackSpeed(speed);
-                                                localStorage.setItem("tasbih_playback_speed", speed.toString());
+                                                appStorage.setItem("tasbih_playback_speed", speed.toString());
                                             }}
                                         >
                                             {speed}x

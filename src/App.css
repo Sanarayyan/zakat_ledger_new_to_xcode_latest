@@ -3036,6 +3036,9 @@ body.light-mode .calculator-container-refined {
 
 /* Result Modal Refined */
 .calc-summary-modal-refined {
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
     background: var(--bg-card);
     border-radius: 1.5rem;
     padding: 1.5rem;

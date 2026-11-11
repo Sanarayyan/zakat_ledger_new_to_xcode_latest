@@ -1,0 +1,15 @@
+[
+  {"name":"gold at threshold", "input":{"category":"gold","goldEntries":[{"caliber":"24K","weight":"87.48"}]}, "expected":{"totalZakatPayable":218.70,"isBelowNisab":false}},
+  {"name":"gold below threshold", "input":{"category":"gold","goldEntries":[{"caliber":"24K","weight":"87.479999"}]}, "expected":{"totalZakatPayable":0,"isBelowNisab":true}},
+  {"name":"22K precise value", "input":{"category":"gold","goldEntries":[{"caliber":"22K","weight":"100"}]}, "expected":{"totalZakatPayable":229,"goldValue":9160}},
+  {"name":"money above threshold", "input":{"category":"money","cash":"10000"}, "expected":{"totalZakatPayable":250}},
+  {"name":"money below threshold", "input":{"category":"money","cash":"8747.99"}, "expected":{"totalZakatPayable":0,"isBelowNisab":true}},
+  {"name":"money solar year", "input":{"category":"money","cash":"10000","yearType":"calendar"}, "expected":{"totalZakatPayable":257.70}},
+  {"name":"year not completed", "input":{"category":"money","cash":"10000","hasHawl":false}, "expected":{"totalZakatPayable":0}},
+  {"name":"camel obligation", "input":{"category":"cattle","cattleType":"camels","cattle":"5","goldRate":"0"}, "expected":{"cattleZakatDue":"1 Sheep","totalZakatPayable":0,"isBelowNisab":false}},
+  {"name":"cattle profit independent of animal threshold", "input":{"category":"cattle","cattleType":"camels","cattle":"2","cash":"10000"}, "expected":{"cattleZakatDue":"0","totalZakatPayable":250,"isBelowNisab":false}},
+  {"name":"trading shares", "input":{"category":"stocks","stocksShareType":"trading","stocksNumShares":"100","stocksMarketPrice":"1000"}, "expected":{"totalZakatPayable":2500}},
+  {"name":"investment shares", "input":{"category":"stocks","stocksShareType":"investment","stocksNumShares":"100","stocksMarketPrice":"1000"}, "expected":{"totalZakatPayable":625}},
+  {"name":"purification half-up", "input":{"category":"stocks","stocksShareType":"purification","stocksDividend":"10.10","stocksNonHalalPct":"5","goldRate":"0","hasHawl":false}, "expected":{"totalZakatPayable":0.51,"isBelowNisab":false}},
+  {"name":"stock below threshold", "input":{"category":"stocks","stocksShareType":"trading","stocksNumShares":"10","stocksMarketPrice":"100"}, "expected":{"totalZakatPayable":0,"isBelowNisab":true}}
+]

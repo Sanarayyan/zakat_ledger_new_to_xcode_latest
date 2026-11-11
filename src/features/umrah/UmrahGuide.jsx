@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +40,6 @@ const ML = {
   bookmarksOnly: 'ബുക്ക്‌മാർക്കുകൾ മാത്രം',
   noBookmarks: 'ബുക്ക്‌മാർക്കുകൾ ഒന്നും ലഭ്യമല്ല',
   noResults: 'ഫലങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല',
-  playing: 'പ്ലേ ചെയ്യുന്നു...',
   audioError: 'ഓഡിയോ ഈ ഉപകരണത്തിൽ ലഭ്യമല്ല',
   checklistCats: {
     'Documents': 'രേഖകൾ', 
@@ -89,40 +90,24 @@ export default function UmrahGuide() {
 
   // Persistence States
   const [completedSteps, setCompletedSteps] = useState(() => {
-    const s = localStorage.getItem('umrah_steps_done');
-    return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'umrah_steps_done', []);
   });
   const [checklist, setChecklist] = useState(() => {
-    const s = localStorage.getItem('umrah_checklist');
-    return s ? JSON.parse(s) : {};
+    return readStoredJSON(appStorage, 'umrah_checklist', {});
   });
   const [bookmarks, setBookmarks] = useState(() => {
-    const s = localStorage.getItem('umrah_bookmarks');
-    return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'umrah_bookmarks', []);
   });
   const [recentlyViewed, setRecentlyViewed] = useState(() => {
-    const s = localStorage.getItem('umrah_recent_views');
-    return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'umrah_recent_views', []);
   });
 
-  // Audio Playback State
-  const [playingId, setPlayingId] = useState(null);
-  const audioRef = React.useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-      }
-    };
-  }, []);
   useEffect(() => {
     // Add section to recently viewed
     setRecentlyViewed(prev => {
       const filtered = prev.filter(x => x !== section);
       const next = [section, ...filtered].slice(0, 5);
-      localStorage.setItem('umrah_recent_views', JSON.stringify(next));
+      appStorage.setItem('umrah_recent_views', JSON.stringify(next));
       return next;
     });
   }, [section]);
@@ -130,7 +115,7 @@ export default function UmrahGuide() {
   const toggleStep = (id) => {
     setCompletedSteps(prev => {
       const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-      localStorage.setItem('umrah_steps_done', JSON.stringify(next));
+      appStorage.setItem('umrah_steps_done', JSON.stringify(next));
       return next;
     });
   };
@@ -138,7 +123,7 @@ export default function UmrahGuide() {
   const toggleChecklist = (key) => {
     setChecklist(prev => {
       const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem('umrah_checklist', JSON.stringify(next));
+      appStorage.setItem('umrah_checklist', JSON.stringify(next));
       return next;
     });
   };
@@ -147,55 +132,12 @@ export default function UmrahGuide() {
     setBookmarks(prev => {
       const key = `${type}::${id}`;
       const next = prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key];
-      localStorage.setItem('umrah_bookmarks', JSON.stringify(next));
+      appStorage.setItem('umrah_bookmarks', JSON.stringify(next));
       return next;
     });
   };
 
   const isBookmarked = (id, type) => bookmarks.includes(`${type}::${id}`);
-
-  // Play Dua Audio from local files
-  const playAudio = (id, text, translation) => {
-    if (playingId === id) {
-      if (audioRef.current) audioRef.current.pause();
-      setPlayingId(null);
-      return;
-    }
-
-    if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-    }
-    
-    setPlayingId(id);
-    
-    try {
-        const audioUrl = new URL(`../../assets/audio/umrah/${id}.mp3`, import.meta.url).href;
-        const audio = new Audio(audioUrl);
-        audioRef.current = audio;
-        
-        audio.oncanplaythrough = () => {
-            audio.play().catch(e => {
-                console.error("Audio playback error:", e);
-                setPlayingId(null);
-                alert(isMl ? ML.audioError : "Audio file not found or failed to play.");
-            });
-        };
-        
-        audio.onerror = () => {
-            setPlayingId(null);
-            alert(isMl ? ML.audioError : "Audio file not available.");
-        };
-        
-        audio.onended = () => {
-            setPlayingId(null);
-        };
-        
-        audio.load();
-    } catch(e) {
-        setPlayingId(null);
-    }
-  };
 
   const copyToClipboard = (dua) => {
     const text = `${dua.arabic}\n${dua.transliteration}\n${isMl && dua.meaning_ml ? dua.meaning_ml : dua.meaning}`;
@@ -334,9 +276,7 @@ export default function UmrahGuide() {
                         {isBookmarked(dua.id, 'dua') ? STAR_FILLED : STAR_EMPTY}
                       </button>
                       <button className="ug-dua-action-icon" onClick={() => copyToClipboard(dua)}><Icons.CopyIcon /></button>
-                      <button className={`ug-dua-action-icon ${playingId === dua.id ? 'pulse-green' : ''}`} onClick={() => playAudio(dua.id, dua.arabic, dua.meaning)}>
-                        {playingId === dua.id ? <Icons.PauseIcon /> : <Icons.SpeakerIcon />}
-                      </button>
+                      <span>{isMl ? ML.audioError : 'Recording unavailable'}</span>
                     </div>
                   </div>
                   <h4 className="ug-dua-title">{isMl ? dua.title_ml : dua.title}</h4>

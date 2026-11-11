@@ -728,3 +728,11 @@ input:checked + .modern-slider:before {
     from { opacity: 0; transform: translate(-50%, 20px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+.calendar-grid-premium { padding: clamp(.5rem, 3vw, 1rem); }
+.calendar-date-key { margin: 0 0 .75rem; color: var(--c-text-muted); font-size: .875rem; text-align: center; }
+.weekday-header-refined, .full-calendar-grid { column-gap: clamp(1px, 1vw, 4px); }
+.weekday-header-refined { font-size: clamp(.625rem, 2.4vw, .75rem); letter-spacing: 0; margin-bottom: .5rem; }
+.grid-cell { min-width: 0; min-height: 44px; aspect-ratio: auto; padding: .2rem 0; font: inherit; }
+.cell-primary-day { font-size: clamp(.875rem, 3.8vw, 1.15rem); }
+.cell-secondary-day { font-size: .7rem; opacity: 1; }

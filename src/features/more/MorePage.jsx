@@ -1,3 +1,5 @@
+import { calendarDay, prayerDateInZone } from '../../services/prayerCalendar.mjs';
+import { appStorage } from '../../services/appStorage';
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../LanguageContext';
@@ -50,10 +52,9 @@ export default function MorePage() {
 
     const getDayData = (offset) => {
         if (!calendar) return null;
-        const targetDate = new Date();
+        const targetDate = prayerDateInZone(calendar);
         targetDate.setDate(targetDate.getDate() + offset);
-        const day = targetDate.getDate();
-        const dayData = calendar.find(d => parseInt(d.date.gregorian.day) === day);
+        const dayData = calendarDay(calendar, targetDate);
         return dayData ? { timings: dayData.timings, date: targetDate } : null;
     };
 
@@ -96,11 +97,11 @@ export default function MorePage() {
     const day2 = getDayData(2);
     
     // Gender visibility logic
-    const [userGender, setUserGender] = useState(() => localStorage.getItem('userGender') || '');
+    const [userGender, setUserGender] = useState(() => appStorage.getItem('userGender') || '');
     
     useEffect(() => {
         const handleStorageChange = () => {
-            setUserGender(localStorage.getItem('userGender') || '');
+            setUserGender(appStorage.getItem('userGender') || '');
         };
         
         window.addEventListener('storage', handleStorageChange);
@@ -185,11 +186,10 @@ export default function MorePage() {
                         <div className="feature-icon">{MOON_ICON}</div>
                         <span className="feature-label">{t('umrah_guide')}</span>
                     </div>
-                    {/* <div className="feature-card upcoming-feature" style={{ opacity: 0.6, cursor: 'not-allowed' }} onClick={() => setShowToast(true)}>
-                        <div className="coming-soon-badge">{t('coming_soon')}</div>
-                        <div className="feature-icon" style={{ opacity: 0.5 }}>{TASBIH_ICON}</div>
-                        <span className="feature-label" style={{ height: 'auto', marginTop: '2px' }}>{lang === 'ml' ? 'റാത്തീബുൽ ഹദ്ദാദ്' : 'Ratheeb al-Haddad'}</span>
-                    </div> */}
+                    <div className="feature-card" onClick={() => navigate('/ratheeb')}>
+                        <div className="feature-icon">{TASBIH_ICON}</div>
+                        <span className="feature-label">{lang === 'ml' ? 'റാത്തീബുൽ ഹദ്ദാദ്' : 'Ratheeb al-Haddad'}</span>
+                    </div>
                 </div>
             </div>
 

@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { DUAS_DATA, DEFAULT_DUAS_DATA } from '../../constants/duasData';
 import { useLanguage } from '../../LanguageContext';
@@ -75,11 +77,11 @@ const DuasPage = ({ onBack }) => {
     const [selectedDuaId, setSelectedDuaId] = useState(null);
     const [expandedDuaId, setExpandedDuaId] = useState(null);
     const [showFullVersion, setShowFullVersion] = useState(false);
-    const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem('dua_favorites') || '[]'));
+    const [favorites, setFavorites] = useState(() => readStoredJSON(appStorage, 'dua_favorites', []));
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem('dua_favorites', JSON.stringify(favorites));
+        appStorage.setItem('dua_favorites', JSON.stringify(favorites));
     }, [favorites]);
 
     const toggleFavorite = (duaId, e) => {

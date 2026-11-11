@@ -1,3 +1,5 @@
+import { readStoredJSON } from '../../services/storedJson.mjs';
+import { appStorage } from '../../services/appStorage';
 import * as Icons from '../../components/IconLibrary';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -156,11 +158,11 @@ function DuasSection({ lang }) {
 function ChecklistSection({ lang }) {
   const isMl = lang === 'ml';
   const [checked, setChecked] = useState(() => {
-    const s = localStorage.getItem('hajj_checklist'); return s ? JSON.parse(s) : {};
+    return readStoredJSON(appStorage, 'hajj_checklist', {});
   });
   const toggle = (key) => setChecked(prev => {
     const next = {...prev, [key]: !prev[key]};
-    localStorage.setItem('hajj_checklist', JSON.stringify(next)); return next;
+    appStorage.setItem('hajj_checklist', JSON.stringify(next)); return next;
   });
   const total = CHECKLIST.reduce((s,c) => s+c.items.length, 0);
   const done = Object.values(checked).filter(Boolean).length;
@@ -233,14 +235,14 @@ export default function HajjGuide() {
   const isMl = lang === 'ml';
   const [section, setSection] = useState('journey');
   const [completed, setCompleted] = useState(() => {
-    const s = localStorage.getItem('hajj_steps_done'); return s ? JSON.parse(s) : [];
+    return readStoredJSON(appStorage, 'hajj_steps_done', []);
   });
   const toggleStep = (id) => setCompleted(prev => {
     const next = prev.includes(id) ? prev.filter(x=>x!==id) : [...prev,id];
-    localStorage.setItem('hajj_steps_done', JSON.stringify(next)); return next;
+    appStorage.setItem('hajj_steps_done', JSON.stringify(next)); return next;
   });
 
-  const userGender = localStorage.getItem('userGender');
+  const userGender = appStorage.getItem('userGender');
   const isMale = userGender?.toLowerCase() === 'male';
   const filteredSections = isMale ? SECTIONS.filter(s => s.id !== 'women') : SECTIONS;
 

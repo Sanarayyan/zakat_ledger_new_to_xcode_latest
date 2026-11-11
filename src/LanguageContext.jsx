@@ -1,10 +1,11 @@
+import { appStorage } from './services/appStorage';
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { TRANSLATIONS } from './translations';
 
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-    const [lang, setLangState] = useState(localStorage.getItem('zakat_lang') || 'en');
+    const [lang, setLangState] = useState(appStorage.getItem('zakat_lang') || 'en');
 
     useEffect(() => {
         const handleStorage = (e) => {
@@ -18,7 +19,7 @@ export const LanguageProvider = ({ children }) => {
 
     const setLang = (newLang) => {
         setLangState(newLang);
-        localStorage.setItem('zakat_lang', newLang);
+        appStorage.setItem('zakat_lang', newLang);
         window.dispatchEvent(new StorageEvent('storage', { key: 'zakat_lang', newValue: newLang }));
     };
 

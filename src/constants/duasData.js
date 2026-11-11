@@ -67,10 +67,3 @@ export const DEFAULT_DUAS_DATA = DUAS_DATA;
  * Utility to merge new dua data into existing state
  * This prevents the 'overwriting' bug reported by users.
  */
-export const mergeDuaData = (prevData, newData) => {
-  return {
-    ...prevData,
-    ...newData
-  };
-};
-

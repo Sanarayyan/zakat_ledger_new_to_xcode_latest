@@ -1267,3 +1267,20 @@
 .premium-switch {
     transform: scale(1.1);
 }
+
+.tasbih-wrapper { width: 100%; height: auto; min-height: 100dvh; overflow: clip; }
+.tasbih-header { grid-template-columns: minmax(0, 1fr) auto; padding-inline: max(.75rem, env(safe-area-inset-left)); }
+.tasbih-header-title { grid-column: auto; grid-row: 1; text-align: center; overflow-wrap: anywhere; min-width: 0; }
+.tap-left-controls { grid-row: 1; }
+.tap-right-controls { grid-column: 1 / -1; justify-self: end; }
+.active-dhikr-container { margin-block: .25rem .35rem; width: min(91%, 23rem); }
+.active-dhikr-display { padding: .4rem .75rem; border-radius: .9rem; gap: .15rem; }
+.dhikr-arabic-row { padding: 0; }
+.dhikr-name, .dhikr-meaning { overflow-wrap: anywhere; }
+.tasbih-wrapper .gesture-hint { color: #e7f4ee; text-align: center; font-size: .85rem; opacity: 1; animation: none; }
+.bottom-bead-selector { padding-inline: .75rem; }
+@media (min-width: 400px) {
+    .tasbih-header { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+    .tasbih-header-title { grid-column: 2; }
+    .tap-right-controls { grid-column: 3; grid-row: 1; }
+}

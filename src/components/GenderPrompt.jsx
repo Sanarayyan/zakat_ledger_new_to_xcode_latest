@@ -1,3 +1,4 @@
+import { appStorage } from '../services/appStorage';
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../LanguageContext';
 import './GenderPrompt.css';
@@ -7,19 +8,19 @@ export default function GenderPrompt() {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const gender = localStorage.getItem('userGender');
+        const gender = appStorage.getItem('userGender');
         if (!gender) {
             setIsVisible(true);
         }
     }, []);
 
     const handleSelect = (gender) => {
-        localStorage.setItem('userGender', gender);
+        appStorage.setItem('userGender', gender);
         setIsVisible(false);
     };
 
     const handleSkip = () => {
-        localStorage.setItem('userGender', 'not-specified');
+        appStorage.setItem('userGender', 'not-specified');
         setIsVisible(false);
     };
 

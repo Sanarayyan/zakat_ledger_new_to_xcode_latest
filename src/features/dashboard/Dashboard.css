@@ -27,8 +27,29 @@
 .dash-wrapper {
     font-family: 'Outfit', sans-serif;
     min-height: 100vh;
-    background: transparent;
+    isolation: isolate;
     color: var(--dash-text-main);
+    --dash-theme-duration: 220ms;
+}
+
+.dash-wrapper::before,
+.dash-wrapper::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--app-day-wallpaper) center / cover no-repeat;
+}
+
+.dash-wrapper::after {
+    background-image: var(--app-night-wallpaper);
+    opacity: 0;
+    transition: opacity var(--dash-theme-duration) ease;
+}
+
+.dash-wrapper.dark::after {
+    opacity: 1;
 }
 
 .dash-container {
@@ -42,14 +63,20 @@
 .dash-header {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
+    gap: 8px;
     padding: calc(12px + var(--safe-area-top, env(safe-area-inset-top))) 0 12px 0;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     box-sizing: border-box;
 }
 
-
+.dash-brand {
+    display: block;
+    /* Trim the transparent space above and below the artwork. */
+    object-fit: cover;
+    object-position: center 35%;
+}
 
 .dash-actions {
     display: flex;
@@ -58,37 +85,42 @@
     flex-shrink: 0;
 }
 
-.dash-lang-toggle {
+.dash-language {
+    position: relative;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.dash-language > span {
     display: flex;
     align-items: center;
-    background: var(--dash-accent);
-    padding: 4px;
-    border-radius: 24px;
-    border: 1px solid var(--dash-border);
-    white-space: nowrap;
+    min-height: 44px;
+    gap: 6px;
 }
 
-.dash-lang-btn {
-    border: none;
-    background: transparent;
-    color: var(--dash-text-muted);
+.dash-language select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    opacity: 0;
     cursor: pointer;
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    border-radius: 20px;
-    font-family: inherit;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    font: inherit;
 }
 
-.dash-lang-btn.active {
-    background: var(--dash-card-bg);
-    color: var(--dash-text-main);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+.dash-language:not(.pointer-focus):has(select:focus-visible),
+.dash-wrapper :is(.dash-date-location, .dash-icon-btn, .dash-sheet-close, .dash-sheet-option):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
-.dash-wrapper.dark .dash-lang-btn.active {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+.dash-chevron {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
 }
 
 .dash-icon-btn {
@@ -99,8 +131,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     transition: color 0.2s ease;
 }
@@ -112,8 +144,6 @@
 /* Main Date Card */
 .dash-date-card {
     background: rgba(244, 241, 234, 0.95); /* Ultra-readable premium solid glassmorphism */
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
     border-radius: 24px;
     padding: 24px;
     position: relative;
@@ -127,17 +157,6 @@
     background: var(--bg-card); /* Dark theme rich charcoal backdrop */
     border-color: var(--text-muted);
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
-}
-
-.dash-date-bg-icon {
-    position: absolute;
-    right: -20px;
-    top: -20px;
-    width: 150px;
-    height: 150px;
-    pointer-events: none;
-    color: var(--dash-card-bg);
-    opacity: 0.5;
 }
 
 .dash-date-info {
@@ -158,6 +177,21 @@
 
 .dash-wrapper.dark .dash-label {
     color: var(--text-muted); /* Crisp light olive */
+}
+
+.dash-date-location {
+    max-width: 100%;
+    margin-block: -12px -6px;
+    padding: 0;
+    text-align: start;
+}
+
+.dash-date-location .dash-chevron {
+    margin-inline-start: 8px;
+}
+
+.dash-date-location :is(.dash-city, .dash-chevron) {
+    color: var(--text-main);
 }
 
 .dash-date-info h2 {
@@ -1133,3 +1167,143 @@
 }
 
 
+
+.dash-date-card { padding: clamp(.875rem, 4vw, 1.5rem); }
+.dash-date-info { margin-bottom: 1rem; }
+.dash-city, .dash-prayer-name { overflow-wrap: anywhere; }
+.dash-location-button {
+    min-height: 44px; padding: .5rem .65rem; border: 1px solid var(--border);
+    border-radius: .6rem; background: var(--bg-card); color: var(--text-main); font: inherit;
+}
+
+.dash-location-sheet {
+    position: fixed;
+    inset: auto 0 calc(62px + env(safe-area-inset-bottom)) 0;
+    width: min(100%, 480px);
+    max-width: none;
+    max-height: calc(100dvh - var(--safe-area-top) - env(safe-area-inset-bottom) - 62px);
+    margin: 0 auto;
+    padding: 16px clamp(16px, 6vw, 24px) 12px;
+    background: var(--dash-card-bg);
+    color: var(--text-main);
+    border: 0;
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.14);
+    overscroll-behavior: contain;
+}
+
+.dash-wrapper.dark .dash-location-sheet {
+    background: var(--bg-dark);
+}
+
+.dash-location-sheet::backdrop {
+    background: transparent;
+}
+
+.dash-location-sheet h2 {
+    margin: 0 38px 16px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.dash-sheet-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.dash-sheet-close svg {
+    width: 32px;
+    height: 32px;
+    padding: 7px;
+    border-radius: 50%;
+    background: var(--text-main);
+    color: var(--dash-card-bg);
+}
+
+.dash-wrapper.dark .dash-sheet-close svg {
+    color: var(--bg-dark);
+}
+
+.dash-sheet-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 62px;
+    padding: 8px 14px;
+    border: 1px solid color-mix(in srgb, var(--text-main) 16%, transparent);
+    border-radius: 16px;
+    background: var(--dash-card-bg);
+    color: inherit;
+    box-shadow: var(--shadow-sm);
+    font-size: 1.05rem;
+    line-height: 1.3;
+    text-align: start;
+}
+
+.dash-sheet-option + .dash-sheet-option {
+    margin-top: 8px;
+}
+
+.dash-sheet-option:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.dash-sheet-icon {
+    display: grid;
+    flex: 0 0 42px;
+    place-items: center;
+    height: 42px;
+    border-radius: 13px;
+    background: var(--dash-accent);
+}
+
+.dash-sheet-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.dash-sheet-option small {
+    display: block;
+    color: var(--text-muted);
+}
+
+.dash-sheet-helper,
+.dash-location-sheet .dash-location-error {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.dash-prayer-info { flex-wrap: wrap; gap: .65rem 1rem; padding: clamp(.65rem, 3vw, 1rem); align-items: start; }
+.dash-prayer-next { flex: 1 1 8rem; min-width: 0; }
+.dash-prayer-timer { flex: 0 1 auto; text-align: start; }
+.dash-prayer-retry { display: flex; flex: 1 0 100%; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.dash-timer { font-variant-numeric: tabular-nums; }
+.dash-features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dash-features-grid > *, .dsc-indicators > * { min-width: 0; overflow-wrap: anywhere; }
+
+.dash-wrapper :where(*) {
+    transition-duration: var(--dash-theme-duration);
+}
+
+.dash-wrapper :is(.dash-date-card, .dash-prayer-info, .dash-streak-capsule,
+    .dash-feature-quran, .dash-feature-prayer, .dash-feature-qibla, .shortcut-card,
+    .dash-daily-ayah, .dash-bottom-nav) {
+    transition: background-color var(--dash-theme-duration) ease,
+        color var(--dash-theme-duration) ease, border-color var(--dash-theme-duration) ease,
+        box-shadow var(--dash-theme-duration) ease, transform var(--dash-theme-duration) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dash-wrapper { --dash-theme-duration: 0ms; }
+}

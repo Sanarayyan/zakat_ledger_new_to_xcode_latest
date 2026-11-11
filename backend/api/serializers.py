@@ -1,73 +1,47 @@
-"""
-ZakatLedger Serializers
-
-A serializer does TWO things:
-  1. Model → JSON  (when React asks for history, Django converts DB rows to JSON)
-  2. JSON → Model  (when React sends data, Django converts JSON to a DB-saveable object)
-
-Think of it as a TRANSLATOR between Python objects and JSON text.
-"""
+"""Serializes saved Zakat calculations for the history list."""
 
 from rest_framework import serializers
 from .models import ZakatCalculation
-import json
+from decimal import Decimal, ROUND_HALF_UP
 
 
-class ZakatCalculationSerializer(serializers.ModelSerializer):
-    """
-    Handles converting ZakatCalculation model ↔ JSON.
-
-    Used by:
-      - GET  /api/calculations/  → Django reads DB rows, serializer converts to JSON list
-      - POST /api/calculations/  → Django receives JSON, serializer saves to DB
-    """
-
-    # These are read-only computed fields added to the JSON output
-    # 'source' tells DRF to call the model method to get the value
-    input  = serializers.SerializerMethodField()
-    result = serializers.SerializerMethodField()
-
-    class Meta:
-        model  = ZakatCalculation
-        fields = [
-            'id',               # Unique ID of this calculation
-            'user_email',       # Who calculated
-            'category',         # gold / money / cattle / stocks
-            'year_type',        # islamic / calendar
-            'gold_rate',        # Gold price at time of calculation
-            'total_zakat',      # Final Zakat amount due
-            'is_below_nisab',   # Was Zakat even mandatory?
-            'zakat_rate_display', # "2.5" or "2.577"
-            'input',            # Full form data (from get_input())
-            'result',           # Full results (from get_result())
-            'created_at',       # When was it calculated
-        ]
-        # These fields are set by Django automatically — React cannot override them
-        read_only_fields = ['id', 'created_at', 'input', 'result']
-
-    def get_input(self, obj):
-        """Convert input_snapshot JSON string → Python dict for the response"""
-        return obj.get_input()
-
-    def get_result(self, obj):
-        """Convert result_snapshot JSON string → Python dict for the response"""
-        return obj.get_result()
+def history_result(obj):
+    """Present legacy snapshots consistently without overwriting historical inputs."""
+    result = obj.get_result()
+    if result.get('calculationVersion') == 2:
+        return result
+    result = dict(result)
+    below = obj.is_below_nisab
+    if obj.category == 'cattle':
+        cash = Decimal(str(result.get('cashValue', 0)))
+        cash_below = cash < obj.gold_rate * Decimal('87.48')
+        payable = 0 if cash_below else result.get('cashZakatAmount', obj.total_zakat)
+        below = result.get('cattleZakatDue', '0') == '0' and cash_below
+    elif below:
+        payable = 0
+    elif obj.category == 'gold':
+        payable = result.get('goldZakatAmount', obj.total_zakat)
+    elif obj.category == 'stocks':
+        payable = result.get('stocksPurificationAmt', 0) if result.get('shareType') == 'purification' else result.get('stocksZakatAmount', obj.total_zakat)
+    else:
+        payable = result.get('cashZakatAmount', obj.total_zakat)
+    result['isBelowNisab'] = below
+    result['totalZakatPayable'] = float(Decimal(str(payable)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
+    result['legacySnapshot'] = True
+    return result
 
 
 class ZakatCalculationListSerializer(serializers.ModelSerializer):
-    """
-    Lightweight version for listing history — only the fields needed for the history table.
-    Using a smaller serializer here means faster response and less data transferred.
-    """
+    """History row. Legacy snapshots are corrected once per row, never rewritten in the DB."""
+
     class Meta:
         model  = ZakatCalculation
-        fields = [
-            'id',
-            'user_email',
-            'category',
-            'year_type',
-            'total_zakat',
-            'is_below_nisab',
-            'zakat_rate_display',
-            'created_at',
-        ]
+        fields = ['id', 'user_email', 'category', 'year_type', 'zakat_rate_display', 'created_at']
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        result = history_result(obj)
+        data['total_zakat'] = f"{result['totalZakatPayable']:.2f}"
+        data['is_below_nisab'] = result.get('isBelowNisab', obj.is_below_nisab)
+        data['result'] = result
+        return data
