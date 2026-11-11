@@ -25,7 +25,7 @@ from google.auth.exceptions import GoogleAuthError
 from google.auth.exceptions import TransportError
 from functools import partial
 from requests.exceptions import RequestException
-from .authentication import authenticated_session, new_login_challenge, exchange_google_identity, lock_account_for_write
+from .authentication import authenticated_session, token_hash, new_login_challenge, exchange_google_identity, lock_account_for_write
 from .calculations import calculate
 from rest_framework.throttling import ScopedRateThrottle
 
@@ -127,7 +127,11 @@ class GoogleVerifyView(APIView):
 class LogoutView(APIView):
     def post(self, request):
         session = authenticated_session(request)
-        if session:
+        all_devices = isinstance(request.data, dict) and request.data.get('allDevices') is True
+        if session and all_devices:
+            # Revoke every session of this account, e.g. after a lost or stolen device.
+            AccessSession.objects.filter(user_email=session.user_email).delete()
+        elif session:
             session.delete()
         return Response({'loggedOut': True})
 
@@ -152,20 +156,30 @@ class AccountDataView(APIView):
             except (ValueError, TypeError):
                 return Response({'error': 'A valid deletionId UUID is required.'}, status=400)
         session = authenticated_session(request)
-        # A receipt confirms only a previous deletion, even after its session was revoked.
-        if deletion_id and AccountDeletionReceipt.objects.filter(pk=deletion_id).exists():
+        owner = token_hash(session.google_subject) if session else ''
+
+        def receipt_answer():
+            # A receipt confirms only a previous deletion, even after its session was revoked,
+            # but never answers for a different signed-in account.
+            receipt = AccountDeletionReceipt.objects.filter(pk=deletion_id).first() if deletion_id else None
+            if not receipt:
+                return None
+            if owner and receipt.account_hash and receipt.account_hash != owner:
+                return Response({'error': 'This deletionId belongs to a different account.'}, status=409)
             return Response({'deleted': True})
+
+        answer = receipt_answer()
+        if answer:
+            return answer
         if not session:
             return Response({'error': 'Valid bearer token required'}, status=401)
         with transaction.atomic():
             if not lock_account_for_write(session):
-                if deletion_id and AccountDeletionReceipt.objects.filter(pk=deletion_id).exists():
-                    return Response({'deleted': True})
-                return Response({'error': 'Valid bearer token required'}, status=401)
+                return receipt_answer() or Response({'error': 'Valid bearer token required'}, status=401)
             if deletion_id:
-                _, created = AccountDeletionReceipt.objects.get_or_create(id=deletion_id)
+                _, created = AccountDeletionReceipt.objects.get_or_create(id=deletion_id, defaults={'account_hash': owner})
                 if not created:
-                    return Response({'deleted': True})
+                    return receipt_answer()
             ZakatCalculation.objects.filter(user_email=session.user_email).delete()
             AccessSession.objects.filter(user_email=session.user_email).delete()
             GoogleIdentity.objects.filter(user_email=session.user_email).delete()

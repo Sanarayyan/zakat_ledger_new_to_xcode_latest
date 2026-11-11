@@ -16,7 +16,8 @@ For full details, see [DEPLOYMENT.md](DEPLOYMENT.md) and [FINAL_RELEASE_ACCEPTAN
 | Check | Result |
 |---|---|
 | App unit tests (`npm test`) | 156 pass, 0 fail, 4 skipped |
-| Backend tests (`manage.py test`, Python 3.12) | 28 pass, 1 skipped (PostgreSQL-only test) |
+| Backend tests (`manage.py test`, Python 3.12) | 34 pass, 1 skipped (PostgreSQL-only test, which also passes on PostgreSQL) |
+| Local security scan (Shannon) | No injection, XSS or SSRF found. Fixed: separate login rate limits, HSTS on by default, deletion receipts tied to their account, "log out everywhere" option |
 | Android debug APK build | Pass |
 | iOS build (Simulator, unsigned) | Pass |
 | Phone testing of this build (test build, iPhone via Xcode + Android APK) | **Pass** — owner reported on 11 Nov 2026 that both phones work properly; no failures reported. Checklist: `PHONE_TEST_CHECKLIST.md` |
@@ -60,6 +61,9 @@ npm run android:open         # build a signed .aab from Android Studio
 - PostgreSQL (`DJANGO_DB_ENGINE=postgresql` + `POSTGRES_*`) and Redis (`DJANGO_CACHE_LOCATION`) for production
 - Before starting the server, run `migrate`, `collectstatic`, `check --deploy`. Start it with `gunicorn zakatledger.wsgi:application`
 - Don't use or migrate the local `backend/db.sqlite3` in production.
+- **Behind a proxy or load balancer:** set `DJANGO_NUM_PROXIES` to the number of proxies, and make the proxy overwrite `X-Forwarded-For`. Without this, all users share one login rate limit (30 per minute).
+- **HSTS** is on for one year by default once the HTTPS redirect is on. Set `DJANGO_SECURE_HSTS_SECONDS=0` until HTTPS works everywhere.
+- Migration `0005` adds an owner column to deletion receipts. It is covered by the `migrate` step above.
 
 **Signing and stores**
 - Android upload keystore (kept outside git) and Play Console app
