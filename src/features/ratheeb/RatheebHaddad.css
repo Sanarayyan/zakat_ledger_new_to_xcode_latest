@@ -271,7 +271,8 @@ input:checked + .rh-slider:before {
 
 /* ACTIVE HIGHLIGHT STATE */
 .rh-dhikr-card.active-reading {
-    background: rgba(212, 175, 55, 0.08);
+    /* Tint over an opaque card so the text never sits on the wallpaper. */
+    background: linear-gradient(rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.08)), #ffffff;
     border: 1px solid rgba(212, 175, 55, 0.45);
     box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
     transform: translateY(-2px) scale(1.005);

@@ -122,7 +122,9 @@ export default function SettingsPage() {
                     {pendingDeletion && <p role="status">{t('pending_app_data_deletion')}</p>}
                     {privacyError && <p role="alert">{privacyError}</p>}
                 </section>
-                <p>Prayer, daily Ayah, and calendar event reminders are scheduled for up to seven days. Open the app online before they expire. Follow-up prayer reminders are scheduled for the current day. Daily Ayah is delivered at 9:00 AM local time. On iOS, Adhan uses a short notification sound; full background playback and a Stop control are available on Android.</p>
+                <section className="settings-card" style={{ padding: 16 }}>
+                    <p>{t('notification_schedule_note')}</p>
+                </section>
                 {/* Personal Preferences Section */}
                 <div className="settings-section-wrapper">
                     <h2 className="settings-section-title">{t('personal_preferences') || 'Personal Preferences'}</h2>

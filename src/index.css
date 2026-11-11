@@ -160,6 +160,11 @@ button {
   background-image: none;
 }
 
+/* Keep the highlighted next-prayer row; the rule above would turn it white under white text. */
+#root .prayer-row.active {
+  background: var(--p-accent);
+}
+
 .dash-location-button {
   color: var(--text-main);
   border: 1px solid var(--border);
