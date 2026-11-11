@@ -40,6 +40,12 @@ npm run android:open         # build a signed .aab from Android Studio
 
 `npm run mobile:sync:device-test` makes the **test build** used for phone testing. Never upload the test build to a store.
 
+**Store build vs test build (important):**
+- Git contains **no built app files**. Xcode and Android Studio get the app only when you run a sync command.
+- Always run `npm run mobile:sync` (with `.env.production`) right before archiving or building the `.aab`.
+- The store build removes all test items automatically: the "DEVICE TEST BUILD — local testing only" note, the test Adhan buttons, the VersionHub test note and the local tester account. This was checked on 11 Nov 2026 with a production build that used placeholder settings.
+- **Quick check before upload:** open Settings in the store build. If you see "DEVICE TEST BUILD", it is the wrong build. Run `npm run mobile:sync` again.
+
 ## 5. What your team must supply (app can't go live without these)
 
 **App settings (`.env.production`, see `.env.example`)**
