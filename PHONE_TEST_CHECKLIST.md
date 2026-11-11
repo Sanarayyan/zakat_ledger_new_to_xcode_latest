@@ -25,11 +25,22 @@ If you change the web code later, run `npm run mobile:sync:device-test` with Nod
 
 ### Android (APK file)
 1. Copy this file to the phone: `android/app/build/outputs/apk/debug/app-debug.apk`
-   (SHA-256 `d22d85c3e766798a912a083c05d4b6a88ef2133174c02e93b701209d310bdd69`)
+   (SHA-256 `34fbf98f097e0146676721c1b1136ac7134f455e573ce2d35fdc028e5cf474c9`, Settings cleanup build)
 2. On the phone, open the file and tap **Install**. Allow "install unknown apps" if asked.
 3. Install it **over** the old test app. Don't uninstall first, so you can check that your data is kept.
 
 ---
+
+## Settings cleanup retest (11 Nov 2026, quick)
+
+| # | What to do | What should happen | iPhone | Android |
+|---|---|---|---|---|
+| S1 | Open Settings | No long technical text at the top. "Personal Preferences" heading is easy to read | | |
+| S2 | Open Notifications | Last line: "To keep reminders working, open the app with internet at least once a week." | | |
+| S3 | Scroll to the bottom | "Your data" card with one short sentence and a red "Delete my app data" | | |
+| S4 | Tap "Delete my app data", then **Cancel** | One short question appears; Cancel keeps everything | | |
+| S5 | Android: Adhan card in Malayalam | Card text and buttons are in Malayalam | — | |
+| S6 | Dark theme and Malayalam | All of the above is readable | | |
 
 ## Part B — Basic checks (both phones)
 

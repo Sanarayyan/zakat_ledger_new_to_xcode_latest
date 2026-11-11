@@ -399,3 +399,40 @@ input:checked + .toggle-slider:before {
 .dark-mode .sheet-btn-cancel:active {
     background-color: var(--text-muted);
 }
+
+/* Section headings sit on the wallpaper; give them a readable surface. */
+.settings-section-wrapper > .settings-section-title {
+    align-self: flex-start;
+    background: var(--bg-card);
+    color: var(--text-main);
+    opacity: 1;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-left: 0;
+}
+
+/* Short reminder note at the end of the notifications list. */
+.settings-note {
+    padding: 14px 20px 18px;
+}
+
+/* "Your data" card at the bottom of Settings. */
+.settings-data-card {
+    padding: 18px 20px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings-delete-btn {
+    align-self: flex-start;
+    color: #d64545;
+    padding: 8px 0;
+    min-height: 44px;
+    font-weight: 600;
+}
+
+/* A shared accordion style adds bottom padding; drop it while the card is closed. */
+.accordion-card .accordion-body:not(.expanded) {
+    padding-bottom: 0;
+}
