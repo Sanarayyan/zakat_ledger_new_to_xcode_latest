@@ -7,6 +7,7 @@ import { useLanguage } from '../../LanguageContext';
 import { usePrayer } from '../../PrayerContext';
 import { getFormattedHijriDate } from '../../utils/hijri';
 import './PrayerTimes.css';
+import { appStorage } from '../../services/appStorage';
 
 const PRAYERS_LIST = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -19,6 +20,13 @@ export default function PrayerTimes() {
     const [showSetup, setShowSetup] = useState(!settings?.location && !chooseCity);
     
     const [isDark, setIsDark] = useState(document.body.classList.contains('dark-mode'));
+
+    useEffect(() => {
+        const visits = parseInt(appStorage.getItem('zakat_prayer_visits') || '0', 10) + 1;
+        appStorage.setItem('zakat_prayer_visits', visits.toString());
+        const timer = setTimeout(() => window.checkAppRating?.('prayer'), 4000);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         const observer = new MutationObserver(() => {

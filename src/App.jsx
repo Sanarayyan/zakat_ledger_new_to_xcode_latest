@@ -683,6 +683,7 @@ function UserDashboard() {
                 setSaveStatus('saved');
             }
             setShowCalcResultModal(true);
+            setTimeout(() => window.checkAppRating?.('zakat'), 1500);
         } catch (error) {
             setSaveStatus('error');
             setCalculationError(error.message);

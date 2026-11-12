@@ -38,6 +38,10 @@ export default function RatingManager() {
                     if (ratingData.reminderDate && new Date() < new Date(ratingData.reminderDate)) return; // In cooldown
                 }
 
+                // Never ask during the very first app open: let new users try the app first.
+                const launchCount = parseInt(appStorage.getItem('zakat_launch_count') || '0', 10);
+                if (launchCount < 2) return;
+
                 // Check specific conditions based on trigger
                 let shouldShow = false;
 
@@ -52,11 +56,18 @@ export default function RatingManager() {
                         daysSinceFirst = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     }
 
-                    if (launches >= 10 || daysSinceFirst >= 3) {
+                    if (launches >= 3 || daysSinceFirst >= 1) {
                         shouldShow = true;
                     }
                 } else if (triggerSource === 'tasbih') {
                     // Triggers when a tasbih session finishes
+                    shouldShow = true;
+                } else if (triggerSource === 'prayer') {
+                    // Prayer times are the most-used screen: ask on the 3rd visit
+                    const prayerVisits = parseInt(appStorage.getItem('zakat_prayer_visits') || '0', 10);
+                    if (prayerVisits >= 3) shouldShow = true;
+                } else if (triggerSource === 'zakat') {
+                    // Triggers after a zakat calculation succeeds
                     shouldShow = true;
                 } else if (triggerSource === 'qibla') {
                     // Triggers when qibla is aligned
@@ -66,7 +77,7 @@ export default function RatingManager() {
                     if (duaFavs.length >= 3) shouldShow = true;
                 } else if (triggerSource === 'quran') {
                     const quranSessions = parseInt(appStorage.getItem('zakat_quran_sessions') || '0', 10);
-                    if (quranSessions >= 10) shouldShow = true;
+                    if (quranSessions >= 3) shouldShow = true;
                 }
 
                 if (shouldShow && isActive()) {
@@ -76,7 +87,7 @@ export default function RatingManager() {
                         // Native APIs do not reveal whether a user completed a review.
                         // Space out successful requests instead of incorrectly marking them rated.
                         const nextEligibleDate = new Date();
-                        nextEligibleDate.setDate(nextEligibleDate.getDate() + 120);
+                        nextEligibleDate.setDate(nextEligibleDate.getDate() + 60);
                         await Preferences.set({
                             key: RATING_PREF_KEY,
                             value: JSON.stringify({
