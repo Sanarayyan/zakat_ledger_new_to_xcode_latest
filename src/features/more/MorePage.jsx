@@ -5,7 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../LanguageContext';
 import { pressable } from '../../utils/pressable';
 import { usePrayer } from '../../PrayerContext';
+import { Capacitor } from '@capacitor/core';
+import { InAppReview } from '@capacitor-community/in-app-review';
 import './MorePage.css';
+
+const STAR_ICON = <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.muslimplus.app';
+
+// Android opens the Play Store review page; iOS uses Apple's own rating popup.
+function rateApp() {
+    if (Capacitor.getPlatform() === 'ios') {
+        InAppReview.requestReview().catch(() => {});
+    } else {
+        window.open(PLAY_STORE_URL, Capacitor.isNativePlatform() ? '_system' : '_blank', 'noopener,noreferrer');
+    }
+}
 
 const BACK_ICON = <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>;
 const ASMA_ICON = <span style={{fontSize: '24px', fontWeight: 'bold', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>الله</span>;
@@ -190,6 +204,10 @@ export default function MorePage() {
                     <div className="feature-card" {...pressable(() => navigate('/ratheeb'), { role: 'link' })}>
                         <div className="feature-icon">{TASBIH_ICON}</div>
                         <span className="feature-label">{lang === 'ml' ? 'റാത്തീബുൽ ഹദ്ദാദ്' : 'Ratheeb al-Haddad'}</span>
+                    </div>
+                    <div className="feature-card" {...pressable(rateApp)}>
+                        <div className="feature-icon">{STAR_ICON}</div>
+                        <span className="feature-label">{lang === 'ml' ? 'ആപ്പ് റേറ്റ് ചെയ്യുക' : 'Rate this app'}</span>
                     </div>
                 </div>
             </div>
