@@ -70,6 +70,21 @@ npm run android:open         # build a signed .aab from Android Studio
 - Apple team, certificates and App Store profile for `com.muslimplus.app`
 - Privacy policy, store listings, screenshots, Data Safety / App Privacy forms
 
+**Update popup (VersionHub), for each release**
+- In VersionHub, add the new version for app `muslim_plus`, once for `android` and once for `ios`.
+- Mark it **optional** (user can tap "Later") or **mandatory** (user must update before using the app).
+- Give the store link. The app only opens these exact forms:
+  - Android: `https://play.google.com/store/apps/details?id=com.muslimplus.app`
+  - iOS: `https://apps.apple.com/app/id<APP_STORE_ID>`
+- If VersionHub is down or offline, the app opens normally (no popup, no crash).
+
+**Ratings (no setup needed)**
+- Uses the phone's own rating popup (Google / Apple). No server, key or setting.
+- Never asks on the first app open. From the 2nd open on, it asks after: 3rd Prayer Times visit, Qibla found, Tasbih finished, 3 Quran opens, a Zakat calculation, 3 favourite duas, or 3 app opens / 1 day.
+- Waits 60 days after asking (30 days if the popup failed). Google and Apple may still skip it (Apple: max 3 times a year).
+- "Rate this app" button on the More page: Android opens the Play Store page; iOS shows Apple's popup. **Send us the App Store ID** so the iOS button can open the App Store review page instead.
+- Testing: Android shows the real popup only when installed from Play **Internal testing**. iOS **TestFlight never shows it**; only the live App Store version does.
+
 ## 6. Open decisions for the owner (not code bugs)
 
 - **Sign in with Apple:** if Google login is offered on iOS, Apple may require an Apple login option too (App Review guideline 4.8). Decide before iOS submission.
